@@ -1,8 +1,8 @@
 <!-- /var/www/html/config/database.php -->
 <?php
 $host = 'localhost';
-$user = 'absensi_user';
-$pass = 'password123';
+$user = 'root';
+$pass = 'admin';
 $dbname = 'absensi_siswa';
 
 $conn = mysqli_connect($host, $user, $pass, $dbname);
