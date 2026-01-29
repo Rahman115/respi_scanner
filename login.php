@@ -1,7 +1,8 @@
 <!-- /var/www/html/login.php -->
 <?php
 session_start();
-require_once 'config/database.php';
+include "config/database.php";
+// require_once 'config/database.php';
 
 if (isset($_SESSION['user_id'])) {
     header('Location: index.php');
@@ -29,8 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
+
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

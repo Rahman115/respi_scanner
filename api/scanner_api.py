@@ -17,7 +17,7 @@ app = Flask(__name__)
 db_config = {
     'host': 'localhost',
     'user': 'absensi_user',
-    'password': 'password123',
+    'password': 'pass123',
     'database': 'absensi_siswa'
 }
 

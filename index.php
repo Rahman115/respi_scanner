@@ -1,7 +1,8 @@
 <!-- /var/www/html/index.php -->
 <?php
 session_start();
-require_once 'config/database.php';
+
+include "config/database.php";
 
 // Redirect jika belum login
 if (!isset($_SESSION['user_id'])) {
@@ -11,12 +12,16 @@ if (!isset($_SESSION['user_id'])) {
 
 // Ambil statistik
 $today = date('Y-m-d');
+
+
 $query_total = mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa");
 $query_hadir = mysqli_query($conn, "SELECT COUNT(DISTINCT siswa_id) as hadir FROM absensi WHERE tanggal = '$today' AND status = 'Hadir'");
 
 $total = mysqli_fetch_assoc($query_total)['total'];
 $hadir = mysqli_fetch_assoc($query_hadir)['hadir'];
 $tidak_hadir = $total - $hadir;
+
+
 
 // Ambil absensi hari ini
 $query_absensi = mysqli_query($conn, "
@@ -27,7 +32,10 @@ $query_absensi = mysqli_query($conn, "
     ORDER BY a.waktu DESC 
     LIMIT 10
 ");
+
+
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

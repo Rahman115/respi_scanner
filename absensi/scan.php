@@ -157,7 +157,7 @@ if (!isset($_SESSION['user_id'])) {
     // Fungsi proses scan
     async function processScan(nis) {
         try {
-            const response = await fetch('http://localhost:5000/api/scan', {
+            const response = await fetch('http://192.168.1.11/api/scan', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
