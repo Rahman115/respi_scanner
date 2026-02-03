@@ -153,11 +153,25 @@ if (!isset($_SESSION['user_id'])) {
         // Kirim ke API
         processScan(decodedText);
     }
+
+
+function getApiUrl(endpoint) {
+    // Cek apakah di localhost atau server
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1';
+    
+    if (isLocalhost) {
+        return `http://192.168.1.11:8080${endpoint}`;
+    } else {
+        return `${endpoint}`;  // relatif path untuk production
+    }
+}
+
     
     // Fungsi proses scan
     async function processScan(nis) {
         try {
-            const response = await fetch('http://192.168.1.11/api/scan', {
+            const response = await fetch(getApiUrl('/api/scan'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

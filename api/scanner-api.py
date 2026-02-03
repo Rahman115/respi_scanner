@@ -436,5 +436,6 @@ if __name__ == '__main__':
     print("  GET  /api/statistics    - Get statistics")
     print("  GET  /api/health        - Health check")
     print("=" * 50)
-    
-    app.run(host='192.168.1.11', port=80, debug=True)
+
+    # app.run(host='192.168.1.11', port=80, debug=True) 
+    app.run(host='0.0.0.0', port=8080, debug=True)

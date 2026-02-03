@@ -1,0 +1,24 @@
+<!-- test-api.html -->
+<script>
+async function testAPI() {
+    const urls = [
+        'http://192.168.1.11/api/scan',
+        'http://192.168.1.11:8080/api/test',
+        'http://localhost:8080/api/test'
+    ];
+    
+    for (let url of urls) {
+        try {
+            console.log(`Testing: ${url}`);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'}
+            });
+            console.log(`✓ ${url}: ${response.status}`);
+        } catch (error) {
+            console.error(`✗ ${url}: ${error.message}`);
+        }
+    }
+}
+testAPI();
+</script>
