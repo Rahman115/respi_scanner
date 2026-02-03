@@ -157,14 +157,16 @@ if (!isset($_SESSION['user_id'])) {
 
 function getApiUrl(endpoint) {
     // Cek apakah di localhost atau server
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                        window.location.hostname === '127.0.0.1';
-    
-    if (isLocalhost) {
+//     const isLocalhost = window.location.hostname === 'localhost' || 
+   //                     window.location.hostname === '127.0.0.1';
+//	console.log(isLocalhost);    
+
+
+  //  if (isLocalhost) {
         return `http://192.168.1.11:8080${endpoint}`;
-    } else {
-        return `${endpoint}`;  // relatif path untuk production
-    }
+  //  } else {
+  //      return `http://192.168.1.11:8080${endpoint}`;  // relatif path untuk production
+  //  }
 }
 
     
