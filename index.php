@@ -47,8 +47,8 @@ $query_absensi = mysqli_query($conn, "
     <?php include 'includes/header.php'; ?>
     
     <div class="content">
-        <h1>Selamat Datang, <?php echo $_SESSION['nama']; ?>!</h1>
-        <p>Dashboard Sistem Absensi Siswa</p>
+        <h1>SMKN 4 Buton Utara</h1>
+        <p>Dashboard Sistem Absensi Siswa [ login : <?php echo $_SESSION['nama']; ?>]</p>
         
         <!-- Stats Cards -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">

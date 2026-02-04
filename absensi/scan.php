@@ -105,7 +105,7 @@ if (!isset($_SESSION['user_id'])) {
             
             <div class="manual-input">
                 <h3>Atau Input Manual</h3>
-                <input type="text" id="manual-nis" placeholder="Masukkan NIS siswa">
+                <input type="text" id="manual-nis" placeholder="Masukkan NIS siswa" autofocus>
                 <button onclick="processManualScan()">Submit</button>
             </div>
             
