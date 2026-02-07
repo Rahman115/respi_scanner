@@ -257,6 +257,73 @@ def check_database():
             'message': str(e)
         }), 500
 
+# =========================================
+#  CRUD SISWA
+# ==========================================
+
+@app.route('/api/student', methods=['POST'])
+def create_student():
+	try:
+		data = request.get_json()
+
+		nis = data.get('nis')
+		nama = data.get('nama')
+		kelas = data.get('kelas')
+
+# cek data kosong
+		if not nis or not nama or not kelas :
+		  return jsonify({
+		    'success': False,
+		    'message': 'nis, nama dan kelas wajib di isi'
+		  }), 400
+
+# connect database
+		conn = connect_db()
+		if not conn:
+		  return jsonify({
+			'success': False, 
+			'message': 'Cannot connect to database'
+		  }), 500
+
+		cursor = conn.cursor(dictionary=True)
+
+# cek NIS sudah ada atau belum
+		cursor.execute("SELECT id FROM siswa WHERE nis = %s", (nis,))
+		if cursor.fetchone():
+		  cursor.close()
+		  conn.close()
+		  return jsonify({
+		    'success': False,
+		    'message': 'NIS sudah terdaftar'
+		  }), 409
+
+# input data siswa
+		cursor.execute(
+		  "INSERT INTO siswa (nis, nama, kelas) VALUES (%s, %s, %s)",
+		  (nis, nama, kelas)
+		)
+		conn.commit()
+
+		cursor.close()
+		conn.close()
+
+		return jsonify({
+			'success': True,
+			'message': 'Siswa berhasil ditambahkan'
+		}), 201
+
+	except Exception as e:
+		return jsonify({
+			'success': False,
+			'message': str(e)
+			}),500
+
+	finally:
+    # Pastikan koneksi ditutup
+	    if 'conn' in locals() and conn:
+	        conn.close()
+
+
 # ===========================================
 # ENDPOINT TANPA DATABASE (UNTUK TESTING)
 # ===========================================
