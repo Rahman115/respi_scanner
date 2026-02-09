@@ -71,15 +71,15 @@ def test_api():
 @app.route('/api/scan', methods=['POST', 'OPTIONS'])
 def process_scan():
     """Process barcode scan"""
-    
+
     logger.info(f"Scan endpoint called with method: {request.method}")
-    
+
     # Handle preflight OPTIONS request
     if request.method == 'OPTIONS':
         logger.info("Handling OPTIONS preflight request")
         response = jsonify({'status': 'preflight'})
         return response
-    
+
     try:
         # Parse JSON data
         if not request.is_json:
@@ -88,10 +88,10 @@ def process_scan():
                 'success': False,
                 'message': 'Content-Type must be application/json'
             }), 400
-        
+
         data = request.get_json()
         logger.info(f"Received data: {data}")
-        
+
         # Validate required fields
         if not data or 'nis' not in data:
             logger.warning("Missing 'nis' in request")
@@ -99,14 +99,14 @@ def process_scan():
                 'success': False,
                 'message': 'NIS is required in JSON body'
             }), 400
-        
+
         nis = str(data['nis']).strip()
         if not nis:
             return jsonify({
                 'success': False,
                 'message': 'NIS cannot be empty'
             }), 400
-        
+
         # Connect to database
         conn = connect_db()
         if not conn:
@@ -114,18 +114,17 @@ def process_scan():
                 'success': False,
                 'message': 'Database connection failed'
             }), 500
-        
+
         cursor = conn.cursor(dictionary=True)
-        
+
         # TEST: Cek apakah tabel ada
         cursor.execute("SHOW TABLES")
         tables = cursor.fetchall()
         logger.info(f"Available tables: {tables}")
-        
+
         # 1. Cari siswa berdasarkan NIS
         cursor.execute("SELECT * FROM siswa WHERE nis = %s", (nis,))
         siswa = cursor.fetchone()
-        
         if not siswa:
             cursor.close()
             conn.close()
@@ -134,9 +133,7 @@ def process_scan():
                 'success': False,
                 'message': f'Siswa dengan NIS {nis} tidak ditemukan'
             }), 404
-        
         logger.info(f"Student found: {siswa['nama']}")
-        
         # 2. Cek apakah sudah absen hari ini
         today = date.today()
         cursor.execute(
@@ -144,7 +141,7 @@ def process_scan():
             (siswa['id'], today)
         )
         existing = cursor.fetchone()
-        
+
         if existing:
             cursor.close()
             conn.close()
@@ -159,7 +156,7 @@ def process_scan():
                 },
                 'attendance_time': str(existing['waktu']) if 'waktu' in existing else 'Unknown'
             }), 409
-        
+
         # 3. Simpan absensi
         now = datetime.now()
         cursor.execute(
@@ -168,18 +165,18 @@ def process_scan():
                VALUES (%s, %s, %s, %s, %s, %s, %s)""",
             (siswa['id'], siswa['nis'], today, now.time(), 'Hadir', 'Scanner', 'Ruang Scan')
         )
-        
+
         conn.commit()
-        
+
         # Get inserted ID
         cursor.execute("SELECT LAST_INSERT_ID() as id")
         attendance_id = cursor.fetchone()['id']
-        
+
         cursor.close()
         conn.close()
-        
+
         logger.info(f"Attendance saved for {siswa['nama']}, ID: {attendance_id}")
-        
+
         # Success response
         return jsonify({
             'success': True,
@@ -199,14 +196,14 @@ def process_scan():
             },
             'timestamp': now.isoformat()
         })
-        
+
     except mysql.connector.Error as db_err:
         logger.error(f"Database error: {db_err}")
         return jsonify({
             'success': False,
             'message': f'Database error: {db_err}'
         }), 500
-        
+
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         return jsonify({
@@ -221,25 +218,25 @@ def check_database():
         conn = connect_db()
         if not conn:
             return jsonify({'success': False, 'message': 'Cannot connect to database'}), 500
-        
+
         cursor = conn.cursor(dictionary=True)
-        
+
         # Check tables
         cursor.execute("SHOW TABLES")
         tables = [list(table.values())[0] for table in cursor.fetchall()]
-        
+
         # Check students count
         cursor.execute("SELECT COUNT(*) as count FROM siswa")
         student_count = cursor.fetchone()['count']
-        
+
         # Check today's attendance
         today = date.today()
         cursor.execute("SELECT COUNT(*) as count FROM absensi WHERE tanggal = %s", (today,))
         attendance_count = cursor.fetchone()['count']
-        
+
         cursor.close()
         conn.close()
-        
+
         return jsonify({
             'success': True,
             'database': db_config['database'],
@@ -250,7 +247,7 @@ def check_database():
             },
             'timestamp': datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         return jsonify({
             'success': False,
@@ -259,6 +256,7 @@ def check_database():
 
 # =========================================
 #  CRUD SISWA
+# 1. Tambah Siswa
 # ==========================================
 
 @app.route('/api/student', methods=['POST'])
@@ -270,14 +268,14 @@ def create_student():
 		nama = data.get('nama')
 		kelas = data.get('kelas')
 
-# cek data kosong
+                # cek data kosong
 		if not nis or not nama or not kelas :
 		  return jsonify({
 		    'success': False,
 		    'message': 'nis, nama dan kelas wajib di isi'
 		  }), 400
 
-# connect database
+                # connect database
 		conn = connect_db()
 		if not conn:
 		  return jsonify({
@@ -287,7 +285,7 @@ def create_student():
 
 		cursor = conn.cursor(dictionary=True)
 
-# cek NIS sudah ada atau belum
+                # cek NIS sudah ada atau belum
 		cursor.execute("SELECT id FROM siswa WHERE nis = %s", (nis,))
 		if cursor.fetchone():
 		  cursor.close()
@@ -323,6 +321,118 @@ def create_student():
 	    if 'conn' in locals() and conn:
 	        conn.close()
 
+
+# 2. READ - Ambil semua siswa
+
+@app.route('/api/students', methods=['GET'])
+def get_students():
+  conn = connect_db()
+  cursor = conn.cursor(dictionary=True)
+
+  cursor.execute("SELECT id, nis, nama, kelas FROM siswa ORDER BY kelas, nama")
+  students = cursor.fetchall()
+
+  cursor.close()
+  conn.close()
+
+  return jsonify({
+    'success': True,
+    'data': students
+  })
+
+# 3. UPDATE - Ubah data siswa
+@app.route('/api/student/<nis>', methods=['PUT'])
+def update_student(nis):
+	try:
+		data = request.get_json()
+		nama = data.get('nama')
+		kelas = data.get('kelas')
+
+		if not nama and not kelas:
+		  return jsonify({
+		    'success': False,
+		    'message': 'Tidak ada data yang diubah'
+		  }), 400
+
+		conn = connect_db()
+		cursor = conn.cursor(dictionary=True)
+
+		cursor.execute("SELECT id FROM siswa WHERE nis = %s", (nis,))
+		siswa = cursor.fetchone()
+
+		if not siswa:
+		  cursor.close()
+		  conn.close()
+		  return jsonify({
+		  'success': False,
+		  'message': 'Siswa tidak ditemukan'
+		  }), 400
+
+		if nama and kelas:
+		  cursor.execute(
+		    "UPDATE siswa SET nama = %s, kelas = %s WHERE nis = %s",
+		    (nama, kelas, nis)
+		  )
+		elif nama:
+		  cursor.execute(
+		    "UPDATE siswa SET nama = %s WHERE nis = %s",
+		    (nama, nis)
+		  )
+		elif kelas:
+		  cursor.execute(
+		    "UPDATE siswa SET kelas SET kelas = %s WHERE nis = %s",
+		    (kelas, nis)
+		  )
+
+		conn.commit()
+		cursor.close()
+		conn.close()
+
+		return jsonify({
+		  'success': True,
+		  'message': 'Data siswa berhasil diperbaharui'
+		})
+
+	except Exception as e:
+		return jsonify({
+		  'success': False,
+		  'message': str(e)
+		}), 500
+
+
+# 4. DELETE - Hapus siswa
+@app.route('/api/student/<nis>', methods=['DELETE'])
+def delete_student(nis):
+	try:
+		conn = connect_db()
+		cursor = conn.cursor(dictionary=True)
+
+		cursor.execute("SELECT id FROM siswa WHERE nis = %s",(nis,))
+		siswa = cursor.fetchone()
+
+		if not siswa:
+			cursor.close()
+			conn.close()
+			return jsonify({
+				'success': False,
+				'message': 'Siswa tidak ditemukan'
+			}), 404
+
+		cursor.execute("DELETE FROM siswa WHERE nis = %s", (nis,))
+		conn.commit()
+
+		cursor.close()
+		conn.close()
+
+		return jsonify({
+		  'success': True,
+		  'message': 'Siswa berhasil dihapus'
+		})
+	except Exception as e:
+		return jsonify({
+		  'success': False,
+		  'message': str(e)
+		}), 500
 
 # ===========================================
 # ENDPOINT TANPA DATABASE (UNTUK TESTING)
