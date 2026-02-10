@@ -241,7 +241,7 @@ def verify_qr_code():
         logger.info(f"QR data received: {json.dumps(qr_data)}")
 
         logger.info(
-            f"QR scan attempt | NIS={qr_data.get('nis')} | IP={request.remote_addr}"
+            f"QR scan attempt - qr_data.get | NIS={qr_data.get('nis')} | IP={request.remote_addr}"
         )
 
         # Cek apakah nis ada dalam qr_data
@@ -255,7 +255,7 @@ def verify_qr_code():
         nis_value = qr_data.get('nis')
 
         logger.info(
-            f"QR scan attempt | NIS={nis_value} | IP={request.remote_addr}"
+            f"QR scan attempt - nis_value | NIS={nis_value} | IP={request.remote_addr}"
         )
 
 
@@ -289,7 +289,7 @@ def verify_qr_code():
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute(
-            "SELECT id, nisn, nama, kelas, card_version FROM siswa WHERE nis = %s",
+            "SELECT id, nis, nama, kelas, card_version FROM siswa WHERE nis = %s",
             (nis_value,)
         )
         student = cursor.fetchone()
@@ -368,7 +368,7 @@ def verify_qr_code():
             """INSERT INTO absensi
                (siswa_id, nis, tanggal, waktu, status, metode, scanner_lokasi) 
                VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (student['id'], student['nis'], today, now.time(), 'Hadir', 'QR Code', location)
+            (student['id'], student['nis'], today, now.time(), 'Hadir', 'scanner', location)
         )
 
         conn.commit()
@@ -483,6 +483,42 @@ def generate_bulk_qr():
     except Exception as e:
         logger.error(f"Bulk QR generation error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+
+@app.route('/api/debug/table-structure', methods=['GET'])
+def debug_table_structure():
+    """Debug endpoint to check table structure"""
+    try:
+        conn = connect_db()
+        if not conn:
+            return jsonify({'success': False, 'message': 'Database error'}), 500
+        
+        cursor = conn.cursor(dictionary=True)
+        
+        # Cek struktur tabel siswa
+        cursor.execute("DESCRIBE siswa")
+        siswa_structure = cursor.fetchall()
+        
+        # Cek beberapa data sample
+        cursor.execute("SELECT nis, nisn, nama, kelas, card_version FROM siswa LIMIT 5")
+        sample_data = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'siswa_structure': siswa_structure,
+            'sample_data': sample_data
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+
+
 
 # ===========================================
 # SCANNER ENDPOINTS (Backward Compatibility)

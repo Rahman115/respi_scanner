@@ -4311,3 +4311,250 @@
 2026-02-10 23:33:00,558 - __main__ - INFO - Host: 0.0.0.0:8080
 2026-02-10 23:33:00,558 - __main__ - INFO - QR Secret Configured: Yes
 2026-02-10 23:33:00,558 - __main__ - INFO - ==================================================
+2026-02-10 23:45:38,440 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-10 23:45:38,441 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:45:38,441 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:45:38,459 - __main__ - ERROR - QR verification error: 'nis'
+2026-02-10 23:45:38,461 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:45:38] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-10 23:45:46,386 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-10 23:45:46,388 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:45:46,389 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:45:46,398 - __main__ - ERROR - QR verification error: 'nis'
+2026-02-10 23:45:46,401 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:45:46] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-10 23:46:01,779 - __main__ - INFO - ==================================================
+2026-02-10 23:46:01,779 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:46:01,780 - __main__ - INFO - Time: 2026-02-10 23:46:01
+2026-02-10 23:46:01,780 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:46:01,780 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:46:01,780 - __main__ - INFO - ==================================================
+2026-02-10 23:46:12,647 - __main__ - INFO - ==================================================
+2026-02-10 23:46:12,647 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:46:12,648 - __main__ - INFO - Time: 2026-02-10 23:46:12
+2026-02-10 23:46:12,648 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:46:12,648 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:46:12,648 - __main__ - INFO - ==================================================
+2026-02-10 23:46:23,653 - __main__ - INFO - ==================================================
+2026-02-10 23:46:23,653 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:46:23,653 - __main__ - INFO - Time: 2026-02-10 23:46:23
+2026-02-10 23:46:23,654 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:46:23,654 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:46:23,654 - __main__ - INFO - ==================================================
+2026-02-10 23:46:34,618 - __main__ - INFO - ==================================================
+2026-02-10 23:46:34,619 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:46:34,619 - __main__ - INFO - Time: 2026-02-10 23:46:34
+2026-02-10 23:46:34,619 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:46:34,619 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:46:34,619 - __main__ - INFO - ==================================================
+2026-02-10 23:46:40,729 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-10 23:46:40,729 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:46:40,729 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:46:40,735 - __main__ - ERROR - QR verification error: 'nis'
+2026-02-10 23:46:40,737 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:46:40] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-10 23:46:43,917 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-10 23:46:43,917 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:46:43,918 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:46:43,927 - __main__ - ERROR - QR verification error: 'nis'
+2026-02-10 23:46:43,930 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:46:43] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-10 23:46:45,640 - __main__ - INFO - ==================================================
+2026-02-10 23:46:45,640 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:46:45,640 - __main__ - INFO - Time: 2026-02-10 23:46:45
+2026-02-10 23:46:45,640 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:46:45,641 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:46:45,641 - __main__ - INFO - ==================================================
+2026-02-10 23:48:25,478 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-10 23:48:25,478 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:48:25,479 - __main__ - INFO - QR scan attempt | NIS=626 | IP=127.0.0.1
+2026-02-10 23:48:25,483 - __main__ - ERROR - QR verification error: 'nis'
+2026-02-10 23:48:25,484 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:48:25] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-10 23:50:40,487 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:50:40] "[33mGET /api/debug/table-structure HTTP/1.1[0m" 404 -
+2026-02-10 23:50:57,712 - __main__ - INFO - ==================================================
+2026-02-10 23:50:57,712 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:50:57,712 - __main__ - INFO - Time: 2026-02-10 23:50:57
+2026-02-10 23:50:57,712 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:50:57,712 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:50:57,713 - __main__ - INFO - ==================================================
+2026-02-10 23:51:08,635 - __main__ - INFO - ==================================================
+2026-02-10 23:51:08,635 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:51:08,636 - __main__ - INFO - Time: 2026-02-10 23:51:08
+2026-02-10 23:51:08,636 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:51:08,636 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:51:08,636 - __main__ - INFO - ==================================================
+2026-02-10 23:51:13,450 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:51:13] "[33mGET /api/debug/table-structure HTTP/1.1[0m" 404 -
+2026-02-10 23:51:19,596 - __main__ - INFO - ==================================================
+2026-02-10 23:51:19,596 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:51:19,596 - __main__ - INFO - Time: 2026-02-10 23:51:19
+2026-02-10 23:51:19,596 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:51:19,596 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:51:19,597 - __main__ - INFO - ==================================================
+2026-02-10 23:52:31,471 - __main__ - INFO - ==================================================
+2026-02-10 23:52:31,472 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:52:31,472 - __main__ - INFO - Time: 2026-02-10 23:52:31
+2026-02-10 23:52:31,472 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:52:31,472 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:52:31,472 - __main__ - INFO - ==================================================
+2026-02-10 23:52:42,390 - __main__ - INFO - ==================================================
+2026-02-10 23:52:42,391 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:52:42,400 - __main__ - INFO - Time: 2026-02-10 23:52:42
+2026-02-10 23:52:42,401 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:52:42,402 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:52:42,402 - __main__ - INFO - ==================================================
+2026-02-10 23:52:45,132 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:52:45] "[33mGET /api/debug/table-structure HTTP/1.1[0m" 404 -
+2026-02-10 23:52:53,395 - __main__ - INFO - ==================================================
+2026-02-10 23:52:53,395 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:52:53,395 - __main__ - INFO - Time: 2026-02-10 23:52:53
+2026-02-10 23:52:53,395 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:52:53,396 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:52:53,396 - __main__ - INFO - ==================================================
+2026-02-10 23:53:04,448 - __main__ - INFO - ==================================================
+2026-02-10 23:53:04,448 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:53:04,448 - __main__ - INFO - Time: 2026-02-10 23:53:04
+2026-02-10 23:53:04,449 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:53:04,449 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:53:04,449 - __main__ - INFO - ==================================================
+2026-02-10 23:53:15,678 - __main__ - INFO - ==================================================
+2026-02-10 23:53:15,679 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:53:15,680 - __main__ - INFO - Time: 2026-02-10 23:53:15
+2026-02-10 23:53:15,680 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:53:15,681 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:53:15,681 - __main__ - INFO - ==================================================
+2026-02-10 23:56:26,762 - __main__ - INFO - ==================================================
+2026-02-10 23:56:26,762 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:56:26,763 - __main__ - INFO - Time: 2026-02-10 23:56:26
+2026-02-10 23:56:26,763 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:56:26,763 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:56:26,763 - __main__ - INFO - ==================================================
+2026-02-10 23:57:30,815 - __main__ - INFO - ==================================================
+2026-02-10 23:57:30,815 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:57:30,816 - __main__ - INFO - Time: 2026-02-10 23:57:30
+2026-02-10 23:57:30,816 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:57:30,816 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:57:30,816 - __main__ - INFO - ==================================================
+2026-02-10 23:59:06,016 - __main__ - INFO - ==================================================
+2026-02-10 23:59:06,017 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:59:06,017 - __main__ - INFO - Time: 2026-02-10 23:59:06
+2026-02-10 23:59:06,017 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:59:06,017 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:59:06,017 - __main__ - INFO - ==================================================
+2026-02-10 23:59:10,330 - __main__ - INFO - ==================================================
+2026-02-10 23:59:10,331 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:59:10,331 - __main__ - INFO - Time: 2026-02-10 23:59:10
+2026-02-10 23:59:10,331 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:59:10,331 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:59:10,331 - __main__ - INFO - ==================================================
+2026-02-10 23:59:16,899 - __main__ - INFO - ==================================================
+2026-02-10 23:59:16,900 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:59:16,900 - __main__ - INFO - Time: 2026-02-10 23:59:16
+2026-02-10 23:59:16,900 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:59:16,900 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:59:16,900 - __main__ - INFO - ==================================================
+2026-02-10 23:59:18,572 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:59:18] "[33mGET /api/debug/table-structure HTTP/1.1[0m" 404 -
+2026-02-10 23:59:21,774 - werkzeug - INFO - 127.0.0.1 - - [10/Feb/2026 23:59:21] "[33mGET /api/debug/table-structure HTTP/1.1[0m" 404 -
+2026-02-10 23:59:27,868 - __main__ - INFO - ==================================================
+2026-02-10 23:59:27,868 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:59:27,869 - __main__ - INFO - Time: 2026-02-10 23:59:27
+2026-02-10 23:59:27,869 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:59:27,869 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:59:27,869 - __main__ - INFO - ==================================================
+2026-02-10 23:59:38,906 - __main__ - INFO - ==================================================
+2026-02-10 23:59:38,906 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:59:38,906 - __main__ - INFO - Time: 2026-02-10 23:59:38
+2026-02-10 23:59:38,907 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:59:38,907 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:59:38,907 - __main__ - INFO - ==================================================
+2026-02-10 23:59:49,882 - __main__ - INFO - ==================================================
+2026-02-10 23:59:49,882 - __main__ - INFO - Starting Absensi API Server
+2026-02-10 23:59:49,882 - __main__ - INFO - Time: 2026-02-10 23:59:49
+2026-02-10 23:59:49,882 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-10 23:59:49,883 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-10 23:59:49,883 - __main__ - INFO - ==================================================
+2026-02-11 00:02:46,630 - __main__ - INFO - ==================================================
+2026-02-11 00:02:46,631 - __main__ - INFO - Starting Absensi API Server
+2026-02-11 00:02:46,632 - __main__ - INFO - Time: 2026-02-11 00:02:46
+2026-02-11 00:02:46,632 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-11 00:02:46,632 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-11 00:02:46,633 - __main__ - INFO - ==================================================
+2026-02-11 00:02:46,640 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.43.3:8080
+2026-02-11 00:02:46,640 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-11 00:04:20,118 - __main__ - INFO - ==================================================
+2026-02-11 00:04:20,119 - __main__ - INFO - Starting Absensi API Server
+2026-02-11 00:04:20,119 - __main__ - INFO - Time: 2026-02-11 00:04:20
+2026-02-11 00:04:20,119 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-11 00:04:20,119 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-11 00:04:20,119 - __main__ - INFO - ==================================================
+2026-02-11 00:04:20,126 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.43.3:8080
+2026-02-11 00:04:20,126 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-11 00:04:32,584 - __main__ - INFO - ==================================================
+2026-02-11 00:04:32,584 - __main__ - INFO - Starting Absensi API Server
+2026-02-11 00:04:32,585 - __main__ - INFO - Time: 2026-02-11 00:04:32
+2026-02-11 00:04:32,585 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-11 00:04:32,585 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-11 00:04:32,585 - __main__ - INFO - ==================================================
+2026-02-11 00:05:40,919 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:05:40] "GET /api/debug/table-structure HTTP/1.1" 200 -
+2026-02-11 00:05:49,212 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-11 00:05:49,213 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=626 | IP=127.0.0.1
+2026-02-11 00:05:49,214 - __main__ - INFO - QR scan attempt - nis_value | NIS=626 | IP=127.0.0.1
+2026-02-11 00:05:49,224 - __main__ - ERROR - QR verification error: 1265 (01000): Data truncated for column 'metode' at row 1
+2026-02-11 00:05:49,227 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:05:49] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-11 00:09:10,417 - __main__ - INFO - ==================================================
+2026-02-11 00:09:10,417 - __main__ - INFO - Starting Absensi API Server
+2026-02-11 00:09:10,417 - __main__ - INFO - Time: 2026-02-11 00:09:10
+2026-02-11 00:09:10,418 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-11 00:09:10,418 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-11 00:09:10,418 - __main__ - INFO - ==================================================
+2026-02-11 00:12:38,516 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-11 00:12:38,518 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=626 | IP=127.0.0.1
+2026-02-11 00:12:38,518 - __main__ - INFO - QR scan attempt - nis_value | NIS=626 | IP=127.0.0.1
+2026-02-11 00:12:38,526 - __main__ - ERROR - QR verification error: 1265 (01000): Data truncated for column 'metode' at row 1
+2026-02-11 00:12:38,528 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:12:38] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-11 00:12:44,643 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-11 00:12:44,644 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=626 | IP=127.0.0.1
+2026-02-11 00:12:44,644 - __main__ - INFO - QR scan attempt - nis_value | NIS=626 | IP=127.0.0.1
+2026-02-11 00:12:44,653 - __main__ - ERROR - QR verification error: 1265 (01000): Data truncated for column 'metode' at row 1
+2026-02-11 00:12:44,656 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:12:44] "[35m[1mPOST /api/qr/verify HTTP/1.1[0m" 500 -
+2026-02-11 00:13:19,064 - __main__ - INFO - ==================================================
+2026-02-11 00:13:19,065 - __main__ - INFO - Starting Absensi API Server
+2026-02-11 00:13:19,065 - __main__ - INFO - Time: 2026-02-11 00:13:19
+2026-02-11 00:13:19,065 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-11 00:13:19,065 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-11 00:13:19,066 - __main__ - INFO - ==================================================
+2026-02-11 00:13:19,072 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.43.3:8080
+2026-02-11 00:13:19,073 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-11 00:13:20,574 - __main__ - INFO - ==================================================
+2026-02-11 00:13:20,574 - __main__ - INFO - Starting Absensi API Server
+2026-02-11 00:13:20,574 - __main__ - INFO - Time: 2026-02-11 00:13:20
+2026-02-11 00:13:20,575 - __main__ - INFO - Host: 0.0.0.0:8080
+2026-02-11 00:13:20,575 - __main__ - INFO - QR Secret Configured: Yes
+2026-02-11 00:13:20,575 - __main__ - INFO - ==================================================
+2026-02-11 00:13:36,520 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-11 00:13:36,521 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=626 | IP=127.0.0.1
+2026-02-11 00:13:36,521 - __main__ - INFO - QR scan attempt - nis_value | NIS=626 | IP=127.0.0.1
+2026-02-11 00:13:36,549 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:13:36] "POST /api/qr/verify HTTP/1.1" 200 -
+2026-02-11 00:14:14,269 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-11 00:14:14,269 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=626 | IP=127.0.0.1
+2026-02-11 00:14:14,270 - __main__ - INFO - QR scan attempt - nis_value | NIS=626 | IP=127.0.0.1
+2026-02-11 00:14:14,283 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:14:14] "[31m[1mPOST /api/qr/verify HTTP/1.1[0m" 409 -
+2026-02-11 00:15:28,940 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:15:28] "OPTIONS /api/qr/verify HTTP/1.1" 200 -
+2026-02-11 00:15:28,951 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "626", "student_id": 1, "card_version": 1, "signature": "bf350f99c4ae4a3db238738ecdf8cfd9769fb07149aa0c330e13936731fa0b9f"}
+2026-02-11 00:15:28,951 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=626 | IP=127.0.0.1
+2026-02-11 00:15:28,951 - __main__ - INFO - QR scan attempt - nis_value | NIS=626 | IP=127.0.0.1
+2026-02-11 00:15:28,959 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:15:28] "[31m[1mPOST /api/qr/verify HTTP/1.1[0m" 409 -
+2026-02-11 00:16:54,951 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:16:54] "OPTIONS /api/qr/generate/627 HTTP/1.1" 200 -
+2026-02-11 00:16:55,126 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:16:55] "GET /api/qr/generate/627 HTTP/1.1" 200 -
+2026-02-11 00:17:42,187 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:17:42] "OPTIONS /api/qr/verify HTTP/1.1" 200 -
+2026-02-11 00:17:42,196 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "627", "student_id": 2, "card_version": 1, "signature": "69d2112b67d626c3b0e087e923f77c17f40f87c47d0be81252174093e5855af5"}
+2026-02-11 00:17:42,196 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=627 | IP=127.0.0.1
+2026-02-11 00:17:42,196 - __main__ - INFO - QR scan attempt - nis_value | NIS=627 | IP=127.0.0.1
+2026-02-11 00:17:42,213 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:17:42] "POST /api/qr/verify HTTP/1.1" 200 -
+2026-02-11 00:17:42,261 - __main__ - INFO - QR data received: {"type": "student_card", "nis": "627", "student_id": 2, "card_version": 1, "signature": "69d2112b67d626c3b0e087e923f77c17f40f87c47d0be81252174093e5855af5"}
+2026-02-11 00:17:42,261 - __main__ - INFO - QR scan attempt - qr_data.get | NIS=627 | IP=127.0.0.1
+2026-02-11 00:17:42,262 - __main__ - INFO - QR scan attempt - nis_value | NIS=627 | IP=127.0.0.1
+2026-02-11 00:17:42,268 - werkzeug - INFO - 127.0.0.1 - - [11/Feb/2026 00:17:42] "[31m[1mPOST /api/qr/verify HTTP/1.1[0m" 409 -
