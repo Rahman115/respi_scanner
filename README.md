@@ -112,6 +112,26 @@ pip install flask flask-cors pillow qrcode
 chmod 755 -R /path/to/absensi
 ```
 
+### 6. Identifikasi dan hentikan proses yang menggunakan port 8080
+```bash
+# Cari PID proses yang menggunakan port 8080
+sudo lsof -i :8080
+
+sudo netstat -tulpn | grep :8080 # alternaif lain
+
+# Hentikan proses tersebut
+sudo kill -9 <PID>
+sleep 2 # tunggu beberapa saat
+
+# Verifikasi port sudah kosong
+sudo lsof -i :8080
+
+# Jalankan ulang API Anda
+python3 api.py
+
+
+```
+
 ## 🏃 CARA MENJALANKAN
 
 ### 1. Start Web Server
