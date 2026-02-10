@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kartu Siswa - QR</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f4;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            width: 300px;
+            border-radius: 8px;
+        }
+        img {
+            width: 200px;
+            height: 200px;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h3>Kartu Siswa</h3>
+    <input type="text" id="nis" placeholder="Masukkan NIS">
+    <button onclick="generateQR()">Generate QR</button>
+
+    <img id="qrImage" alt="QR akan muncul di sini">
+    <p id="status"></p>
+</div>
+
+<script src="../js/qr.js"></script>
+</body>
+</html>

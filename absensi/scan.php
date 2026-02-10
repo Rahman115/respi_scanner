@@ -163,7 +163,7 @@ function getApiUrl(endpoint) {
 
 
   //  if (isLocalhost) {
-        return `http://192.168.1.11:8080${endpoint}`;
+        return `http://localhost:8080${endpoint}`;
   //  } else {
   //      return `http://192.168.1.11:8080${endpoint}`;  // relatif path untuk production
   //  }
@@ -182,21 +182,21 @@ function getApiUrl(endpoint) {
             });
             
             const result = await response.json();
-            
+	    console.log(result);
             if (result.success) {
                 // Tampilkan success
                 document.getElementById('result-text').innerHTML = 
                     '<span class="success">✅ Scan berhasil diproses!</span>';
-                
+
                 // Tampilkan info siswa
-                document.getElementById('student-name').textContent = result.siswa.nama;
-                document.getElementById('student-class').textContent = result.siswa.kelas;
-                document.getElementById('scan-time').textContent = result.siswa.waktu;
+                document.getElementById('student-name').textContent = result.student.nama;
+                document.getElementById('student-class').textContent = result.student.kelas;
+                document.getElementById('scan-time').textContent = result.attendance.time;
                 document.getElementById('student-info').style.display = 'block';
-                
+
                 // Play success sound
                 playBeep();
-                
+
                 // Reset setelah 3 detik
                 setTimeout(() => {
                     document.getElementById('student-info').style.display = 'none';

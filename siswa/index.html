@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Siswa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        form, table {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+        }
+        button {
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .btn-edit {
+            color: blue;
+        }
+        .btn-delete {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Manajemen Data Siswa</h1>
+
+<form id="studentForm">
+    <input type="hidden" id="oldNis">
+
+    <label>NIS</label><br>
+    <input type="text" id="nis" required><br>
+
+    <label>Nama</label><br>
+    <input type="text" id="nama" required><br>
+
+    <label>Kelas</label><br>
+    <input type="text" id="kelas" required><br>
+
+    <button type="submit">Simpan</button>
+    <button type="button" onclick="resetForm()">Batal</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>NIS</th>
+            <th>Nama</th>
+            <th>Kelas</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody id="studentTable"></tbody>
+</table>
+
+<script src="app.js"></script>
+</body>
+</html>

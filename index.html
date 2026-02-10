@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h1>Dashboard Absensi</h1>
+
+<div id="userInfo"></div>
+
+<button onclick="logout()">Logout</button>
+
+<script src="app.js"></script>
+
+<script>
+    // Proteksi halaman
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "login.html";
+    }
+
+    // Tampilkan info user (opsional)
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (user.nama) {
+        document.getElementById("userInfo").innerText =
+            `Login sebagai: ${user.nama} (${user.role})`;
+    }
+
+    function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>
