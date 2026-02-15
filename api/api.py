@@ -650,7 +650,7 @@ def process_scan():
             (student['id'], today)
         )
         existing = cursor.fetchone()
-        
+
         if existing:
             cursor.close()
             conn.close()
@@ -658,7 +658,7 @@ def process_scan():
                 'success': False, 
                 'message': f'{student["nama"]} sudah absen hari ini'
             }), 409
-        
+
         # Save attendance
         now = datetime.now()
         cursor.execute(
@@ -667,11 +667,11 @@ def process_scan():
                VALUES (%s, %s, %s, %s, %s, %s, %s)""",
             (student['id'], student['nis'], today, now.time(), 'Hadir', 'Scanner', location)
         )
-        
+
         conn.commit()
         cursor.close()
         conn.close()
-        
+
         return jsonify({
             'success': True,
             'message': 'Absensi berhasil',
@@ -686,7 +686,7 @@ def process_scan():
                 'method': 'Scanner'
             }
         })
-        
+
     except Exception as e:
         logger.error(f"Scan processing error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -900,15 +900,15 @@ def get_today_attendance():
     try:
         kelas = request.args.get('kelas')
         status = request.args.get('status')
-        
+
         today = date.today()
-        
+
         conn = connect_db()
         if not conn:
             return jsonify({'success': False, 'message': 'Database error'}), 500
-        
+
         cursor = conn.cursor(dictionary=True)
-        
+
         query = """
             SELECT a.*, s.nama, s.kelas 
             FROM absensi a 
@@ -916,30 +916,30 @@ def get_today_attendance():
             WHERE a.tanggal = %s
         """
         params = [today]
-        
+
         if kelas:
             query += " AND s.kelas = %s"
             params.append(kelas)
-        
+
         if status:
             query += " AND a.status = %s"
             params.append(status)
-        
+
         query += " ORDER BY a.waktu DESC"
-        
+
         cursor.execute(query, tuple(params))
         attendance = cursor.fetchall()
-        
+
         cursor.close()
         conn.close()
-        
+
         return jsonify({
             'success': True,
             'date': str(today),
             'count': len(attendance),
             'attendance': attendance
         })
-        
+
     except Exception as e:
         logger.error(f"Get attendance error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -951,17 +951,17 @@ def get_attendance_statistics():
     try:
         start_date = request.args.get('start_date', date.today().isoformat())
         end_date = request.args.get('end_date', date.today().isoformat())
-        
+
         conn = connect_db()
         if not conn:
             return jsonify({'success': False, 'message': 'Database error'}), 500
-        
+
         cursor = conn.cursor(dictionary=True)
-        
+
         # Total students
         cursor.execute("SELECT COUNT(*) as total FROM siswa")
         total = cursor.fetchone()['total']
-        
+
         # Attendance by date
         cursor.execute("""
             SELECT 
@@ -976,9 +976,9 @@ def get_attendance_statistics():
             GROUP BY tanggal
             ORDER BY tanggal DESC
         """, (start_date, end_date))
-        
+
         daily_stats = cursor.fetchall()
-        
+
         # Attendance by class
         cursor.execute("""
             SELECT 
@@ -990,12 +990,12 @@ def get_attendance_statistics():
             GROUP BY s.kelas
             ORDER BY s.kelas
         """, (date.today(),))
-        
+
         class_stats = cursor.fetchall()
-        
+
         cursor.close()
         conn.close()
-        
+
         return jsonify({
             'success': True,
             'total_students': total,
@@ -1006,7 +1006,7 @@ def get_attendance_statistics():
                 'end_date': end_date
             }
         })
-        
+
     except Exception as e:
         logger.error(f"Get statistics error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1023,7 +1023,7 @@ def system_info():
         import platform
         import psutil
         import socket
-        
+
         # System info
         system_info = {
             'hostname': socket.gethostname(),
@@ -1033,13 +1033,13 @@ def system_info():
             'processor': platform.processor(),
             'architecture': platform.machine()
         }
-        
+
         # CPU info
         cpu_info = {
             'cores': psutil.cpu_count(),
             'usage_percent': psutil.cpu_percent(interval=1)
         }
-        
+
         # Memory info
         memory = psutil.virtual_memory()
         memory_info = {
@@ -1047,7 +1047,7 @@ def system_info():
             'available_gb': round(memory.available / (1024**3), 2),
             'used_percent': memory.percent
         }
-        
+
         # Disk info
         disk = psutil.disk_usage('/')
         disk_info = {
@@ -1056,25 +1056,25 @@ def system_info():
             'free_gb': round(disk.free / (1024**3), 2),
             'used_percent': disk.percent
         }
-        
+
         # Database info
         conn = connect_db()
         if conn:
             cursor = conn.cursor(dictionary=True)
-            
+
             # Counts
             cursor.execute("SELECT COUNT(*) as total FROM siswa")
             student_count = cursor.fetchone()['total']
-            
+
             cursor.execute("SELECT COUNT(*) as total FROM absensi")
             attendance_count = cursor.fetchone()['total']
-            
+
             cursor.execute("SELECT COUNT(*) as total FROM users")
             user_count = cursor.fetchone()['total']
-            
+
             cursor.close()
             conn.close()
-            
+
             db_info = {
                 'connected': True,
                 'student_count': student_count,
@@ -1083,7 +1083,7 @@ def system_info():
             }
         else:
             db_info = {'connected': False}
-        
+
         return jsonify({
             'success': True,
             'system': system_info,
@@ -1093,7 +1093,7 @@ def system_info():
             'database': db_info,
             'timestamp': datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"System info error: {e}")
         return jsonify({
@@ -1110,10 +1110,10 @@ def health_check():
         db_status = 'healthy' if conn else 'unhealthy'
         if conn:
             conn.close()
-        
+
         # Check QR secret
         qr_status = 'healthy' if QR_SECRET_KEY and QR_SECRET_KEY != 'YOUR_SECRET_KEY_HERE' else 'unhealthy'
-        
+
         return jsonify({
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
@@ -1124,7 +1124,7 @@ def health_check():
             },
             'version': '1.0.0'
         })
-        
+
     except Exception as e:
         return jsonify({
             'status': 'unhealthy',
@@ -1141,6 +1141,190 @@ def test_api():
         'version': '1.0.0',
         'features': ['QR Code', 'JWT Auth', 'Scanner', 'Attendance', 'Students']
     })
+
+
+
+# ===========================================
+# DEBUGS ENDPOINT
+# ===========================================
+# 1. LOG VIEWER - Endpoint
+// Endpoint untuk log
+@app.route('/api/debug/logs', methods=['GET'])
+@token_required
+def get_logs():
+    """Get application logs"""
+    try:
+        lines = request.args.get('lines', 100, type=int)
+
+        log_file = 'app.log'  # Sesuaikan dengan lokasi log
+
+        if not os.path.exists(log_file):
+            return jsonify({'success': False, 'message': 'Log file not found'})
+
+        with open(log_file, 'r') as f:
+            logs = f.readlines()[-lines:]
+
+        return jsonify({
+            'success': True,
+            'logs': logs,
+            'total_lines': len(logs)
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+# 2. PERVORMANCE MONITOR - Endpoint
+@app.route('/api/debug/performance', methods=['GET'])
+@token_required
+def check_performance():
+    """Check database performance"""
+    try:
+        conn = connect_db()
+        cursor = conn.cursor(dictionary=True)
+
+        # Check query performance
+        queries = [
+            "SHOW STATUS LIKE 'Questions'",
+            "SHOW STATUS LIKE 'Slow_queries'",
+            "SHOW VARIABLES LIKE 'long_query_time'"
+        ]
+
+        results = {}
+        for query in queries:
+            cursor.execute(query)
+            results[query] = cursor.fetchall()
+
+        # Get table sizes
+        cursor.execute("""
+            SELECT
+                table_name,
+                ROUND(((data_length + index_length) / 1024 / 1024), 2) AS size_mb
+            FROM information_schema.tables
+            WHERE table_schema = DATABASE()
+            ORDER BY size_mb DESC
+        """)
+
+        table_sizes = cursor.fetchall()
+
+        return jsonify({
+            'success': True,
+            'performance_stats': results,
+            'table_sizes': table_sizes
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+# DATA BACKUP & RESTORE TOOL
+@app.route('/api/debug/backup', methods=['POST'])
+@token_required
+def create_backup():
+    """Create database backup"""
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_file = f"backup/backup_{timestamp}.sql"
+
+        # Ensure backup directory exists
+        os.makedirs('backup', exist_ok=True)
+
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        # Get all tables
+        cursor.execute("SHOW TABLES")
+        tables = cursor.fetchall()
+
+        with open(backup_file, 'w') as f:
+            for table in tables:
+                table_name = table[0]
+
+                # Get create table syntax
+                cursor.execute(f"SHOW CREATE TABLE {table_name}")
+                create_table = cursor.fetchone()[1]
+                f.write(f"{create_table};\n\n")
+
+                # Get data
+                cursor.execute(f"SELECT * FROM {table_name}")
+                rows = cursor.fetchall()
+
+                if rows:
+                    # Get column names
+                    cursor.execute(f"SHOW COLUMNS FROM {table_name}")
+                    columns = [col[0] for col in cursor.fetchall()]
+
+                    for row in rows:
+                        values = []
+                        for value in row:
+                            if value is None:
+                                values.append('NULL')
+                            elif isinstance(value, (int, float)):
+                                values.append(str(value))
+                            else:
+                                values.append(f"'{value}'")
+
+                        insert = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(values)});"
+                        f.write(f"{insert}\n")
+
+                    f.write("\n")
+
+        return jsonify({
+            'success': True,
+            'backup_file': backup_file,
+            'tables': len(tables),
+            'size': os.path.getsize(backup_file)
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+# ERROR SIMULATOR
+// Endpoint untuk simulate errors
+@app.route('/api/debug/simulate-error/<error_type>', methods=['GET'])
+def simulate_error(error_type):
+    """Simulate various errors for testing"""
+
+    errors = {
+        'database': lambda: simulate_db_error(),
+        'timeout': lambda: simulate_timeout(),
+        'memory': lambda: simulate_memory_error(),
+        'auth': lambda: simulate_auth_error(),
+        'validation': lambda: simulate_validation_error()
+    }
+
+    if error_type in errors:
+        return errors[error_type]()
+    else:
+        return jsonify({'success': False, 'message': 'Error type not found'})
+
+# QUERY ANALIZER
+@app.route('/api/debug/query-analyzer', methods=['POST'])
+def analyze_query():
+    """Analyze SQL query performance"""
+    try:
+        query = request.json.get('query')
+
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        # Explain the query
+        cursor.execute(f"EXPLAIN {query}")
+        explain_result = cursor.fetchall()
+
+        # Execute with profiling
+        cursor.execute("SET profiling = 1")
+        cursor.execute(query)
+        cursor.execute("SHOW PROFILES")
+        profiles = cursor.fetchall()
+
+        return jsonify({
+            'success': True,
+            'explain': explain_result,
+            'profiles': profiles
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+
 
 # ===========================================
 # ERROR HANDLERS

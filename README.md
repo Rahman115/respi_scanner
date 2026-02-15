@@ -21,8 +21,10 @@ config/
 includes/
 ├── header.php          # Template header
 ├── footer.php          # Template footer
-js/                    # File JavaScript
+js/
+├── script.js           # File JavaScript
 css/                   # File stylesheet
+├── style.css
 api/
 ├── api.py              # API Python untuk scanner
 ├── get_activity.php    # Endpoint get aktivitas
@@ -30,8 +32,8 @@ api/
 ├── scanner_api-old.py  # API scanner versi lama
 ├── venv/               # Virtual environment Python
 siswa/                  # Halaman terkait data siswa
-index.php               # Halaman utama/dashboard
-login.php               # Halaman login
+index.html              # Halaman utama/dashboard
+login.html              # Halaman login
 README.md               # Dokumentasi ini
 ```
 

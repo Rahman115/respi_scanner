@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Hari Ini - Dashboard Absensi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .date-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .filter-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .filter-title i {
+            font-size: 1.5em;
+            color: #667eea;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stat-card.present {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        .stat-card.izin {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+
+        .stat-card.sick {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card.alpha {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Table Section */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h3 {
+            color: #555;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-header h3 i {
+            color: #667eea;
+        }
+
+        .attendance-count {
+            background: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-hadir {
+            background: #84fab0;
+            color: #2e7d32;
+        }
+
+        .status-izin {
+            background: #f6d365;
+            color: #b76e00;
+        }
+
+        .status-sakit {
+            background: #f093fb;
+            color: #9c27b0;
+        }
+
+        .status-alpha {
+            background: #ff9a9e;
+            color: #c62828;
+        }
+
+        .time-cell {
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+
+        .class-badge {
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error */
+        .error-message {
+            background: #ff5252;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* No Data */
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .no-data i {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+            }
+            
+            .btn-filter, .btn-reset {
+                width: 100%;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>📋 Absensi Hari Ini</h1>
+                <p>Data kehadiran siswa terkini</p>
+            </div>
+            <div class="date-badge" id="currentDate">
+                <i class="fas fa-calendar-alt"></i> Loading...
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <a href="attendance_dashboard.html" class="nav-tab">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="#" class="nav-tab active">
+                <i class="fas fa-calendar-day"></i> Absensi Hari Ini
+            </a>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">
+                <i class="fas fa-filter"></i>
+                <h3>Filter Data</h3>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label><i class="fas fa-school"></i> Kelas</label>
+                    <select id="kelasFilter">
+                        <option value="">Semua Kelas</option>
+                        <option value="X">Kelas X</option>
+                        <option value="XI">Kelas XI</option>
+                        <option value="XII">Kelas XII</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-tag"></i> Status</label>
+                    <select id="statusFilter">
+                        <option value="">Semua Status</option>
+                        <option value="Hadir">Hadir</option>
+                        <option value="Izin">Izin</option>
+                        <option value="Sakit">Sakit</option>
+                        <option value="Alpha">Alpha</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn-filter" onclick="loadTodayAttendance()">
+                        <i class="fas fa-search"></i> Terapkan Filter
+                    </button>
+                    <button class="btn-reset" onclick="resetFilters()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Memuat data absensi...</p>
+        </div>
+
+        <!-- Statistics Content -->
+        <div id="statisticsContent">
+            <!-- Summary Cards -->
+            <div class="stats-grid" id="summaryCards">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Attendance Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>
+                        <i class="fas fa-list"></i>
+                        Daftar Absensi
+                    </h3>
+                    <span class="attendance-count" id="attendanceCount">0 siswa</span>
+                </div>
+                <table id="attendanceTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Siswa</th>
+                            <th>Kelas</th>
+                            <th>Status</th>
+                            <th>Waktu</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="noDataMessage" class="no-data" style="display: none;">
+                    <i class="fas fa-notes-medical"></i>
+                    <p>Belum ada data absensi untuk hari ini</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').innerHTML = `<i class="fas fa-calendar-alt"></i> ${today.toLocaleDateString('id-ID', options)}`;
+        // take token 
+        // proteksi halaman
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "../login.html";
+        }
+
+        // console.log(token);
+
+
+        // Load attendance on page load
+        window.onload = loadTodayAttendance;
+
+        // Auto refresh every 30 seconds
+        setInterval(loadTodayAttendance, 30000);
+
+        async function loadTodayAttendance() {
+            const kelas = document.getElementById('kelasFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            // Build URL with filters
+            let url = 'http://localhost:8080/api/attendance/today';
+            const params = new URLSearchParams();
+            if (kelas) params.append('kelas', kelas);
+            if (status) params.append('status', status);
+            if (params.toString()) url += '?' + params.toString();
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('statisticsContent').style.opacity = '0.5';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token // Ganti dengan token yang valid
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateSummaryCards(data);
+                    updateAttendanceTable(data);
+                } else {
+                    showError(data.message);
+                }
+            } catch (error) {
+                showError('Gagal memuat data: ' + error.message);
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('statisticsContent').style.opacity = '1';
+            }
+        }
+
+        function updateSummaryCards(data) {
+            const summaryCards = document.getElementById('summaryCards');
+            
+            // Calculate statistics
+            const stats = {
+                hadir: 0,
+                izin: 0,
+                sakit: 0,
+                alpha: 0
+            };
+            
+            data.attendance.forEach(item => {
+                if (item.status === 'Hadir') stats.hadir++;
+                else if (item.status === 'Izin') stats.izin++;
+                else if (item.status === 'Sakit') stats.sakit++;
+                else if (item.status === 'Alpha') stats.alpha++;
+            });
+
+            summaryCards.innerHTML = `
+                <div class="stat-card total">
+                    <div class="stat-value">${data.count}</div>
+                    <div class="stat-label">Total Absensi</div>
+                </div>
+                <div class="stat-card present">
+                    <div class="stat-value">${stats.hadir}</div>
+                    <div class="stat-label">Hadir</div>
+                </div>
+                <div class="stat-card izin">
+                    <div class="stat-value">${stats.izin}</div>
+                    <div class="stat-label">Izin</div>
+                </div>
+                <div class="stat-card sick">
+                    <div class="stat-value">${stats.sakit}</div>
+                    <div class="stat-label">Sakit</div>
+                </div>
+                <div class="stat-card alpha">
+                    <div class="stat-value">${stats.alpha}</div>
+                    <div class="stat-label">Alpha</div>
+                </div>
+            `;
+        }
+
+        function updateAttendanceTable(data) {
+            const tbody = document.getElementById('attendanceTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const attendanceCount = document.getElementById('attendanceCount');
+            
+            // Update count
+            attendanceCount.textContent = `${data.count} siswa`;
+            
+            if (!data.attendance || data.attendance.length === 0) {
+                tbody.innerHTML = '';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+
+            noDataMessage.style.display = 'none';
+            
+            tbody.innerHTML = data.attendance.map((item, index) => {
+                const statusClass = getStatusClass(item.status);
+                const waktu = item.waktu ? new Date(item.waktu).toLocaleTimeString('id-ID') : '-';
+                
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${item.nama}</strong></td>
+                        <td><span class="class-badge">Kelas ${item.kelas}</span></td>
+                        <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                        <td class="time-cell">${waktu}</td>
+                        <td>${item.keterangan || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Hadir': return 'status-hadir';
+                case 'Izin': return 'status-izin';
+                case 'Sakit': return 'status-sakit';
+                case 'Alpha': return 'status-alpha';
+                default: return '';
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('kelasFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadTodayAttendance();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
