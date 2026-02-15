@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi QR - Sistem Absensi QR NISN</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar (sama dengan index.html) -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>QR Absensi</h3>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="../index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="verify-qr.html">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verifikasi QR</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="bulk-generate.html">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Bulk Generate</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="check-nisn.html">
+                        <i class="fas fa-search"></i>
+                        <span>Cek NISN</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="scan-legacy.html">
+                        <i class="fas fa-scanner"></i>
+                        <span>Scan Legacy</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1>Verifikasi QR NISN</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Camera Scanner Section (Optional) -->
+            <div class="camera-section" id="cameraSection" style="display: none;">
+                <div class="camera-container">
+                    <video id="camera" autoplay playsinline></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <div class="camera-controls">
+                        <button class="btn btn-danger" onclick="stopCamera()">
+                            <i class="fas fa-stop"></i> Hentikan Kamera
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Form -->
+            <div class="feature-card">
+                <div class="card-header">
+                    <i class="fas fa-qrcode"></i>
+                    <h2>Input Data QR</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="qrDataInput">
+                        <i class="fas fa-qrcode"></i> Data QR (JSON atau NISN):
+                    </label>
+                    <textarea id="qrDataInput" rows="5" placeholder='Contoh JSON: {"nisn":"1234567890"} atau langsung NISN: 1234567890'></textarea>
+                    <p class="input-hint">
+                        <i class="fas fa-info-circle"></i> 
+                        Bisa paste langsung dari scanner atau ketik manual. Auto-focus aktif.
+                    </p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="scanLocation">
+                            <i class="fas fa-map-marker-alt"></i> Lokasi Scanner:
+                        </label>
+                        <input type="text" id="scanLocation" value="Gate Utama" placeholder="Masukkan lokasi scanner">
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="scanMethod">
+                            <i class="fas fa-cog"></i> Metode:
+                        </label>
+                        <select id="scanMethod">
+                            <option value="scanner_nisn">QR Scanner</option>
+                            <option value="manual">Manual Input</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="verifyQRCode()">
+                        <i class="fas fa-check"></i> Verifikasi QR
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleCamera()">
+                        <i class="fas fa-camera"></i> Gunakan Kamera
+                    </button>
+                </div>
+
+                <!-- Result Container -->
+                <div id="verifyResult" class="result-container" style="display: none;">
+                    <div class="result-header">
+                        <h3>Hasil Verifikasi</h3>
+                        <button class="close-btn" onclick="closeResult()">&times;</button>
+                    </div>
+                    <div id="verifyResultContent" class="result-content"></div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-mini-grid">
+                <div class="stat-mini-card">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <span id="todayCount">0</span>
+                        <p>Verifikasi Hari Ini</p>
+                    </div>
+                </div>
+                <div class="stat-mini-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <span id="successRate">0%</span>
+                        <p>Tingkat Keberhasilan</p>
+                    </div>
+                </div>
+                <div class="stat-mini-card">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <span id="uniqueStudents">0</span>
+                        <p>Siswa Unik</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        // State management
+        let cameraStream = null;
+        let scanCount = JSON.parse(localStorage.getItem('verify_stats') || '{"total":0,"success":0,"today":0,"students":[]}');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAutoEntry();
+            updateStats();
+            
+            // Focus ke input
+            document.getElementById('qrDataInput').focus();
+        });
+
+        function setupAutoEntry() {
+            const input = document.getElementById('qrDataInput');
+            // console
+            console.log('INPUT : ',input);
+            input.addEventListener('focus', function() {
+                this.select();
+            });
+
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text');
+                
+                // Coba parse sebagai JSON
+                try {
+                    const jsonData = JSON.parse(pastedData);
+                    if (jsonData.nisn) {
+                        this.value = jsonData.nisn;
+                    } else {
+                        this.value = JSON.stringify(jsonData, null, 2);
+                    }
+                } catch {
+                    // Jika bukan JSON, ambil angka saja
+                    const nisnOnly = pastedData.replace(/\D/g, '');
+                    if (nisnOnly.length === 10) {
+                        this.value = nisnOnly;
+                        // Auto submit jika 10 digit
+                        setTimeout(() => verifyQRCode(), 100);
+                    } else {
+                        this.value = pastedData;
+                    }
+                }
+            });
+
+            // Enter key untuk submit
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    verifyQRCode();
+                }
+            });
+        }
+
+        async function verifyQRCode() {
+            const qrDataInput = document.getElementById('qrDataInput').value.trim();
+            const location = document.getElementById('scanLocation').value.trim();
+            const method = document.getElementById('scanMethod').value;
+
+            if (!qrDataInput) {
+                showNotification('Data QR tidak boleh kosong', 'error');
+                return;
+            }
+            console.log('Hasil Input : ',qrDataInput); // lihat hasil input
+            // Proses input
+            let qrData;
+            try {
+                qrData = JSON.parse(qrDataInput);
+            } catch {
+                const nisnOnly = qrDataInput.replace(/\D/g, '');
+                if (nisnOnly.length === 10) {
+                    qrData = nisnOnly;
+                } else {
+                    showNotification('Format QR tidak valid. Harus JSON atau NISN 10 digit', 'error');
+                    return;
+                }
+            }
+
+            // Show loading
+            showLoading('Memproses verifikasi...');
+
+            try {
+                const response = await makeRequest('/qr/verify', 'POST', {
+                    qr_data: qrData,
+                    location: location,
+                    method: method
+                }, false);
+                console.log('Hasil response : ', response);
+                hideLoading();
+
+                if (response.success) {
+                    updateStats(true, response.student.nisn);
+                    showSuccessResult(response);
+                    playBeepSound('success');
+                    
+                    // Auto clear setelah 3 detik
+                    setTimeout(() => {
+                        document.getElementById('qrDataInput').value = '';
+                        document.getElementById('qrDataInput').focus();
+                    }, 3000);
+                } else {
+                    updateStats(false);
+                    showErrorResult(response.message);
+                    playBeepSound('error');
+                }
+            } catch (error) {
+                hideLoading();
+                showErrorResult('Koneksi error: ' + error.message);
+                playBeepSound('error');
+            }
+        }
+
+        function showSuccessResult(response) {
+            const student = response.student;
+            const attendance = response.attendance;
+
+            const html = `
+                <div class="result-success">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>VERIFIKASI BERHASIL</h3>
+                    
+                    <div class="student-details">
+                        <div class="detail-item">
+                            <label>NIS</label>
+                            <span>${student.nis}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>NISN</label>
+                            <span class="nisn-highlight">${student.nisn}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Nama</label>
+                            <span>${student.nama}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Kelas</label>
+                            <span>${student.kelas}</span>
+                        </div>
+                    </div>
+
+                    <div class="attendance-details">
+                        <div class="detail-item">
+                            <label>Tanggal</label>
+                            <span>${attendance.date}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Waktu</label>
+                            <span>${attendance.time}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Lokasi</label>
+                            <span>${attendance.location}</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Scan Lagi
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('verifyResultContent').innerHTML = html;
+            document.getElementById('verifyResult').style.display = 'block';
+        }
+
+        function showErrorResult(message) {
+            const html = `
+                <div class="result-error">
+                    <i class="fas fa-times-circle"></i>
+                    <h3>VERIFIKASI GAGAL</h3>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Coba Lagi
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('verifyResultContent').innerHTML = html;
+            document.getElementById('verifyResult').style.display = 'block';
+        }
+
+        function updateStats(isSuccess = false, nisn = null) {
+            const today = new Date().toDateString();
+            
+            // Update counters
+            scanCount.total++;
+            if (isSuccess) {
+                scanCount.success++;
+                if (nisn && !scanCount.students.includes(nisn)) {
+                    scanCount.students.push(nisn);
+                }
+            }
+            
+            // Check if today's date is still today
+            if (scanCount.lastDate !== today) {
+                scanCount.today = 0;
+                scanCount.lastDate = today;
+            }
+            scanCount.today++;
+            
+            // Save to localStorage
+            localStorage.setItem('verify_stats', JSON.stringify(scanCount));
+            
+            // Update display
+            document.getElementById('todayCount').textContent = scanCount.today;
+            document.getElementById('successRate').textContent = 
+                scanCount.total > 0 ? Math.round((scanCount.success / scanCount.total) * 100) + '%' : '0%';
+            document.getElementById('uniqueStudents').textContent = scanCount.students.length;
+        }
+
+        function resetForm() {
+            document.getElementById('qrDataInput').value = '';
+            document.getElementById('qrDataInput').focus();
+            document.getElementById('verifyResult').style.display = 'none';
+        }
+
+        function closeResult() {
+            document.getElementById('verifyResult').style.display = 'none';
+        }
+
+        // Camera functions (opsional)
+        async function toggleCamera() {
+            const cameraSection = document.getElementById('cameraSection');
+            
+            if (cameraSection.style.display === 'none') {
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    document.getElementById('camera').srcObject = cameraStream;
+                    cameraSection.style.display = 'block';
+                    
+                    // Setup QR scanning dari camera (perlu library tambahan)
+                    startQRScanning();
+                } catch (error) {
+                    showNotification('Tidak dapat mengakses kamera', 'error');
+                }
+            } else {
+                stopCamera();
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraSection').style.display = 'none';
+        }
+
+        function startQRScanning() {
+            // Implementasi QR scanner memerlukan library seperti jsQR
+            // Ini adalah placeholder
+            showNotification('Fitur camera scanner memerlukan library tambahan', 'info');
+        }
+
+function playBeepSound(type = 'success') {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Atur jenis bunyi
+        if (type === 'success') {
+            oscillator.frequency.value = 800; // nada tinggi
+        } else {
+            oscillator.frequency.value = 300; // nada rendah
+        }
+
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.2);
+
+        oscillator.onended = () => {
+            audioContext.close();
+        };
+    } catch (err) {
+        console.error('Gagal memainkan beep:', err);
+    }
+}
+
+
+    </script>
+</body>
+</html>

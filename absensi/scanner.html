@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner QR Code - Absensi Siswa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(to right, #4A6FA5, #6B46C1);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 i {
+            font-size: 32px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Status Area */
+        .status-area {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .status-area.active {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+
+        .status-area.error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .status-title {
+            font-size: 18px;
+            color: #6c757d;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .status-message {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 15px 0;
+            min-height: 28px;
+        }
+
+        .status-message.success {
+            color: #28a745;
+        }
+
+        .status-message.error {
+            color: #dc3545;
+        }
+
+        .status-time {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Student Info Card */
+        .student-card {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: none;
+        }
+
+        .student-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .student-title {
+            color: #4A6FA5;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* QR Code Display */
+        .qr-display {
+            text-align: center;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .qr-title {
+            color: #4A6FA5;
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        #qrcode {
+            display: inline-block;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-instruction {
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Manual Input */
+        .manual-input {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4A6FA5;
+        }
+
+        .input-group button {
+            background: linear-gradient(to right, #4A6FA5, #6B46C1);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 70, 193, 0.3);
+        }
+
+        .input-group button:active {
+            transform: translateY(0);
+        }
+
+        /* Attendance History */
+        .history {
+            margin-top: 30px;
+        }
+
+        .history-title {
+            color: #4A6FA5;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .history-item {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-time {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .history-status {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4A6FA5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 14px;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .student-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-qrcode"></i> Scanner QR Code Absensi</h1>
+            <p>Sistem Verifikasi Kehadiran Siswa</p>
+        </div>
+
+        <div class="content">
+            <!-- Status Area -->
+            <div class="status-area" id="statusArea">
+                <div class="status-title">STATUS SISTEM</div>
+                <div class="status-message" id="statusMessage">Menunggu scan QR Code...</div>
+                <div class="status-time" id="statusTime">-</div>
+            </div>
+
+            <!-- Loading Animation -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Memproses QR Code...</p>
+            </div>
+
+            <!-- Student Info Card -->
+            <div class="student-card" id="studentCard">
+                <div class="student-title">
+                    <i class="fas fa-user-graduate"></i>
+                    INFORMASI SISWA
+                </div>
+                <div class="student-details">
+                    <div class="detail-item">
+                        <div class="detail-label">NIS</div>
+                        <div class="detail-value" id="studentNIS">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nama</div>
+                        <div class="detail-value" id="studentName">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Kelas</div>
+                        <div class="detail-value" id="studentClass">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Waktu Absen</div>
+                        <div class="detail-value" id="attendanceTime">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Code Display -->
+            <div class="qr-display">
+                <div class="qr-title">
+                    <i class="fas fa-qrcode"></i> TAMPILAN QR CODE
+                </div>
+                <div id="qrcode"></div>
+                <div class="qr-instruction">
+                    <p><strong>Petunjuk:</strong> QR code di atas dapat discan menggunakan aplikasi scanner untuk verifikasi kehadiran siswa.</p>
+                    <p>Hasil verifikasi akan ditampilkan pada bagian status di atas.</p>
+                </div>
+            </div>
+
+            <!-- Manual Input -->
+            <div class="manual-input">
+                <div class="qr-title">
+                    <i class="fas fa-keyboard"></i> INPUT MANUAL
+                </div>
+                <div class="input-group">
+                    <input type="text" id="manualNIS" placeholder="Masukkan NIS siswa (contoh: 2023001)">
+                    <button onclick="verifyManualNIS()">
+                        <i class="fas fa-check"></i> Verifikasi
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attendance History -->
+            <div class="history">
+                <div class="history-title">
+                    <i class="fas fa-history"></i> RIWAYAT VERIFIKASI
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="history-item">
+                        <div>
+                            <div class="history-name">Tidak ada riwayat</div>
+                            <div class="history-time">-</div>
+                        </div>
+                        <div class="history-status">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Sistem Absensi QR Code &copy; 2024 - Dibuat dengan <i class="fas fa-heart" style="color: #e74c3c;"></i></p>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API (ubah sesuai dengan konfigurasi server Anda)
+        const API_BASE_URL = 'http://localhost:8080/api';
+        
+        // Simpan riwayat absensi di localStorage
+        let attendanceHistory = JSON.parse(localStorage.getItem('attendanceHistory')) || [];
+        
+        // Generate QR code contoh untuk demo
+        function generateDemoQRCode() {
+            const demoData = {
+                nis: "2023001",
+                nama: "Budi Santoso",
+                kelas: "XII IPA 1"
+            };
+            
+            const qrData = {
+                type: 'student_card',
+                nis: demoData.nis,
+                student_id: 1,
+                card_version: 1,
+                signature: "demo_signature_for_testing"
+            };
+            
+            const qrString = JSON.stringify(qrData);
+            
+            // Clear previous QR code
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Generate new QR code
+            QRCode.toCanvas(document.getElementById('qrcode'), qrString, {
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            }, function(error) {
+                if (error) console.error(error);
+            });
+        }
+        
+        // Fungsi untuk verifikasi QR code
+        async function verifyQRCode(qrData) {
+            try {
+                // Tampilkan loading
+                document.getElementById('loading').classList.add('active');
+                
+                // Kirim data ke API
+                const response = await fetch(`${API_BASE_URL}/qr/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ qr_data: qrData })
+                });
+                
+                const result = await response.json();
+                
+                // Sembunyikan loading
+                document.getElementById('loading').classList.remove('active');
+                
+                // Update status area
+                const statusArea = document.getElementById('statusArea');
+                const statusMessage = document.getElementById('statusMessage');
+                const statusTime = document.getElementById('statusTime');
+                
+                if (result.success) {
+                    // Success state
+                    statusArea.classList.remove('error');
+                    statusArea.classList.add('active');
+                    statusMessage.textContent = `✓ ${result.message}`;
+                    statusMessage.className = 'status-message success';
+                    
+                    // Tampilkan informasi siswa
+                    document.getElementById('studentNIS').textContent = result.student.nis;
+                    document.getElementById('studentName').textContent = result.student.nama;
+                    document.getElementById('studentClass').textContent = result.student.kelas;
+                    document.getElementById('attendanceTime').textContent = result.attendance.time;
+                    
+                    // Tampilkan card siswa
+                    document.getElementById('studentCard').classList.add('active');
+                    
+                    // Tambahkan ke riwayat
+                    addToHistory({
+                        name: result.student.nama,
+                        nis: result.student.nis,
+                        time: result.attendance.time,
+                        status: 'Hadir'
+                    });
+                } else {
+                    // Error state
+                    statusArea.classList.remove('active');
+                    statusArea.classList.add('error');
+                    statusMessage.textContent = `✗ ${result.message}`;
+                    statusMessage.className = 'status-message error';
+                    
+                    // Sembunyikan card siswa
+                    document.getElementById('studentCard').classList.remove('active');
+                }
+                
+                // Update waktu
+                const now = new Date();
+                statusTime.textContent = `Waktu: ${now.toLocaleTimeString('id-ID')}`;
+                
+            } catch (error) {
+                console.error('Error verifying QR code:', error);
+                
+                // Sembunyikan loading
+                document.getElementById('loading').classList.remove('active');
+                
+                // Tampilkan error
+                const statusArea = document.getElementById('statusArea');
+                const statusMessage = document.getElementById('statusMessage');
+                const statusTime = document.getElementById('statusTime');
+                
+                statusArea.classList.remove('active');
+                statusArea.classList.add('error');
+                statusMessage.textContent = '✗ Gagal menghubungi server';
+                statusMessage.className = 'status-message error';
+                
+                const now = new Date();
+                statusTime.textContent = `Waktu: ${now.toLocaleTimeString('id-ID')}`;
+            }
+        }
+        
+        // Fungsi untuk verifikasi NIS manual
+        async function verifyManualNIS() {
+            const nisInput = document.getElementById('manualNIS');
+            const nis = nisInput.value.trim();
+            
+            if (!nis) {
+                alert('Harap masukkan NIS siswa');
+                return;
+            }
+            
+            // Data QR code untuk NIS manual
+            const qrData = {
+                type: 'student_card',
+                nis: nis,
+                student_id: 0, // ID dummy
+                card_version: 1,
+                signature: "manual_verification"
+            };
+            
+            await verifyQRCode(qrData);
+            
+            // Reset input
+            nisInput.value = '';
+        }
+        
+        // Tambahkan ke riwayat absensi
+        function addToHistory(attendance) {
+            const now = new Date();
+            const historyItem = {
+                ...attendance,
+                date: now.toLocaleDateString('id-ID'),
+                timestamp: now.getTime()
+            };
+            
+            // Tambahkan ke awal array
+            attendanceHistory.unshift(historyItem);
+            
+            // Simpan maksimal 10 riwayat
+            if (attendanceHistory.length > 10) {
+                attendanceHistory = attendanceHistory.slice(0, 10);
+            }
+            
+            // Simpan ke localStorage
+            localStorage.setItem('attendanceHistory', JSON.stringify(attendanceHistory));
+            
+            // Update tampilan riwayat
+            updateHistoryDisplay();
+        }
+        
+        // Update tampilan riwayat
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (attendanceHistory.length === 0) {
+                historyList.innerHTML = `
+                    <div class="history-item">
+                        <div>
+                            <div class="history-name">Tidak ada riwayat</div>
+                            <div class="history-time">-</div>
+                        </div>
+                        <div class="history-status">-</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            
+            attendanceHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="history-name">${item.name}</div>
+                        <div class="history-time">${item.date} ${item.time}</div>
+                    </div>
+                    <div class="history-status">${item.status}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Simulasi scan QR code untuk demo
+        function simulateQRScan() {
+            // Data QR code contoh
+            const demoQRData = {
+                type: 'student_card',
+                nis: '2023001',
+                student_id: 1,
+                card_version: 1,
+                signature: 'demo_signature_for_testing'
+            };
+            
+            console.log('Simulasi scan QR code:', demoQRData);
+            
+            // Verifikasi QR code
+            verifyQRCode(demoQRData);
+        }
+        
+        // Inisialisasi halaman
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate QR code demo
+            generateDemoQRCode();
+            
+            // Update riwayat
+            updateHistoryDisplay();
+            
+            // Setup event listener untuk input manual (Enter key)
+            document.getElementById('manualNIS').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyManualNIS();
+                }
+            });
+            
+            // Auto-simulasi scan setiap 30 detik (untuk demo saja)
+            // setTimeout(simulateQRScan, 5000);
+            
+            // Update waktu status setiap detik
+            setInterval(() => {
+                const statusTime = document.getElementById('statusTime');
+                const now = new Date();
+                if (statusTime.textContent !== '-') {
+                    statusTime.textContent = `Waktu: ${now.toLocaleTimeString('id-ID')}`;
+                }
+            }, 1000);
+            
+            // Info konsol
+            console.log('Scanner QR Code Absensi siap digunakan!');
+            console.log('Fitur:');
+            console.log('1. Tampilan QR code untuk discan');
+            console.log('2. Input NIS manual');
+            console.log('3. Riwayat verifikasi');
+            console.log('4. Status verifikasi real-time');
+        });
+    </script>
+</body>
+</html>

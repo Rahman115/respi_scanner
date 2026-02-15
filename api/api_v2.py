@@ -161,7 +161,7 @@ def generate_qr_code(nis):
             return jsonify({'success': False, 'message': 'Database error'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, nis,nisn, nama, kelas, card_version FROM siswa WHERE nis = %s", (nis,))
+        cursor.execute("SELECT id, nis, nama, kelas, card_version FROM siswa WHERE nis = %s", (nis,))
         student = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -169,18 +169,24 @@ def generate_qr_code(nis):
         if not student:
             return jsonify({'success': False, 'message': 'Siswa tidak ditemukan'}), 404
 
-        # QR data hanya berisi NISN
-        nisn_value = str(student['nisn']).strip()
+        # Prepare QR data
+        qr_data = {
+            'type': 'student_card',
+            'nis': student['nis'],
+            # 'nama': student['nama'],
+            # 'kelas': student['kelas'],
+            'student_id': student['id'],
+            'card_version':student['card_version']
+            # 'issued_at': datetime.utcnow().isoformat()
+            # 'expires': (datetime.utcnow() + timedelta(days=30)).isoformat()
+        }
 
-	# validasi NISN 10 Digit
-        if len(nisn_value) != 10:
-            return jsonify({'success': False, 'message': f'NISN harus 10 digit, saat ini {len(nisn_value)} digit: {nisn_value}'}), 400
-
-	# hanya NISN saja yang disimpan di dalam QR
-        qr_data = nisn_value  # String murni, bukan JSON
+        # Generate signature
+        signature = generate_qr_signature(qr_data)
+        qr_data['signature'] = signature
 
         # Convert to string
-        # qr_string = json.dumps(qr_data)
+        qr_string = json.dumps(qr_data)
 
         # Generate QR code
         qr = qrcode.QRCode(
@@ -190,7 +196,7 @@ def generate_qr_code(nis):
             border=QR_CONFIG['border']
         )
 
-        qr.add_data(qr_data) # Hanya NISN
+        qr.add_data(qr_string)
         qr.make(fit=True)
 
         # Create image
@@ -208,12 +214,12 @@ def generate_qr_code(nis):
             'success': True,
             'student': {
                 'nis': student['nis'],
-                'nisn': student['nisn'],
                 'nama': student['nama'],
                 'kelas': student['kelas']
             },
             'qr_data': qr_data,
             'qr_image': f"data:image/png;base64,{qr_base64}"
+            # 'expires': qr_data['expires']
         })
 
     except Exception as e:
@@ -231,40 +237,109 @@ def verify_qr_code():
 
         qr_data = data['qr_data']
 
+        # Debug log untuk melihat struktur data yang diterima
+        logger.info(f"QR data received: {json.dumps(qr_data)}")
 
         logger.info(
-            f"NISN QR data received | NISN={qr_data} | IP={request.remote_addr}"
+            f"QR scan attempt - qr_data.get | NIS={qr_data.get('nis')} | IP={request.remote_addr}"
+        )
+
+        # Cek apakah nis ada dalam qr_data
+        if 'nis' not in qr_data:
+            logger.warning(f"QR data missing 'nis' field: {qr_data}")
+            return jsonify({
+                'success': False,
+                'message': 'Data QR tidak valid: NIS tidak ditemukan'
+            }), 400
+
+        nis_value = qr_data.get('nis')
+
+        logger.info(
+            f"QR scan attempt - nis_value | NIS={nis_value} | IP={request.remote_addr}"
         )
 
 
-        # Validasi bahwa qr_data adalah string
-        if not isinstance(qr_data, str) or len(qr_data) != 10 or not qr_data.isdigit():
-            logger.warning(f"Invalid NISN format: {qr_data}")
-            return jsonify({'success': False, 'message': 'Format NISN tidak valid. Harus 10 digit angka'}),400
 
-        # Cek apakah nis ada dalam qr_data
-        nisn_value = qr_data.strip()
+        # Verify signature
+        if 'signature' not in qr_data:
+            return jsonify({'success': False, 'message': 'Signature tidak ditemukan'}), 400
 
-        # Database check
+        # signature = qr_data.pop('signature')
+        # if not verify_qr_signature(qr_data, signature):
+        signature = qr_data.get('signature')
+        payload = qr_data.copy()
+        payload.pop('signature',None)
+
+        if not verify_qr_signature(payload, signature):
+            logger.warning(
+                f"Invalid QR signature | NIS={nis_value} | IP={request.remote_addr}"
+            )
+            return jsonify({'success': False, 'message': 'Signature tidak valid'}), 401
+
+        # Check expiration
+        # expires = datetime.fromisoformat(qr_data['expires'].replace('Z', '+00:00'))
+        # if datetime.utcnow() > expires:
+        #    return jsonify({'success': False, 'message': 'QR code sudah kadaluarsa'}), 400
+
+        # changed code
+        # < Database check >
         conn = connect_db()
         if not conn:
             return jsonify({'success': False, 'message': 'Database error'}), 500
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute(
-            "SELECT id, nis, nisn, nama, kelas, card_version FROM siswa WHERE nisn = %s",
-            (nisn_value,)
+            "SELECT id, nis, nama, kelas, card_version FROM siswa WHERE nis = %s",
+            (nis_value,)
         )
         student = cursor.fetchone()
 
         if not student:
             logger.warning(
-                f"QR scan with unknown NISN | NIS={nisn_value} | IP={request.remote_addr}"
+                f"QR scan with unknown NIS | NIS={nis_value} | IP={request.remote_addr}"
             )
             return jsonify({'success': False, 'message': 'Siswa tidak valid'}), 404
 
-        # nis = nis_value
+        # if student['aktif'] == 0:
+        #     logger.warning(
+        #         f"Inactive student card scanned | NIS={student['nis']} | IP={request.remote_addr}"
+        #     )
+        #     return jsonify({'success': False, 'message': 'Kartu siswa tidak aktif'}), 403
+
+        # cek card_version
+
+        if qr_data['card_version'] != student['card_version']:
+            logger.warning(
+                f"Outdated card version | NIS={student['nis']} "
+                f"| QR={qr_data.get('card_version')} "
+                f"| DB={student['card_version']} "
+                f"| IP={request.remote_addr}"
+            )
+            return jsonify({
+                'success': False,
+                'message': 'Kartu siswa sudah tidak berlaku'
+            }), 403
+
+
+        # Process attendance
+        nis = nis_value
         location = data.get('location', 'QR Scanner')
+
+        # Connect to database
+        # conn = connect_db()
+        # if not conn:
+        #     return jsonify({'success': False, 'message': 'Database error'}), 500
+
+        # cursor = conn.cursor(dictionary=True)
+
+        # Find student
+        # cursor.execute("SELECT * FROM siswa WHERE nis = %s", (nis,))
+        # student = cursor.fetchone()
+
+        if not student:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'message': 'Siswa tidak ditemukan'}), 404
 
         # Check if already attended today
         today = date.today()
@@ -310,7 +385,6 @@ def verify_qr_code():
             'message': 'Absensi QR berhasil',
             'student': {
                 'nis': student['nis'],
-                'nisn': student['nisn'],
                 'nama': student['nama'],
                 'kelas': student['kelas']
             },
@@ -318,7 +392,7 @@ def verify_qr_code():
                 'id': attendance_id,
                 'date': str(today),
                 'time': now.strftime('%H:%M:%S'),
-                'method': 'Scanner',
+                'method': 'QR Code',
                 'location': location
             }
         })
@@ -351,82 +425,58 @@ def generate_bulk_qr():
         qr_results = []
 
         for nis in nis_list:
-            cursor.execute("SELECT id, nis,nisn, nama, kelas FROM siswa WHERE nis = %s", (nis,))
+            cursor.execute("SELECT id, nis, nama, kelas FROM siswa WHERE nis = %s", (nis,))
             student = cursor.fetchone()
 
-            if student and student.get('nisn'):
+            if student:
                 # Generate QR data
-                # qr_data = {
-                  #  'type': 'student_card',
-                  #  'nis': student['nis'],
+                qr_data = {
+                    'type': 'student_card',
+                    'nis': student['nis'],
                     # 'nama': student['nama'],
                     # 'kelas': student['kelas'],
-                   # 'student_id': student['id'],
-                    #'card_version': student['card_version']
+                    'student_id': student['id'],
+                    'card_version': student['card_version']
                     # 'timestamp': datetime.utcnow().isoformat(),
                     # 'expires': (datetime.utcnow() + timedelta(days=30)).isoformat()
-               # }
+                }
 
-                #signature = generate_qr_signature(qr_data)
-                nisn_value = str(student['nisn']).strip() #qr_data['signature'] = signature
-                # Validasi NISN
-                if len(nisn_value) == 10 and nisn_value.isdigit():
-                    qr_data = nisn_value
+                signature = generate_qr_signature(qr_data)
+                qr_data['signature'] = signature
+                qr_string = json.dumps(qr_data)
 
                 # Generate QR code
-                    qr = qrcode.QRCode(
-                        version=QR_CONFIG['version'],
-                        error_correction=getattr(qrcode.constants, f"ERROR_CORRECT_{QR_CONFIG['error_correction']}"),
-                        box_size=QR_CONFIG['box_size'],
-                        border=QR_CONFIG['border']
-                    )
+                qr = qrcode.QRCode(
+                    version=QR_CONFIG['version'],
+                    error_correction=getattr(qrcode.constants, f"ERROR_CORRECT_{QR_CONFIG['error_correction']}"),
+                    box_size=QR_CONFIG['box_size'],
+                    border=QR_CONFIG['border']
+                )
 
-                    qr.add_data(qr_data)
-                    qr.make(fit=True)
+                qr.add_data(qr_string)
+                qr.make(fit=True)
 
-                    img = qr.make_image(fill_color="black", back_color="white")
-                    img_bytes = io.BytesIO()
-                    img.save(img_bytes, format='PNG')
-                    img_bytes.seek(0)
+                img = qr.make_image(fill_color="black", back_color="white")
+                img_bytes = io.BytesIO()
+                img.save(img_bytes, format='PNG')
+                img_bytes.seek(0)
 
-                    qr_base64 = base64.b64encode(img_bytes.getvalue()).decode('utf-8')
+                qr_base64 = base64.b64encode(img_bytes.getvalue()).decode('utf-8')
 
-                    qr_results.append({
-                        'nis': student['nis'],
-                        'nisn': student['nisn'],
-                        'nama': student['nama'],
-                        'kelas': student['kelas'],
-                        'qr_data': qr_data,
-                        'qr_image': f"data:image/png;base64,{qr_base64}"
-                    })
-                else:
-                    # Tambahan catatan untu NISN tidak valid
-                    qr_request.append({
-                        'nis': student['nis'],
-                        'nama': student['nama'],
-                        'kelas': student['kelas'],
-                        'error': f'NISN tid valid: {nisn_value}',
-                        'qr_data': None,
-                        'qr_image': None
-                    })
-            else:
-                # Jika siswa tidak ditemukan atau tidak punya NISN
-                qr_result.append({
-                'nis': nis,
-                'error': 'Siswa tidak ditemukan atau tidak memiliki NISN',
-                'qr_data': None,
-                'qr_image': None
+                qr_results.append({
+                    'nis': student['nis'],
+                    'nama': student['nama'],
+                    'kelas': student['kelas'],
+                    'qr_data': qr_data,
+                    'qr_image': f"data:image/png;base64,{qr_base64}"
                 })
+
         cursor.close()
         conn.close()
-        # Hitung sukses dan gagal
-        success_count = len([r for r in qr_results if 'qr_data' in r and r['qr_data']])
-        error_count = len([r for r in qr_results if 'error' in r])
+
         return jsonify({
             'success': True,
             'count': len(qr_results),
-            'success_count': success_count,
-            'error_count': error_count,
             'qr_codes': qr_results
         })
 
@@ -435,7 +485,7 @@ def generate_bulk_qr():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-# TABLE STRUCTURE
+
 @app.route('/api/debug/table-structure', methods=['GET'])
 def debug_table_structure():
     """Debug endpoint to check table structure"""
@@ -443,168 +493,29 @@ def debug_table_structure():
         conn = connect_db()
         if not conn:
             return jsonify({'success': False, 'message': 'Database error'}), 500
-
+        
         cursor = conn.cursor(dictionary=True)
-
+        
         # Cek struktur tabel siswa
         cursor.execute("DESCRIBE siswa")
         siswa_structure = cursor.fetchall()
-
+        
         # Cek beberapa data sample
         cursor.execute("SELECT nis, nisn, nama, kelas, card_version FROM siswa LIMIT 5")
         sample_data = cursor.fetchall()
-
+        
         cursor.close()
         conn.close()
-
+        
         return jsonify({
             'success': True,
             'siswa_structure': siswa_structure,
             'sample_data': sample_data
         })
-
+        
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# CHECK NISN - GET
-@app.route('/api/students/check-nisn', methods=['GET'])
-@token_required
-def check_student_nisn():
-    """Check if students have valid NISN"""
-    try:
-        conn = connect_db()
-        if not conn:
-            return jsonify({'success': False, 'message': 'Database error'}), 500
-
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT
-                nis,
-                nisn,
-                nama,
-                kelas,
-                CASE
-                    WHEN nisn IS NULL OR nisn = '' THEN 'TIDAK ADA'
-                    WHEN LENGTH(TRIM(nisn)) != 10 THEN 'TIDAK VALID'
-                    WHEN TRIM(nisn) NOT REGEXP '^[0-9]{10}$' THEN 'TIDAK VALID'
-                    ELSE 'VALID'
-                END as status_nisn,
-                LENGTH(TRIM(nisn)) as panjang_nisn
-            FROM siswa
-            ORDER BY kelas, nama
-        """)
-
-        students = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-        # Hitung statistik
-        valid_count = len([s for s in students if s['status_nisn'] == 'VALID'])
-        invalid_count = len([s for s in students if s['status_nisn'] == 'TIDAK VALID'])
-        missing_count = len([s for s in students if s['status_nisn'] == 'TIDAK ADA'])
-
-        return jsonify({
-            'success': True,
-            'total': len(students),
-            'valid_nisn': valid_count,
-            'invalid_nisn': invalid_count,
-            'missing_nisn': missing_count,
-            'students': students
-        })
-
-    except Exception as e:
-        logger.error(f"Check NISN error: {e}")
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-# SCAN NISN - POST
-@app.route('/api/scan-nisn', methods=['POST'])
-def process_scan_nisn():
-    """Process barcode scan based on NISN (legacy support)"""
-    try:
-        data = request.get_json()
-
-        if not data or 'nisn' not in data:
-            return jsonify({'success': False, 'message': 'NISN diperlukan'}), 400
-
-        nisn = str(data['nisn']).strip()
-        location = data.get('location', 'Scanner NISN USB')
-
-        # Validasi format NISN
-        if len(nisn) != 10 or not nisn.isdigit():
-            return jsonify({
-                'success': False,
-                'message': f'NISN harus 10 digit angka. Diterima: {nisn}'
-            }), 400
-
-        conn = connect_db()
-        if not conn:
-            return jsonify({'success': False, 'message': 'Database error'}), 500
-
-        cursor = conn.cursor(dictionary=True)
-
-        # Find student by NISN
-        cursor.execute("SELECT * FROM siswa WHERE nisn = %s", (nisn,))
-        student = cursor.fetchone()
-
-        if not student:
-            cursor.close()
-            conn.close()
-            return jsonify({
-                'success': False, 
-                'message': f'Siswa dengan NISN {nisn} tidak ditemukan'
-            }), 404
-
-        # Check attendance
-        today = date.today()
-        cursor.execute(
-            "SELECT * FROM absensi WHERE siswa_id = %s AND tanggal = %s",
-            (student['id'], today)
-        )
-        existing = cursor.fetchone()
-
-        if existing:
-            cursor.close()
-            conn.close()
-            return jsonify({
-                'success': False, 
-                'message': f'{student["nama"]} sudah absen hari ini'
-            }), 409
-
-        # Save attendance
-        now = datetime.now()
-        cursor.execute(
-            """INSERT INTO absensi 
-               (siswa_id, nis, tanggal, waktu, status, metode, scanner_lokasi) 
-               VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (student['id'], student['nis'], today, now.time(), 'Hadir', 'scanner', location)
-        )
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({
-            'success': True,
-            'message': 'Absensi NISN berhasil',
-            'student': {
-                'nis': student['nis'],
-                'nisn': student['nisn'],
-                'nama': student['nama'],
-                'kelas': student['kelas']
-            },
-            'attendance': {
-                'date': str(today),
-                'time': now.strftime('%H:%M:%S'),
-                'method': 'Scanner NISN'
-            }
-        })
-
-    except Exception as e:
-        logger.error(f"NISN scan processing error: {e}")
-        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 
@@ -710,11 +621,11 @@ def get_students():
 
         if kelas:
             cursor.execute(
-                "SELECT id, nis, nisn, nama, kelas FROM siswa WHERE kelas = %s ORDER BY nama",
+                "SELECT id, nis, nama, kelas FROM siswa WHERE kelas = %s ORDER BY nama",
                 (kelas,)
             )
         else:
-            cursor.execute("SELECT id, nis, nisn, nama, kelas FROM siswa ORDER BY kelas, nama")
+            cursor.execute("SELECT id, nis, nama, kelas FROM siswa ORDER BY kelas, nama")
 
         students = cursor.fetchall()
 
@@ -738,13 +649,12 @@ def add_student():
     try:
         data = request.get_json()
 
-        required_fields = ['nis','nisn', 'nama', 'kelas']
+        required_fields = ['nis', 'nama', 'kelas']
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'message': f'{field} diperlukan'}), 400
 
         nis = data['nis'].strip()
-        nisn = data['nisn'].strip()
         nama = data['nama'].strip()
         kelas = data['kelas'].strip()
 
@@ -763,8 +673,8 @@ def add_student():
 
         # Insert new student
         cursor.execute(
-            "INSERT INTO siswa (nis, nisn, nama, kelas) VALUES (%s, %s, %s, %s)",
-            (nis, nisn, nama, kelas)
+            "INSERT INTO siswa (nis, nama, kelas) VALUES (%s, %s, %s)",
+            (nis, nama, kelas)
         )
 
         conn.commit()
@@ -779,7 +689,6 @@ def add_student():
             'student': {
                 'id': student_id,
                 'nis': nis,
-                'nisn': nisn,
                 'nama': nama,
                 'kelas': kelas
             }

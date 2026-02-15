@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Generate QR - Sistem Absensi QR NISN</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>QR Absensi</h3>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="verify-qr.html">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verifikasi QR</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="bulk-generate.html">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Bulk Generate</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="check-nisn.html">
+                        <i class="fas fa-search"></i>
+                        <span>Cek NISN</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="scan-legacy.html">
+                        <i class="fas fa-scanner"></i>
+                        <span>Scan Legacy</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1>Bulk Generate QR Code</h1>
+                <div class="page-actions">
+                    <button class="btn btn-success" onclick="downloadAllQR()" id="downloadAllBtn" style="display: none;">
+                        <i class="fas fa-download"></i> Download Semua
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Methods Tabs -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('manual')" id="tabManual">
+                        <i class="fas fa-keyboard"></i> Input Manual
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('file')" id="tabFile">
+                        <i class="fas fa-file-upload"></i> Upload File
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('kelas')" id="tabKelas">
+                        <i class="fas fa-users"></i> Per Kelas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab: Manual Input -->
+            <div class="feature-card" id="tabManualContent">
+                <div class="card-header">
+                    <i class="fas fa-keyboard"></i>
+                    <h2>Input NIS Manual</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="nisListInput">
+                        <i class="fas fa-list"></i> Daftar NIS (pisahkan dengan koma, enter, atau spasi):
+                    </label>
+                    <textarea id="nisListInput" rows="6" placeholder="Contoh:&#10;2024001, 2024002, 2024003&#10;atau&#10;2024001&#10;2024002&#10;2024003"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="qrSize">
+                        <i class="fas fa-arrows-alt"></i> Ukuran QR:
+                    </label>
+                    <select id="qrSize">
+                        <option value="small">Kecil (150x150)</option>
+                        <option value="medium" selected>Sedang (200x200)</option>
+                        <option value="large">Besar (300x300)</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generateBulkQR('manual')">
+                        <i class="fas fa-qrcode"></i> Generate QR
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearManualInput()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadSampleData()">
+                        <i class="fas fa-flask"></i> Sample
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab: File Upload -->
+            <div class="feature-card" id="tabFileContent" style="display: none;">
+                <div class="card-header">
+                    <i class="fas fa-file-upload"></i>
+                    <h2>Upload File NIS</h2>
+                </div>
+
+                <div class="upload-area" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Drag & Drop file di sini</h3>
+                    <p>atau</p>
+                    <input type="file" id="fileInput" accept=".txt,.csv" style="display: none;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Pilih File
+                    </button>
+                    <p class="file-hint">Format: .txt atau .csv (satu NIS per baris)</p>
+                </div>
+
+                <div id="filePreview" style="display: none;">
+                    <h4>Preview Data:</h4>
+                    <pre id="fileContent"></pre>
+                    <button class="btn btn-primary" onclick="generateBulkQR('file')">
+                        <i class="fas fa-qrcode"></i> Generate dari File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab: Per Kelas -->
+            <div class="feature-card" id="tabKelasContent" style="display: none;">
+                <div class="card-header">
+                    <i class="fas fa-users"></i>
+                    <h2>Generate per Kelas</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="kelasSelect">
+                        <i class="fas fa-school"></i> Pilih Kelas:
+                    </label>
+                    <select id="kelasSelect" onchange="loadStudentsByKelas()">
+                        <option value="">-- Pilih Kelas --</option>
+                    </select>
+                </div>
+
+                <div id="kelasPreview" style="display: none;">
+                    <h4>Daftar Siswa:</h4>
+                    <div class="table-container">
+                        <table id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                    <th>NIS</th>
+                                    <th>NISN</th>
+                                    <th>Nama</th>
+                                    <th>Status NISN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsList"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="selected-info">
+                        <span id="selectedCount">0</span> siswa dipilih
+                    </div>
+
+                    <button class="btn btn-primary" onclick="generateBulkQR('kelas')">
+                        <i class="fas fa-qrcode"></i> Generate QR untuk yang Dipilih
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="progressContainer" style="display: none;">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <p id="progressText">Memproses 0/0 siswa...</p>
+            </div>
+
+            <!-- Results -->
+            <div id="bulkResult" class="feature-card" style="display: none;">
+                <div class="card-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Hasil Generate QR</h2>
+                </div>
+
+                <div class="result-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Total Diproses</span>
+                        <span class="summary-value" id="totalProcessed">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Berhasil</span>
+                        <span class="summary-value success" id="successCount">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Gagal</span>
+                        <span class="summary-value error" id="errorCount">0</span>
+                    </div>
+                </div>
+
+                <div class="qr-grid" id="qrGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script>
+        let currentStudents = [];
+        let selectedNIS = [];
+        let generatedQRs = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadKelasList();
+            setupFileUpload();
+        });
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+            
+            // Show corresponding content
+            document.getElementById('tabManualContent').style.display = tabName === 'manual' ? 'block' : 'none';
+            document.getElementById('tabFileContent').style.display = tabName === 'file' ? 'block' : 'none';
+            document.getElementById('tabKelasContent').style.display = tabName === 'kelas' ? 'block' : 'none';
+        }
+
+        async function loadKelasList() {
+            try {
+                const response = await makeRequest('/students', 'GET');
+                if (response.success) {
+                    const kelas = [...new Set(response.students.map(s => s.kelas))];
+                    const select = document.getElementById('kelasSelect');
+                    select.innerHTML = '<option value="">-- Pilih Kelas --</option>' + 
+                        kelas.map(k => `<option value="${k}">${k}</option>`).join('');
+                }
+            } catch (error) {
+                showNotification('Gagal memuat daftar kelas', 'error');
+            }
+        }
+
+        async function loadStudentsByKelas() {
+            const kelas = document.getElementById('kelasSelect').value;
+            if (!kelas) return;
+
+            try {
+                const response = await makeRequest(`/students?kelas=${encodeURIComponent(kelas)}`, 'GET');
+                if (response.success) {
+                    currentStudents = response.students;
+                    displayStudentsTable(currentStudents);
+                    document.getElementById('kelasPreview').style.display = 'block';
+                }
+            } catch (error) {
+                showNotification('Gagal memuat data siswa', 'error');
+            }
+        }
+
+        function displayStudentsTable(students) {
+            const tbody = document.getElementById('studentsList');
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="student-checkbox" value="${s.nis}" 
+                               onchange="updateSelectedCount()" ${s.nisn ? '' : 'disabled'}>
+                    </td>
+                    <td>${s.nis}</td>
+                    <td>${s.nisn || '-'}</td>
+                    <td>${s.nama}</td>
+                    <td>
+                        ${s.nisn ? 
+                            '<span class="status-badge status-valid">Valid</span>' : 
+                            '<span class="status-badge status-invalid">Tidak Ada</span>'}
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('selectAll').checked = false;
+            updateSelectedCount();
+        }
+
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
+            const isChecked = document.getElementById('selectAll').checked;
+            checkboxes.forEach(cb => cb.checked = isChecked);
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+            selectedNIS = Array.from(checkboxes).map(cb => cb.value);
+            document.getElementById('selectedCount').textContent = selectedNIS.length;
+        }
+
+        function setupFileUpload() {
+            const dropZone = document.getElementById('dropZone');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                
+                const file = e.dataTransfer.files[0];
+                if (file) processFile(file);
+            });
+
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                if (e.target.files[0]) processFile(e.target.files[0]);
+            });
+        }
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                document.getElementById('fileContent').textContent = content;
+                document.getElementById('filePreview').style.display = 'block';
+                
+                // Parse NIS dari file
+                const lines = content.split(/\r?\n/).filter(line => line.trim());
+                window.fileNISList = lines.map(line => line.trim());
+            };
+            reader.readAsText(file);
+        }
+
+        async function generateBulkQR(source) {
+            let nisList = [];
+            
+            if (source === 'manual') {
+                const input = document.getElementById('nisListInput').value.trim();
+                nisList = input.split(/[,\n\s]+/).filter(n => n.trim());
+            } else if (source === 'file') {
+                nisList = window.fileNISList || [];
+            } else if (source === 'kelas') {
+                nisList = selectedNIS;
+            }
+
+            if (nisList.length === 0) {
+                showNotification('Tidak ada NIS untuk diproses', 'error');
+                return;
+            }
+
+            if (nisList.length > 100) {
+                const confirm = await showConfirm(`Anda akan generate ${nisList.length} QR. Lanjutkan?`);
+                if (!confirm) return;
+            }
+
+            // Show progress
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = `Memproses 0/${nisList.length} siswa...`;
+
+            try {
+                const response = await makeRequest('/qr/bulk/generate', 'POST', {
+                    nis_list: nisList
+                });
+
+                if (response.success) {
+                    displayBulkResults(response);
+                    document.getElementById('downloadAllBtn').style.display = 'block';
+                } else {
+                    showNotification(response.message, 'error');
+                }
+            } catch (error) {
+                showNotification('Error: ' + error.message, 'error');
+            } finally {
+                document.getElementById('progressContainer').style.display = 'none';
+            }
+        }
+
+        function displayBulkResults(response) {
+            generatedQRs = response.qr_codes.filter(q => q.qr_data);
+            
+            document.getElementById('totalProcessed').textContent = response.count;
+            document.getElementById('successCount').textContent = response.success_count;
+            document.getElementById('errorCount').textContent = response.error_count;
+
+            const grid = document.getElementById('qrGrid');
+            grid.innerHTML = generatedQRs.map(qr => `
+                <div class="qr-card">
+                    <div class="qr-header">
+                        <h4>${qr.nama}</h4>
+                        <p>${qr.kelas}</p>
+                    </div>
+                    <div class="qr-body">
+                        <div class="qr-preview" id="qr-${qr.nisn}">
+                            <!-- QR akan digenerate oleh library -->
+                        </div>
+                        <p class="qr-data">NISN: ${qr.nisn}</p>
+                    </div>
+                    <div class="qr-footer">
+                        <button class="btn btn-secondary btn-small" onclick="downloadSingleQR('${qr.nisn}', '${qr.nama}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="btn btn-primary btn-small" onclick="printQR('${qr.nisn}')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('bulkResult').style.display = 'block';
+            
+            // Generate QR visual (menggunakan library QR)
+            setTimeout(() => {
+                generatedQRs.forEach(qr => {
+                    generateQRVisual(`qr-${qr.nisn}`, qr.qr_data);
+                });
+            }, 100);
+        }
+
+        function generateQRVisual(elementId, data) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            // Simple QR representation
+            element.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 10px;
+                    display: inline-block;
+                    border: 1px solid #ddd;
+                    font-family: monospace;
+                    letter-spacing: 2px;
+                    font-weight: bold;
+                    color: #333;
+                ">
+                    ██████████<br>
+                    █&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;█<br>
+                    █&nbsp;&nbsp;${data.substring(0,3)}&nbsp;&nbsp;█<br>
+                    █&nbsp;&nbsp;${data.substring(3,6)}&nbsp;&nbsp;█<br>
+                    █&nbsp;&nbsp;${data.substring(6)}&nbsp;&nbsp;█<br>
+                    █&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;█<br>
+                    ██████████
+                </div>
+            `;
+        }
+
+        function downloadSingleQR(nisn, nama) {
+            const filename = `QR_${nisn}_${nama.replace(/\s+/g, '_')}.txt`;
+            const content = `NISN: ${nisn}\nNama: ${nama}\nGenerated: ${new Date().toLocaleString()}`;
+            
+            downloadFile(content, filename);
+            showNotification(`QR ${nama} didownload`, 'success');
+        }
+
+        function downloadAllQR() {
+            const zipContent = generatedQRs.map(qr => 
+                `=== ${qr.nama} (${qr.nisn}) ===\nNISN: ${qr.qr_data}\n\n`
+            ).join('');
+            
+            downloadFile(zipContent, `Bulk_QR_${new Date().toISOString().slice(0,10)}.txt`);
+            showNotification(`${generatedQRs.length} QR didownload`, 'success');
+        }
+
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function printQR(nisn) {
+            const qr = generatedQRs.find(q => q.nisn === nisn);
+            if (!qr) return;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head><title>QR ${qr.nama}</title></head>
+                <body style="text-align: center; padding: 50px;">
+                    <h2>${qr.nama}</h2>
+                    <p>Kelas: ${qr.kelas}</p>
+                    <p>NISN: ${qr.nisn}</p>
+                    <div style="margin: 30px auto; width: 200px;">
+                        <!-- QR placeholder -->
+                        <div style="background: white; padding: 20px; border: 1px solid #000;">
+                            QR: ${qr.nisn}
+                        </div>
+                    </div>
+                    <p>Generated: ${new Date().toLocaleString()}</p>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function clearManualInput() {
+            document.getElementById('nisListInput').value = '';
+        }
+
+        function loadSampleData() {
+            document.getElementById('nisListInput').value = '2024001, 2024002, 2024003, 2024004, 2024005';
+        }
+    </script>
+</body>
+</html>

@@ -1,3 +1,5 @@
+
+<!--
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -21,6 +23,8 @@
         window.location.href = "login.html";
     }
 
+    console.log(token);
+
     // Tampilkan info user (opsional)
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (user.nama) {
@@ -35,5 +39,246 @@
     }
 </script>
 
+</body>
+</html>
+ -->
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistem Absensi QR NISN</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>QR Absensi</h3>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="absensi/verify-qr.html">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verifikasi QR</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="absensi/bulk-generate.html">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Bulk Generate</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="check-nisn.html">
+                        <i class="fas fa-search"></i>
+                        <span>Cek NISN</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="absensi/scan-legacy.html">
+                        <i class="fas fa-scanner"></i>
+                        <span>Scan Legacy</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1>Dashboard</h1>
+                <div class="datetime" id="currentDateTime"></div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalSiswa">-</h3>
+                        <p>Total Siswa</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="hadirHariIni">-</h3>
+                        <p>Hadir Hari Ini</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="nisnValid">-</h3>
+                        <p>NISN Valid</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="absensiMingguIni">-</h3>
+                        <p>Absensi Minggu Ini</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-title">
+                <h2>Aksi Cepat</h2>
+            </div>
+
+            <div class="quick-actions-grid">
+                <a href="verify-qr.html" class="action-card">
+                    <i class="fas fa-qrcode"></i>
+                    <h3>Verifikasi QR</h3>
+                    <p>Scan dan verifikasi QR code siswa</p>
+                    <span class="action-link">Buka <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="scan-legacy.html" class="action-card">
+                    <i class="fas fa-scanner"></i>
+                    <h3>Scan NISN</h3>
+                    <p>Input NISN 10 digit dengan auto-focus</p>
+                    <span class="action-link">Buka <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="bulk-generate.html" class="action-card">
+                    <i class="fas fa-layer-group"></i>
+                    <h3>Bulk Generate</h3>
+                    <p>Generate QR untuk banyak siswa</p>
+                    <span class="action-link">Buka <i class="fas fa-arrow-right"></i></span>
+                </a>
+
+                <a href="check-nisn.html" class="action-card">
+                    <i class="fas fa-search"></i>
+                    <h3>Cek NISN</h3>
+                    <p>Periksa validitas NISN siswa</p>
+                    <span class="action-link">Buka <i class="fas fa-arrow-right"></i></span>
+                </a>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="section-title">
+                <h2>Aktivitas Terbaru</h2>
+            </div>
+
+            <div class="recent-activity">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Aktivitas</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentActivityList">
+                        <tr>
+                            <td colspan="3" style="text-align: center;">Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+console.log("Stored token:", localStorage.getItem('token'));
+
+
+        // Fungsi khusus untuk dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardStats();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        async function loadDashboardStats() {
+            try {
+                // Load total siswa
+                const students = await makeRequest('/students', 'GET');
+                document.getElementById('totalSiswa').textContent = students.count || 0;
+
+                // Load NISN stats
+                const nisnStats = await makeRequest('/students/check-nisn', 'GET');
+                if (nisnStats.success) {
+                    document.getElementById('nisnValid').textContent = nisnStats.valid_nisn || 0;
+                }
+
+                // Load attendance today
+                const todayAttendance = await makeRequest('/attendance/today', 'GET');
+                if (todayAttendance.success) {
+                    document.getElementById('hadirHariIni').textContent = todayAttendance.count || 0;
+                }
+
+                // Load recent activity dari logs
+                const logs = JSON.parse(localStorage.getItem('activity_logs') || '[]');
+                const recentActivity = document.getElementById('recentActivityList');
+                
+                if (logs.length > 0) {
+                    recentActivity.innerHTML = logs.slice(0, 5).map(log => `
+                        <tr>
+                            <td>${log.time}</td>
+                            <td>${log.message}</td>
+                            <td>
+                                <span class="status-badge status-${log.type}">${log.type}</span>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    recentActivity.innerHTML = '<tr><td colspan="3" style="text-align: center;">Belum ada aktivitas</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+    </script>
 </body>
 </html>

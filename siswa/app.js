@@ -59,7 +59,7 @@ function loadStudents() {
 
             const table = document.getElementById("studentTable");
             table.innerHTML = "";
-
+            console.log(data.students);
             data.students.forEach(siswa => {
                 table.innerHTML += `
                     <tr>

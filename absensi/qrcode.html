@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi QR NISN System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        .card-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .nisn-input {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .result-container {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .close-result {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .qr-preview {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .qr-image {
+            max-width: 200px;
+            height: auto;
+            margin: 15px auto;
+            display: block;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-valid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-invalid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-missing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-focus-note {
+            font-size: 0.9rem;
+            color: #28a745;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logs-container {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-time {
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .log-message {
+            color: #333;
+        }
+
+        .bulk-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bulk-btn {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .bulk-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-qrcode"></i> Sistem Absensi QR NISN</h1>
+            <p class="subtitle">Verifikasi, Generate QR, dan Scan NISN 10 Digit</p>
+        </header>
+
+        <div class="card-container">
+            <!-- Card 1: Verifikasi QR NISN -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <h2 class="card-title">Verifikasi QR NISN</h2>
+                        <p class="card-subtitle">Scan dan verifikasi QR code yang berisi NISN</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="qrDataInput"><i class="fas fa-qrcode"></i> Data QR (JSON/NISN):</label>
+                    <textarea id="qrDataInput" rows="4" placeholder='Masukkan data QR (JSON) atau NISN 10 digit langsung...'></textarea>
+                    <p class="auto-focus-note"><i class="fas fa-bullseye"></i> Input akan otomatis fokus saat halaman dimuat</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="scanLocation"><i class="fas fa-map-marker-alt"></i> Lokasi Scanner:</label>
+                    <input type="text" id="scanLocation" value="Gate Utama" placeholder="Masukkan lokasi scanner">
+                </div>
+                
+                <button class="btn" onclick="verifyQRCode()">
+                    <i class="fas fa-check"></i> Verifikasi QR Code
+                </button>
+                
+                <div id="verifyResult" class="result-container">
+                    <div class="result-header">
+                        <h3 class="result-title">Hasil Verifikasi</h3>
+                        <button class="close-result" onclick="closeResult('verifyResult')">&times;</button>
+                    </div>
+                    <div id="verifyResultContent"></div>
+                </div>
+            </div>
+
+            <!-- Card 2: Bulk Generate QR NISN -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-barcode"></i>
+                    </div>
+                    <div>
+                        <h2 class="card-title">Bulk Generate QR</h2>
+                        <p class="card-subtitle">Generate QR code untuk beberapa siswa sekaligus</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nisListInput"><i class="fas fa-list-ol"></i> Daftar NIS (pisahkan dengan koma):</label>
+                    <textarea id="nisListInput" rows="4" placeholder="Contoh: 2024001, 2024002, 2024003"></textarea>
+                </div>
+                
+                <div class="bulk-controls">
+                    <button class="btn bulk-btn" onclick="generateBulkQR()">
+                        <i class="fas fa-qrcode"></i> Generate QR
+                    </button>
+                    <button class="btn btn-secondary bulk-btn" onclick="clearBulkResults()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                
+                <div id="bulkResult" class="result-container">
+                    <div class="result-header">
+                        <h3 class="result-title">Hasil Generate QR</h3>
+                        <button class="close-result" onclick="closeResult('bulkResult')">&times;</button>
+                    </div>
+                    <div id="bulkResultContent"></div>
+                </div>
+                
+                <div id="bulkQrContainer" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- Card 3: Check NISN Siswa -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div>
+                        <h2 class="card-title">Cek Status NISN</h2>
+                        <p class="card-subtitle">Periksa validitas NISN semua siswa di database</p>
+                    </div>
+                </div>
+                
+                <button class="btn btn-warning" onclick="checkAllNISN()">
+                    <i class="fas fa-search"></i> Cek Semua NISN
+                </button>
+                
+                <div id="nisnResult" class="result-container">
+                    <div class="result-header">
+                        <h3 class="result-title">Status NISN Siswa</h3>
+                        <button class="close-result" onclick="closeResult('nisnResult')">&times;</button>
+                    </div>
+                    <div id="nisnResultContent"></div>
+                </div>
+            </div>
+
+            <!-- Card 4: Scan NISN Legacy -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-scanner"></i>
+                    </div>
+                    <div>
+                        <h2 class="card-title">Scan NISN Legacy</h2>
+                        <p class="card-subtitle">Scan NISN 10 digit langsung (input otomatis)</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nisnInput"><i class="fas fa-id-card"></i> NISN (10 digit):</label>
+                    <input type="text" id="nisnInput" class="nisn-input" maxlength="10" placeholder="1234567890">
+                    <p class="auto-focus-note"><i class="fas fa-bullseye"></i> Input otomatis fokus dan menerima input langsung dari scanner</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="legacyLocation"><i class="fas fa-map-marker-alt"></i> Lokasi Scanner:</label>
+                    <input type="text" id="legacyLocation" value="Scanner USB" placeholder="Masukkan lokasi scanner">
+                </div>
+                
+                <button class="btn btn-success" onclick="processNISNScan()">
+                    <i class="fas fa-check-circle"></i> Proses Scan NISN
+                </button>
+                
+                <div id="legacyResult" class="result-container">
+                    <div class="result-header">
+                        <h3 class="result-title">Hasil Scan</h3>
+                        <button class="close-result" onclick="closeResult('legacyResult')">&times;</button>
+                    </div>
+                    <div id="legacyResultContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <h2 class="card-title">Log Aktivitas</h2>
+                    <p class="card-subtitle">Riwayat aktivitas terbaru</p>
+                </div>
+                <button class="btn btn-secondary" style="width: auto; margin-left: auto; padding: 8px 15px;" onclick="clearLogs()">
+                    <i class="fas fa-trash"></i> Clear Logs
+                </button>
+            </div>
+            
+            <div class="logs-container" id="logsContainer">
+                <!-- Logs akan ditampilkan di sini -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8080/api'; // Sesuaikan dengan URL API Anda
+        let JWT_TOKEN = localStorage.getItem('token') || '';
+        
+	console.log(JWT_TOKEN);
+
+        // Auto focus pada input pertama saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Coba fokus ke input NISN Legacy (karena yang paling sering digunakan)
+            const nisnInput = document.getElementById('nisnInput');
+            if (nisnInput) {
+                nisnInput.focus();
+                nisnInput.select();
+            }
+            
+            // Setup auto entry untuk input NISN
+            setupAutoEntry();
+            
+            // Cek token JWT
+            checkAuth();
+            
+            // Add log startup
+            addLog('Sistem QR NISN dimuat', 'info');
+        });
+
+        // Setup auto entry untuk input field
+        function setupAutoEntry() {
+            const inputs = ['nisnInput', 'qrDataInput'];
+            
+            inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    // Auto select saat fokus
+                    input.addEventListener('focus', function() {
+                        this.select();
+                    });
+                    
+                    // Auto format untuk NISN input
+                    if (inputId === 'nisnInput') {
+                        input.addEventListener('input', function(e) {
+                            // Hanya izinkan angka
+                            this.value = this.value.replace(/\D/g, '');
+                            
+                            // Auto submit jika sudah 10 digit
+                            if (this.value.length === 10) {
+                                setTimeout(() => {
+                                    processNISNScan();
+                                }, 100);
+                            }
+                        });
+                        
+                        // Auto paste handler
+                        input.addEventListener('paste', function(e) {
+                            e.preventDefault();
+                            const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
+                            this.value = pastedData.substring(0, 10);
+                            
+                            // Auto submit jika sudah 10 digit
+                            if (this.value.length === 10) {
+                                setTimeout(() => {
+                                    processNISNScan();
+                                }, 100);
+                            }
+                        });
+                    }
+                }
+            });
+            
+            // Setup untuk QR data input
+            const qrDataInput = document.getElementById('qrDataInput');
+            if (qrDataInput) {
+                qrDataInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedData = e.clipboardData.getData('text');
+                    
+                    // Coba parse JSON
+                    try {
+                        const jsonData = JSON.parse(pastedData);
+                        this.value = JSON.stringify(jsonData, null, 2);
+                    } catch {
+                        // Jika bukan JSON, anggap sebagai NISN langsung
+                        const nisnOnly = pastedData.replace(/\D/g, '');
+                        if (nisnOnly.length === 10) {
+                            this.value = nisnOnly;
+                        } else {
+                            this.value = pastedData;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Fungsi untuk menambah log
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('logsContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            else if (type === 'error') icon = '❌';
+            else if (type === 'warning') icon = '⚠️';
+            
+            logItem.innerHTML = `
+                <span class="log-time">${timestamp}</span>
+                <span class="log-message">${icon} ${message}</span>
+            `;
+            
+            logsContainer.prepend(logItem);
+            
+            // Batasi jumlah log
+            const maxLogs = 20;
+            while (logsContainer.children.length > maxLogs) {
+                logsContainer.removeChild(logsContainer.lastChild);
+            }
+        }
+
+        // Fungsi untuk clear logs
+        function clearLogs() {
+            const logsContainer = document.getElementById('logsContainer');
+            logsContainer.innerHTML = '';
+            addLog('Logs cleared', 'info');
+        }
+
+        // Fungsi untuk close result container
+        function closeResult(containerId) {
+            document.getElementById(containerId).style.display = 'none';
+        }
+
+        // Fungsi untuk menampilkan result container
+        function showResult(containerId, contentId, content) {
+            document.getElementById(contentId).innerHTML = content;
+            document.getElementById(containerId).style.display = 'block';
+            
+            // Scroll ke result
+            document.getElementById(containerId).scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        // Cek autentikasi
+        function checkAuth() {
+            if (!JWT_TOKEN) {
+                Swal.fire({
+                    title: 'Login Diperlukan',
+                    text: 'Masukkan token JWT untuk mengakses API',
+                    input: 'password',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Login',
+                    showLoaderOnConfirm: true,
+                    preConfirm: async (token) => {
+                        if (!token) {
+                            Swal.showValidationMessage('Token diperlukan');
+                            return false;
+                        }
+                        
+                        // Simpan token
+                        JWT_TOKEN = token;
+                        localStorage.setItem('jwt_token', token);
+                        addLog('Token JWT disimpan', 'success');
+                        return true;
+                    }
+                });
+            }
+        }
+
+        // Fungsi untuk membuat request API
+        async function makeRequest(endpoint, method = 'GET', data = null, requiresAuth = true) {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            if (requiresAuth && JWT_TOKEN) {
+                headers['Authorization'] = `Bearer ${JWT_TOKEN}`;
+            }
+            
+            const options = {
+                method: method,
+                headers: headers
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                return await response.json();
+            } catch (error) {
+                addLog(`Error API: ${error.message}`, 'error');
+                return { success: false, message: `Koneksi error: ${error.message}` };
+            }
+        }
+
+        // ===========================================
+        // 1. VERIFIKASI QR CODE NISN
+        // ===========================================
+        async function verifyQRCode() {
+            const qrDataInput = document.getElementById('qrDataInput').value.trim();
+            const location = document.getElementById('scanLocation').value.trim();
+            
+            if (!qrDataInput) {
+                Swal.fire('Error', 'Data QR tidak boleh kosong', 'error');
+                addLog('Verifikasi gagal: Data QR kosong', 'error');
+                return;
+            }
+            
+            // Tentukan format data QR
+            let qrData;
+            try {
+                // Coba parse sebagai JSON
+                qrData = JSON.parse(qrDataInput);
+            } catch {
+                // Jika bukan JSON, anggap sebagai NISN langsung
+                const nisnOnly = qrDataInput.replace(/\D/g, '');
+                if (nisnOnly.length === 10) {
+                    qrData = nisnOnly;
+                } else {
+                    Swal.fire('Error', 'Format QR tidak valid. Harus JSON atau NISN 10 digit', 'error');
+                    addLog('Verifikasi gagal: Format QR tidak valid', 'error');
+                    return;
+                }
+            }
+            
+            addLog(`Memulai verifikasi QR untuk lokasi: ${location}`, 'info');
+            
+            // Tampilkan loading
+            const resultContent = document.getElementById('verifyResultContent');
+            resultContent.innerHTML = '<div class="loading"></div> Memproses verifikasi QR...';
+            document.getElementById('verifyResult').style.display = 'block';
+            
+            try {
+                const response = await makeRequest('/qr/verify-nisn', 'POST', {
+                    qr_data: qrData,
+                    location: location
+                }, false);
+                
+                if (response.success) {
+                    const student = response.student;
+                    const attendance = response.attendance;
+                    
+                    const html = `
+                        <div class="student-info">
+                            <div class="info-item">
+                                <div class="info-label">NIS</div>
+                                <div class="info-value">${student.nis}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">NISN</div>
+                                <div class="info-value">${student.nisn}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Nama</div>
+                                <div class="info-value">${student.nama}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Kelas</div>
+                                <div class="info-value">${student.kelas}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Status Absensi</div>
+                            <div class="info-value" style="color: #28a745;">BERHASIL</div>
+                        </div>
+                        <div class="student-info">
+                            <div class="info-item">
+                                <div class="info-label">Tanggal</div>
+                                <div class="info-value">${attendance.date}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Waktu</div>
+                                <div class="info-value">${attendance.time}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Metode</div>
+                                <div class="info-value">${attendance.method}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Lokasi</div>
+                                <div class="info-value">${attendance.location}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="resetVerifyForm()">
+                                <i class="fas fa-redo"></i> Scan Lagi
+                            </button>
+                        </div>
+                    `;
+                    
+                    showResult('verifyResult', 'verifyResultContent', html);
+                    addLog(`Verifikasi berhasil: ${student.nama} (${student.nisn})`, 'success');
+                    
+                    // Auto clear form setelah 3 detik jika sukses
+                    setTimeout(() => {
+                        document.getElementById('qrDataInput').value = '';
+                        document.getElementById('qrDataInput').focus();
+                    }, 3000);
+                    
+                    // Play success sound jika browser mendukung
+                    playBeepSound('success');
+                } else {
+                    const html = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-times-circle" style="font-size: 3rem; color: #dc3545;"></i>
+                            <h3 style="color: #dc3545; margin: 15px 0;">${response.message}</h3>
+                            <button class="btn" onclick="resetVerifyForm()">
+                                <i class="fas fa-redo"></i> Coba Lagi
+                            </button>
+                        </div>
+                    `;
+                    
+                    showResult('verifyResult', 'verifyResultContent', html);
+                    addLog(`Verifikasi gagal: ${response.message}`, 'error');
+                    playBeepSound('error');
+                }
+            } catch (error) {
+                addLog(`Error verifikasi: ${error.message}`, 'error');
+                resultContent.innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function resetVerifyForm() {
+            document.getElementById('qrDataInput').value = '';
+            document.getElementById('qrDataInput').focus();
+            document.getElementById('verifyResult').style.display = 'none';
+        }
+
+        // ===========================================
+        // 2. BULK GENERATE QR NISN
+        // ===========================================
+        async function generateBulkQR() {
+            const nisListInput = document.getElementById('nisListInput').value.trim();
+            
+            if (!nisListInput) {
+                Swal.fire('Error', 'Daftar NIS tidak boleh kosong', 'error');
+                addLog('Bulk generate gagal: Daftar NIS kosong', 'error');
+                return;
+            }
+            
+            // Parse NIS list
+            const nisList = nisListInput.split(',').map(nis => nis.trim()).filter(nis => nis);
+            
+            if (nisList.length === 0) {
+                Swal.fire('Error', 'Format daftar NIS tidak valid', 'error');
+                return;
+            }
+            
+            addLog(`Memulai bulk generate QR untuk ${nisList.length} siswa`, 'info');
+            
+            // Tampilkan loading
+            const resultContent = document.getElementById('bulkResultContent');
+            resultContent.innerHTML = '<div class="loading"></div> Generating QR codes...';
+            document.getElementById('bulkResult').style.display = 'block';
+            
+            try {
+                const response = await makeRequest('/qr/bulk/generate-nisn', 'POST', {
+                    nis_list: nisList
+                });
+                
+                if (response.success) {
+                    const qrCodes = response.qr_codes;
+                    
+                    let html = `
+                        <div class="info-item">
+                            <div class="info-label">Total Diproses</div>
+                            <div class="info-value">${response.count}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Berhasil</div>
+                            <div class="info-value" style="color: #28a745;">${response.success_count}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Gagal</div>
+                            <div class="info-value" style="color: #dc3545;">${response.error_count}</div>
+                        </div>
+                    `;
+                    
+                    // Tampilkan hasil per siswa
+                    if (qrCodes.length > 0) {
+                        html += `<div style="margin-top: 20px;"><h4>Detail Siswa:</h4></div>`;
+                        html += `<div class="table-container"><table>`;
+                        html += `<tr><th>NIS</th><th>NISN</th><th>Nama</th><th>Kelas</th><th>Status</th><th>Aksi</th></tr>`;
+                        
+                        qrCodes.forEach(item => {
+                            if (item.qr_data) {
+                                html += `
+                                    <tr>
+                                        <td>${item.nis}</td>
+                                        <td>${item.nisn}</td>
+                                        <td>${item.nama}</td>
+                                        <td>${item.kelas}</td>
+                                        <td><span class="status-badge status-valid">VALID</span></td>
+                                        <td>
+                                            <button class="btn" style="padding: 5px 10px; font-size: 0.9rem;" onclick="downloadQR('${item.nisn}', '${item.nama}')">
+                                                <i class="fas fa-download"></i> QR
+                                            </button>
+                                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9rem;" onclick="previewQR('${item.nisn}', '${item.nama}', '${item.kelas}')">
+                                                <i class="fas fa-eye"></i> Preview
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            } else {
+                                html += `
+                                    <tr>
+                                        <td>${item.nis || '-'}</td>
+                                        <td>-</td>
+                                        <td>${item.nama || '-'}</td>
+                                        <td>${item.kelas || '-'}</td>
+                                        <td><span class="status-badge status-invalid">ERROR</span></td>
+                                        <td style="color: #dc3545;">${item.error}</td>
+                                    </tr>
+                                `;
+                            }
+                        });
+                        
+                        html += `</table></div>`;
+                    }
+                    
+                    showResult('bulkResult', 'bulkResultContent', html);
+                    addLog(`Bulk generate selesai: ${response.success_count} berhasil, ${response.error_count} gagal`, 'success');
+                } else {
+                    const html = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-times-circle" style="font-size: 3rem; color: #dc3545;"></i>
+                            <h3 style="color: #dc3545; margin: 15px 0;">${response.message}</h3>
+                        </div>
+                    `;
+                    
+                    showResult('bulkResult', 'bulkResultContent', html);
+                    addLog(`Bulk generate gagal: ${response.message}`, 'error');
+                }
+            } catch (error) {
+                addLog(`Error bulk generate: ${error.message}`, 'error');
+                resultContent.innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function clearBulkResults() {
+            document.getElementById('nisListInput').value = '';
+            document.getElementById('bulkResult').style.display = 'none';
+            document.getElementById('bulkQrContainer').innerHTML = '';
+            addLog('Bulk results cleared', 'info');
+        }
+
+        function previewQR(nisn, nama, kelas) {
+            const qrContainer = document.getElementById('bulkQrContainer');
+            const qrData = nisn; // Hanya NISN saja
+            
+            // Generate QR code dengan JavaScript
+            const qrCodeDiv = document.createElement('div');
+            qrCodeDiv.className = 'qr-preview';
+            qrCodeDiv.innerHTML = `
+                <h4>${nama} - ${kelas}</h4>
+                <p>NISN: ${nisn}</p>
+                <div id="qr-${nisn}"></div>
+                <p><small>QR berisi: ${qrData}</small></p>
+                <button class="btn" onclick="downloadQR('${nisn}', '${nama}')">
+                    <i class="fas fa-download"></i> Download QR
+                </button>
+            `;
+            
+            qrContainer.prepend(qrCodeDiv);
+            
+            // Gunakan library QR jika ada, atau buat simple representation
+            setTimeout(() => {
+                const qrElement = document.getElementById(`qr-${nisn}`);
+                if (qrElement) {
+                    qrElement.innerHTML = `
+                        <div style="
+                            background: white;
+                            padding: 20px;
+                            display: inline-block;
+                            border: 2px dashed #ccc;
+                            font-family: monospace;
+                            letter-spacing: 3px;
+                            font-weight: bold;
+                            color: #333;
+                        ">
+                            ██████████<br>
+                            █&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;█<br>
+                            █&nbsp;&nbsp;${nisn.substring(0,3)}&nbsp;&nbsp;█<br>
+                            █&nbsp;&nbsp;${nisn.substring(3,6)}&nbsp;&nbsp;█<br>
+                            █&nbsp;&nbsp;${nisn.substring(6)}&nbsp;&nbsp;█<br>
+                            █&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;█<br>
+                            ██████████
+                        </div>
+                    `;
+                }
+            }, 100);
+        }
+
+        function downloadQR(nisn, nama) {
+            // Simulasi download QR
+            const filename = `QR_${nisn}_${nama.replace(/\s+/g, '_')}.txt`;
+            const content = `NISN: ${nisn}\nNama: ${nama}\nQR Data: ${nisn}\nGenerated: ${new Date().toLocaleString()}`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            addLog(`Downloaded QR untuk ${nama} (${nisn})`, 'success');
+        }
+
+        // ===========================================
+        // 3. CHECK ALL NISN
+        // ===========================================
+        async function checkAllNISN() {
+            addLog('Memulai pemeriksaan NISN semua siswa', 'info');
+            
+            // Tampilkan loading
+            const resultContent = document.getElementById('nisnResultContent');
+            resultContent.innerHTML = '<div class="loading"></div> Memeriksa NISN semua siswa...';
+            document.getElementById('nisnResult').style.display = 'block';
+            
+            try {
+                const response = await makeRequest('/students/check-nisn', 'GET');
+                
+                if (response.success) {
+                    const students = response.students;
+                    
+                    let html = `
+                        <div class="student-info">
+                            <div class="info-item">
+                                <div class="info-label">Total Siswa</div>
+                                <div class="info-value">${response.total}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">NISN Valid</div>
+                                <div class="info-value" style="color: #28a745;">${response.valid_nisn}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">NISN Tidak Valid</div>
+                                <div class="info-value" style="color: #dc3545;">${response.invalid_nisn}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Tidak Ada NISN</div>
+                                <div class="info-value" style="color: #ffc107;">${response.missing_nisn}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Tampilkan tabel detail
+                    if (students.length > 0) {
+                        html += `<div style="margin-top: 20px;"><h4>Detail Per Siswa:</h4></div>`;
+                        html += `<div class="table-container"><table>`;
+                        html += `<tr><th>NIS</th><th>NISN</th><th>Nama</th><th>Kelas</th><th>Status</th><th>Panjang</th></tr>`;
+                        
+                        students.forEach(student => {
+                            let statusClass = 'status-invalid';
+                            let statusText = student.status_nisn;
+                            
+                            if (student.status_nisn === 'VALID') {
+                                statusClass = 'status-valid';
+                            } else if (student.status_nisn === 'TIDAK ADA') {
+                                statusClass = 'status-missing';
+                            }
+                            
+                            html += `
+                                <tr>
+                                    <td>${student.nis}</td>
+                                    <td>${student.nisn || '-'}</td>
+                                    <td>${student.nama}</td>
+                                    <td>${student.kelas}</td>
+                                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                    <td>${student.panjang_nisn || '0'}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += `</table></div>`;
+                    }
+                    
+                    showResult('nisnResult', 'nisnResultContent', html);
+                    addLog(`Pemeriksaan NISN selesai: ${response.valid_nisn} valid, ${response.invalid_nisn} tidak valid, ${response.missing_nisn} tidak ada`, 'success');
+                } else {
+                    const html = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-times-circle" style="font-size: 3rem; color: #dc3545;"></i>
+                            <h3 style="color: #dc3545; margin: 15px 0;">${response.message}</h3>
+                        </div>
+                    `;
+                    
+                    showResult('nisnResult', 'nisnResultContent', html);
+                    addLog(`Pemeriksaan NISN gagal: ${response.message}`, 'error');
+                }
+            } catch (error) {
+                addLog(`Error pemeriksaan NISN: ${error.message}`, 'error');
+                resultContent.innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // ===========================================
+        // 4. SCAN NISN LEGACY
+        // ===========================================
+        async function processNISNScan() {
+            const nisnInput = document.getElementById('nisnInput').value.trim();
+            const location = document.getElementById('legacyLocation').value.trim();
+            
+            if (!nisnInput) {
+                Swal.fire('Error', 'NISN tidak boleh kosong', 'error');
+                addLog('Scan NISN gagal: NISN kosong', 'error');
+                return;
+            }
+            
+            // Validasi NISN 10 digit
+            if (nisnInput.length !== 10 || !/^\d{10}$/.test(nisnInput)) {
+                Swal.fire('Error', 'NISN harus 10 digit angka', 'error');
+                addLog(`Scan NISN gagal: Format tidak valid (${nisnInput})`, 'error');
+                return;
+            }
+            
+            addLog(`Memproses scan NISN: ${nisnInput} di lokasi: ${location}`, 'info');
+            
+            // Tampilkan loading
+            const resultContent = document.getElementById('legacyResultContent');
+            resultContent.innerHTML = '<div class="loading"></div> Memproses scan NISN...';
+            document.getElementById('legacyResult').style.display = 'block';
+            
+            try {
+                const response = await makeRequest('/scan-nisn', 'POST', {
+                    nisn: nisnInput,
+                    location: location
+                }, false);
+                
+                if (response.success) {
+                    const student = response.student;
+                    const attendance = response.attendance;
+                    
+                    const html = `
+                        <div class="student-info">
+                            <div class="info-item">
+                                <div class="info-label">NIS</div>
+                                <div class="info-value">${student.nis}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">NISN</div>
+                                <div class="info-value">${student.nisn}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Nama</div>
+                                <div class="info-value">${student.nama}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Kelas</div>
+                                <div class="info-value">${student.kelas}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Status Absensi</div>
+                            <div class="info-value" style="color: #28a745;">BERHASIL</div>
+                        </div>
+                        <div class="student-info">
+                            <div class="info-item">
+                                <div class="info-label">Tanggal</div>
+                                <div class="info-value">${attendance.date}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Waktu</div>
+                                <div class="info-value">${attendance.time}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Metode</div>
+                                <div class="info-value">${attendance.method}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="resetLegacyForm()">
+                                <i class="fas fa-redo"></i> Scan Lagi
+                            </button>
+                        </div>
+                    `;
+                    
+                    showResult('legacyResult', 'legacyResultContent', html);
+                    addLog(`Scan NISN berhasil: ${student.nama} (${student.nisn})`, 'success');
+                    
+                    // Auto reset form setelah 2 detik
+                    setTimeout(() => {
+                        resetLegacyForm();
+                    }, 2000);
+                    
+                    // Play success sound
+                    playBeepSound('success');
+                } else {
+                    const html = `
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-times-circle" style="font-size: 3rem; color: #dc3545;"></i>
+                            <h3 style="color: #dc3545; margin: 15px 0;">${response.message}</h3>
+                            <button class="btn" onclick="resetLegacyForm()">
+                                <i class="fas fa-redo"></i> Coba Lagi
+                            </button>
+                        </div>
+                    `;
+                    
+                    showResult('legacyResult', 'legacyResultContent', html);
+                    addLog(`Scan NISN gagal: ${response.message}`, 'error');
+                    playBeepSound('error');
+                }
+            } catch (error) {
+                addLog(`Error scan NISN: ${error.message}`, 'error');
+                resultContent.innerHTML = `<p style="color: #dc3545;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function resetLegacyForm() {
+            document.getElementById('nisnInput').value = '';
+            document.getElementById('nisnInput').focus();
+            document.getElementById('legacyResult').style.display = 'none';
+        }
+
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
+        function playBeepSound(type = 'success') {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'success') {
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.1);
+                } else {
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(300, audioContext.currentTime + 0.1);
+                }
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                // Fallback jika Web Audio API tidak didukung
+                console.log('Beep sound not supported');
+            }
+        }
+
+        // Export semua fungsi ke global scope
+        window.verifyQRCode = verifyQRCode;
+        window.generateBulkQR = generateBulkQR;
+        window.clearBulkResults = clearBulkResults;
+        window.checkAllNISN = checkAllNISN;
+        window.processNISNScan = processNISNScan;
+        window.resetVerifyForm = resetVerifyForm;
+        window.resetLegacyForm = resetLegacyForm;
+        window.previewQR = previewQR;
+        window.downloadQR = downloadQR;
+        window.closeResult = closeResult;
+        window.clearLogs = clearLogs;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan NISN - Absensi Siswa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Fullscreen container */
+        .scan-fullscreen {
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main scanner card */
+        .scanner-card {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header */
+        .scanner-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .scanner-header i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .scanner-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .scanner-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Large NISN Display */
+        .nisn-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            position: relative;
+            border: 3px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .nisn-display:hover {
+            border-color: #667eea;
+            background: #fff;
+        }
+
+        .nisn-display.focused {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .nisn-digits {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .digit {
+            display: inline-block;
+            width: 5rem;
+            height: 6rem;
+            line-height: 6rem;
+            text-align: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            border-bottom: 4px solid #dee2e6;
+            margin: 0 0.2rem;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .digit.filled {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f0f3ff;
+            transform: translateY(-2px);
+        }
+
+        .nisn-cursor {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-left: 1rem;
+            color: #667eea;
+            animation: blink 1s infinite;
+            line-height: 1;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Hidden input */
+        .nisn-hidden-input {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .location-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .location-selector label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .location-selector select {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            font-size: 1rem;
+            min-width: 200px;
+            cursor: pointer;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .location-selector select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .mode-selector label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+
+        .mode-selector label:hover {
+            border-color: #667eea;
+        }
+
+        .mode-selector input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        #manualProcessBtn {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        #manualProcessBtn:hover {
+            background: #5a67d8;
+        }
+
+        /* Status Panel */
+        .status-panel {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f8f9fa;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 4px solid transparent;
+        }
+
+        .status-ready {
+            color: #666;
+        }
+
+        .status-success {
+            color: #28a745;
+            background: #e8f5e9;
+            border-left-color: #28a745;
+        }
+
+        .status-error {
+            color: #dc3545;
+            background: #ffebee;
+            border-left-color: #dc3545;
+        }
+
+        .status-info {
+            color: #17a2b8;
+            background: #e3f2fd;
+            border-left-color: #17a2b8;
+        }
+
+        /* Quick Stats */
+        .scan-stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem 2.5rem;
+            border-radius: 12px;
+            color: white;
+            min-width: 150px;
+        }
+
+        .stat i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat span {
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .stat small {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .result-header h3 {
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #dc3545;
+        }
+
+        .result-success {
+            padding: 1rem;
+        }
+
+        .student-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .label {
+            font-weight: 600;
+            width: 100px;
+            color: #555;
+        }
+
+        .value {
+            flex: 1;
+            color: #333;
+        }
+
+        .nisn-big {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            font-family: monospace;
+        }
+
+        .result-error {
+            text-align: center;
+            padding: 2rem;
+            color: #dc3545;
+        }
+
+        .result-error i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-error p {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-error .small {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Recent Scans Table */
+        .recent-scans {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .recent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .recent-header i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .recent-header h2 {
+            flex: 1;
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .btn-clear {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .history-success {
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+
+        .history-error {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+        .nisn-cell {
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.error {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .scan-fullscreen {
+                padding: 1rem;
+            }
+
+            .digit {
+                width: 3rem;
+                height: 4rem;
+                line-height: 4rem;
+                font-size: 2rem;
+            }
+
+            .nisn-cursor {
+                font-size: 3rem;
+            }
+
+            .scan-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stat {
+                width: 100%;
+            }
+
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .location-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .mode-selector {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">
+        <i class="fas fa-expand"></i> Fullscreen
+    </button>
+
+    <div class="scan-fullscreen">
+        <div class="scanner-card">
+            <!-- Header -->
+            <div class="scanner-header">
+                <i class="fas fa-qrcode"></i>
+                <h1>Scan NISN Siswa</h1>
+                <p>Scan barcode atau ketik NISN 10 digit</p>
+            </div>
+
+            <!-- Large NISN Display -->
+            <div class="nisn-display" id="nisnDisplay" onclick="focusInput()">
+                <div class="nisn-digits" id="nisnDigits">
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                    <span class="digit">_</span>
+                </div>
+                <span class="nisn-cursor" id="nisnCursor">|</span>
+            </div>
+
+            <!-- Hidden Input -->
+            <input type="text" id="nisnInput" class="nisn-hidden-input" maxlength="10" autofocus>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="location-selector">
+                    <label for="scanLocation">
+                        <i class="fas fa-map-marker-alt"></i> Lokasi:
+                    </label>
+                    <select id="scanLocation">
+                        <option value="Gate Utama">Gate Utama</option>
+                        <option value="Gate Belakang">Gate Belakang</option>
+                        <option value="Lab Komputer">Lab Komputer</option>
+                        <option value="Perpustakaan">Perpustakaan</option>
+                        <option value="Kelas">Kelas</option>
+                        <option value="Aula">Aula</option>
+                        <option value="Lapangan">Lapangan</option>
+                    </select>
+                </div>
+
+                <div class="mode-selector">
+                    <label>
+                        <input type="radio" name="scanMode" value="auto" checked onchange="setScanMode('auto')">
+                        <i class="fas fa-sync"></i> Auto Clear
+                    </label>
+                    <label>
+                        <input type="radio" name="scanMode" value="manual" onchange="setScanMode('manual')">
+                        <i class="fas fa-hand"></i> Manual
+                    </label>
+                </div>
+
+                <button class="btn btn-primary" onclick="processNISNScan()" id="manualProcessBtn">
+                    <i class="fas fa-check"></i> Proses Manual
+                </button>
+            </div>
+
+            <!-- Status Panel -->
+            <div class="status-panel" id="statusPanel">
+                <div class="status-ready">
+                    <i class="fas fa-check-circle"></i> Siap scan... Klik display atau scan barcode
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="scan-stats">
+                <div class="stat">
+                    <i class="fas fa-clock"></i>
+                    <span id="scanCount">0</span>
+                    <small>Hari Ini</small>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successCount">0</span>
+                    <small>Berhasil</small>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-times-circle"></i>
+                    <span id="failCount">0</span>
+                    <small>Gagal</small>
+                </div>
+            </div>
+
+            <!-- Last Scan Result -->
+            <div class="result-card" id="lastScanResult" style="display: none;">
+                <div class="result-header">
+                    <h3><i class="fas fa-clock"></i> Hasil Scan Terakhir</h3>
+                    <button class="close-btn" onclick="closeLastResult()">&times;</button>
+                </div>
+                <div id="lastScanContent"></div>
+            </div>
+
+            <!-- Recent Scans -->
+            <div class="recent-scans">
+                <div class="recent-header">
+                    <i class="fas fa-history"></i>
+                    <h2>Riwayat Scan (10 Terakhir)</h2>
+                    <button class="btn-clear" onclick="clearHistory()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>NISN</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scanHistoryBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #666;">Belum ada scan</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        // const API_URL = window.location.origin; // Sesuaikan dengan URL backend Anda
+        const API_URL = 'http://localhost:8080/api';
+        // State management
+        let scanMode = 'auto';
+        let scanStats = JSON.parse(localStorage.getItem('scan_stats') || '{"total":0,"success":0,"fail":0,"today":0,"lastDate":""}');
+        let scanHistory = JSON.parse(localStorage.getItem('scan_history') || '[]');
+
+        // DOM Elements
+        const nisnInput = document.getElementById('nisnInput');
+        const nisnDisplay = document.getElementById('nisnDisplay');
+        const statusPanel = document.getElementById('statusPanel');
+        const manualProcessBtn = document.getElementById('manualProcessBtn');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupScanner();
+            updateStats();
+            renderHistory();
+            
+            // Update today's stats
+            const today = new Date().toDateString();
+            if (scanStats.lastDate !== today) {
+                scanStats.today = 0;
+                scanStats.lastDate = today;
+                saveStats();
+            }
+        });
+
+        function setupScanner() {
+            // Auto focus
+            setTimeout(() => nisnInput.focus(), 500);
+
+            // Input event
+            nisnInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+                updateNISNDisplay(this.value);
+                
+                if (this.value.length === 10 && scanMode === 'auto') {
+                    processNISNScan();
+                }
+            });
+
+            // Enter key
+            nisnInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.value.length === 10) {
+                        processNISNScan();
+                    } else {
+                        showStatus('NISN harus 10 digit', 'error');
+                    }
+                }
+            });
+
+            // Paste event
+            nisnInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
+                this.value = pasted.substring(0, 10);
+                updateNISNDisplay(this.value);
+                
+                if (this.value.length === 10 && scanMode === 'auto') {
+                    setTimeout(() => processNISNScan(), 50);
+                }
+            });
+
+            // Focus/Blur events
+            nisnInput.addEventListener('focus', () => {
+                nisnDisplay.classList.add('focused');
+            });
+
+            nisnInput.addEventListener('blur', () => {
+                nisnDisplay.classList.remove('focused');
+            });
+        }
+
+        function focusInput() {
+            nisnInput.focus();
+        }
+
+        function updateNISNDisplay(value) {
+            const digits = document.querySelectorAll('#nisnDigits .digit');
+            const valueArray = value.split('');
+            
+            for (let i = 0; i < 10; i++) {
+                if (i < valueArray.length) {
+                    digits[i].textContent = valueArray[i];
+                    digits[i].classList.add('filled');
+                } else {
+                    digits[i].textContent = '_';
+                    digits[i].classList.remove('filled');
+                }
+            }
+        }
+
+        function setScanMode(mode) {
+            scanMode = mode;
+            showStatus(`Mode ${mode === 'auto' ? 'Auto Clear' : 'Manual'}`, 'info');
+            manualProcessBtn.style.display = mode === 'manual' ? 'flex' : 'none';
+        }
+
+        async function processNISNScan() {
+            const nisn = nisnInput.value.trim();
+            const location = document.getElementById('scanLocation').value;
+
+            if (!nisn || nisn.length !== 10) {
+                showStatus('NISN harus 10 digit', 'error');
+                return;
+            }
+
+            showStatus('Memproses...', 'info');
+console.log('NISN : ', nisn);
+            try {
+                const response = await fetch(`${API_URL}/scan-nisn`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nisn: nisn,
+                        location: location
+                    })
+                });
+console.log('response : ', response);
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    handleSuccess(data, nisn, location);
+                } else {
+                    handleError(data.message || 'Scan gagal', nisn);
+                }
+            } catch (error) {
+                console.error('Scan error:', error);
+                handleError('Koneksi error: ' + error.message, nisn);
+            }
+        }
+
+        function handleSuccess(response, nisn, location) {
+            const student = response.student;
+            
+            // Update stats
+            scanStats.total++;
+            scanStats.success++;
+            scanStats.today++;
+            saveStats();
+            updateStats();
+
+            // Add to history
+            addToHistory({
+                time: new Date().toLocaleTimeString(),
+                nisn: nisn,
+                nama: student.nama,
+                kelas: student.kelas,
+                location: location,
+                status: 'success'
+            });
+
+            // Show success
+            showStatus(`✓ BERHASIL: ${student.nama} (${student.kelas})`, 'success');
+            updateLastScanResult('success', response);
+            
+            // Play sound
+            playBeepSound('success');
+            
+            // Auto clear
+            if (scanMode === 'auto') {
+                nisnInput.value = '';
+                updateNISNDisplay('');
+            }
+
+            nisnInput.focus();
+        }
+
+        function handleError(message, nisn) {
+            // Update stats
+            scanStats.total++;
+            scanStats.fail++;
+            saveStats();
+            updateStats();
+
+            // Add to history
+            addToHistory({
+                time: new Date().toLocaleTimeString(),
+                nisn: nisn,
+                nama: '-',
+                kelas: '-',
+                location: document.getElementById('scanLocation').value,
+                status: 'error',
+                message: message
+            });
+
+            // Show error
+            showStatus(`✗ GAGAL: ${message}`, 'error');
+            updateLastScanResult('error', { message, nisn });
+            
+            // Play sound
+            playBeepSound('error');
+
+            // Auto clear
+            if (scanMode === 'auto') {
+                nisnInput.value = '';
+                updateNISNDisplay('');
+            }
+
+            nisnInput.focus();
+        }
+
+        function showStatus(message, type) {
+            let icon = '';
+            switch(type) {
+                case 'success': icon = '✅'; break;
+                case 'error': icon = '❌'; break;
+                case 'info': icon = 'ℹ️'; break;
+                default: icon = '👆';
+            }
+
+            statusPanel.innerHTML = `
+                <div class="status-${type}">
+                    ${icon} ${message}
+                </div>
+            `;
+        }
+
+        function updateLastScanResult(type, data) {
+            const resultDiv = document.getElementById('lastScanResult');
+            const contentDiv = document.getElementById('lastScanContent');
+
+            if (type === 'success') {
+                const student = data.student;
+                const attendance = data.attendance;
+                
+                contentDiv.innerHTML = `
+                    <div class="result-success">
+                        <div class="student-info">
+                            <div class="info-row">
+                                <span class="label">NISN:</span>
+                                <span class="value nisn-big">${student.nisn}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Nama:</span>
+                                <span class="value">${student.nama}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Kelas:</span>
+                                <span class="value">${student.kelas}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Waktu:</span>
+                                <span class="value">${attendance.time}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Lokasi:</span>
+                                <span class="value">${attendance.location}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = `
+                    <div class="result-error">
+                        <i class="fas fa-times-circle"></i>
+                        <p>${data.message}</p>
+                        <p class="small">NISN: ${data.nisn}</p>
+                    </div>
+                `;
+            }
+
+            resultDiv.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function closeLastResult() {
+            document.getElementById('lastScanResult').style.display = 'none';
+        }
+
+        function addToHistory(item) {
+            scanHistory.unshift(item);
+            
+            // Keep only last 10 items
+            if (scanHistory.length > 10) {
+                scanHistory.pop();
+            }
+            
+            localStorage.setItem('scan_history', JSON.stringify(scanHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('scanHistoryBody');
+            
+            if (scanHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Belum ada scan</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = scanHistory.map(item => `
+                <tr class="history-${item.status}">
+                    <td>${item.time}</td>
+                    <td class="nisn-cell">${item.nisn}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.kelas}</td>
+                    <td>${item.location}</td>
+                    <td>
+                        <span class="status-badge ${item.status}">
+                            ${item.status === 'success' ? 'Berhasil' : 'Gagal'}
+                        </span>
+                        ${item.message ? `<br><small>${item.message}</small>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat scan?')) {
+                scanHistory = [];
+                localStorage.setItem('scan_history', JSON.stringify(scanHistory));
+                renderHistory();
+                showStatus('Riwayat dibersihkan', 'info');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('scanCount').textContent = scanStats.today || 0;
+            document.getElementById('successCount').textContent = scanStats.success || 0;
+            document.getElementById('failCount').textContent = scanStats.fail || 0;
+        }
+
+        function saveStats() {
+            localStorage.setItem('scan_stats', JSON.stringify(scanStats));
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function playBeepSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'success') {
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                } else {
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.1);
+                }
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Beep sound not supported');
+            }
+        }
+    </script>
+</body>
+</html>

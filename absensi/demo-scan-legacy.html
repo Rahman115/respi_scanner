@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan NISN Legacy - Sistem Absensi QR NISN</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Tambahan style untuk debugging */
+        .status-info { color: #17a2b8; }
+        .status-success { color: #28a745; }
+        .status-error { color: #dc3545; }
+        .status-ready { color: #6c757d; }
+        .nisn-big { font-size: 1.2em; font-weight: bold; }
+        .result-success { padding: 1rem; }
+        .result-error { padding: 1rem; text-align: center; color: #dc3545; }
+        .result-error .small { font-size: 0.8rem; color: #6c757d; }
+        .info-row { margin-bottom: 0.5rem; }
+        .label { font-weight: bold; margin-right: 0.5rem; }
+        .history-success { background-color: rgba(40, 167, 69, 0.1); }
+        .history-error { background-color: rgba(220, 53, 69, 0.1); }
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status-success { background-color: #28a745; color: white; }
+        .status-error { background-color: #dc3545; color: white; }
+        .nisn-cell { font-family: monospace; font-size: 1.1rem; }
+        
+        /* Perbaikan untuk NISN Display */
+        .nisn-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            cursor: text; /* Ubah cursor menjadi text */
+            position: relative;
+            min-height: 100px;
+        }
+        
+        .nisn-digits {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .digit {
+            display: inline-block;
+            width: 3rem;
+            height: 4rem;
+            line-height: 4rem;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            border-bottom: 3px solid #dee2e6;
+            margin: 0 0.2rem;
+            background-color: #f8f9fa;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .digit.filled {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            background-color: #e7f1ff;
+        }
+        
+        #nisnCursor {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+            opacity: 1;
+            transition: opacity 0.1s;
+            color: #007bff;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Style untuk hidden input */
+        .nisn-hidden-input {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+        }
+        
+        /* Scanner container */
+        .scanner-container {
+            position: relative;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        /* Control panel */
+        .control-panel {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .location-selector select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-left: 0.5rem;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .mode-selector label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+        }
+        
+        #manualProcessBtn {
+            display: none;
+        }
+        
+        /* Status panel */
+        .status-panel {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            background: white;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Quick stats */
+        .scan-stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 100px;
+        }
+        
+        .stat i {
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+        
+        .stat span {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stat small {
+            color: #6c757d;
+        }
+        
+        /* Result card */
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .close-btn:hover {
+            color: #dc3545;
+        }
+        
+        /* Feature card */
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            flex: 1;
+        }
+        
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Sidebar styles (tambahkan jika belum ada) */
+        .sidebar {
+            width: 250px;
+            background: #343a40;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .sidebar-header {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #495057;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .menu-item a:hover,
+        .menu-item.active a {
+            background: #007bff;
+            color: white;
+        }
+        
+        .menu-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 1rem;
+            border-top: 1px solid #495057;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+<!--   
+     <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>QR Absensi</h3>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="verify-qr.html">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verifikasi QR</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="bulk-generate.html">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Bulk Generate</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="check-nisn.html">
+                        <i class="fas fa-search"></i>
+                        <span>Cek NISN</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="scan-legacy.html">
+                        <i class="fas fa-scanner"></i>
+                        <span>Scan Legacy</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+-->
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1>Scan NISN Legacy</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scanner Section -->
+            <div class="scanner-container">
+                <div class="scanner-header">
+                    <i class="fas fa-scanner"></i>
+                    <h2>Scanner NISN 10 Digit</h2>
+                    <p class="scanner-subtitle">Klik pada kotak display untuk memulai scan</p>
+                </div>
+
+                <!-- Large NISN Display - sekarang bisa diklik -->
+                <div class="nisn-display" id="nisnDisplay" onclick="focusInput()">
+                    <span class="nisn-digits" id="nisnDigits">
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                        <span class="digit">_</span>
+                    </span>
+                    <span class="nisn-cursor" id="nisnCursor">|</span>
+                </div>
+
+                <!-- Hidden Input untuk scanner -->
+                <input type="text" id="nisnInput" class="nisn-hidden-input" 
+                       maxlength="10" autofocus placeholder="Scan NISN di sini...">
+
+                <!-- Control Panel -->
+                <div class="control-panel">
+                    <div class="location-selector">
+                        <label for="scanLocation">
+                            <i class="fas fa-map-marker-alt"></i> Lokasi:
+                        </label>
+                        <select id="scanLocation">
+                            <option value="Gate Utama">Gate Utama</option>
+                            <option value="Gate Belakang">Gate Belakang</option>
+                            <option value="Lab Komputer">Lab Komputer</option>
+                            <option value="Perpustakaan">Perpustakaan</option>
+                            <option value="Kelas">Kelas</option>
+                        </select>
+                    </div>
+
+                    <div class="mode-selector">
+                        <label>
+                            <input type="radio" name="scanMode" value="auto" checked onchange="setScanMode('auto')">
+                            <i class="fas fa-sync"></i> Auto Clear
+                        </label>
+                        <label>
+                            <input type="radio" name="scanMode" value="manual" onchange="setScanMode('manual')">
+                            <i class="fas fa-hand"></i> Manual
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="processNISNScan()" id="manualProcessBtn">
+                        <i class="fas fa-check"></i> Proses Manual
+                    </button>
+                </div>
+
+                <!-- Status Panel -->
+                <div class="status-panel" id="statusPanel">
+                    <div class="status-ready">
+                        <i class="fas fa-check-circle"></i>
+                        Siap scan... Klik display untuk mulai
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="scan-stats">
+                    <div class="stat">
+                        <i class="fas fa-clock"></i>
+                        <span id="scanCount">0</span>
+                        <small>Scan Hari Ini</small>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="successCount">0</span>
+                        <small>Berhasil</small>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-times-circle"></i>
+                        <span id="failCount">0</span>
+                        <small>Gagal</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Scan Result -->
+            <div class="result-card" id="lastScanResult" style="display: none;">
+                <div class="result-header">
+                    <h3>Hasil Scan Terakhir</h3>
+                    <button class="close-btn" onclick="closeLastResult()">&times;</button>
+                </div>
+                <div id="lastScanContent"></div>
+            </div>
+
+            <!-- Recent Scans -->
+            <div class="feature-card">
+                <div class="card-header">
+                    <i class="fas fa-history"></i>
+                    <h2>Riwayat Scan (10 Terakhir)</h2>
+                    <button class="btn btn-secondary btn-small" onclick="clearHistory()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table id="scanHistory">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>NISN</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scanHistoryBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">Belum ada scan</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data dummy siswa untuk testing
+        const dummyStudents = {
+            '1234567890': { nama: 'Budi Santoso', kelas: '10 IPA 1' },
+            '2345678901': { nama: 'Siti Aminah', kelas: '11 IPS 2' },
+            '3456789012': { nama: 'Ahmad Hidayat', kelas: '12 IPA 3' },
+            '4567890123': { nama: 'Dewi Lestari', kelas: '10 IPS 1' },
+            '5678901234': { nama: 'Rudi Hermawan', kelas: '11 IPA 2' }
+        };
+
+        // State management
+        let scanMode = 'auto';
+        let scanStats = JSON.parse(localStorage.getItem('scan_stats') || '{"total":0,"success":0,"fail":0,"today":0,"lastDate":""}');
+        let scanHistory = JSON.parse(localStorage.getItem('scan_history') || '[]');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up scanner...');
+            setupScanner();
+            updateStats();
+            renderHistory();
+            
+            // Update today's stats jika perlu
+            const today = new Date().toDateString();
+            if (scanStats.lastDate !== today) {
+                scanStats.today = 0;
+                scanStats.lastDate = today;
+                saveStats();
+            }
+            
+            // Tampilkan status siap
+            showStatus('Siap scan... Klik display untuk mulai', 'ready');
+        });
+
+        function focusInput() {
+            document.getElementById('nisnInput').focus();
+            console.log('Input focused via click');
+        }
+
+        function setupScanner() {
+            const input = document.getElementById('nisnInput');
+            
+            // Event listeners
+            input.addEventListener('input', function(e) {
+                // Hanya angka
+                this.value = this.value.replace(/\D/g, '');
+                
+                // Update display
+                updateNISNDisplay(this.value);
+                console.log('Input value:', this.value);
+                
+                // Auto submit jika 10 digit dan mode auto
+                if (this.value.length === 10 && scanMode === 'auto') {
+                    console.log('Auto submit triggered');
+                    processNISNScan();
+                }
+            });
+
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    console.log('Enter pressed');
+                    if (this.value.length === 10) {
+                        processNISNScan();
+                    } else {
+                        showStatus('NISN harus 10 digit', 'error');
+                    }
+                }
+            });
+
+            // Prevent paste of non-digits
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
+                this.value = pasted.substring(0, 10);
+                updateNISNDisplay(this.value);
+                console.log('Pasted value:', this.value);
+                
+                if (this.value.length === 10 && scanMode === 'auto') {
+                    setTimeout(() => processNISNScan(), 50);
+                }
+            });
+
+            // Handle focus/blur untuk cursor
+            input.addEventListener('focus', () => {
+                document.getElementById('nisnCursor').style.animation = 'blink 1s infinite';
+            });
+
+            input.addEventListener('blur', () => {
+                document.getElementById('nisnCursor').style.animation = 'none';
+                document.getElementById('nisnCursor').style.opacity = '0.5';
+            });
+
+            // Auto focus setelah load
+            setTimeout(() => {
+                input.focus();
+            }, 500);
+        }
+
+        function updateNISNDisplay(value) {
+            const digits = document.querySelectorAll('#nisnDigits .digit');
+            const valueArray = value.split('');
+            
+            for (let i = 0; i < 10; i++) {
+                if (i < valueArray.length) {
+                    digits[i].textContent = valueArray[i];
+                    digits[i].classList.add('filled');
+                } else {
+                    digits[i].textContent = '_';
+                    digits[i].classList.remove('filled');
+                }
+            }
+        }
+
+        function setScanMode(mode) {
+            scanMode = mode;
+            showStatus(`Mode ${mode === 'auto' ? 'Auto Clear' : 'Manual'}`, 'info');
+            
+            // Update button visibility
+            document.getElementById('manualProcessBtn').style.display = 
+                mode === 'manual' ? 'inline-block' : 'none';
+        }
+
+        async function processNISNScan() {
+            const nisnInput = document.getElementById('nisnInput');
+            const nisn = nisnInput.value.trim();
+            const location = document.getElementById('scanLocation').value;
+
+            console.log('Processing NISN:', nisn);
+
+            if (!nisn || nisn.length !== 10) {
+                showStatus('NISN harus 10 digit', 'error');
+                return;
+            }
+
+            // Show processing status
+            showStatus('Memproses...', 'info');
+
+            // Simulasi proses scan
+            setTimeout(() => {
+                // Cek apakah NISN ada di database dummy
+                const student = dummyStudents[nisn];
+                
+                if (student) {
+                    // Success
+                    const response = {
+                        success: true,
+                        student: {
+                            nisn: nisn,
+                            nama: student.nama,
+                            kelas: student.kelas
+                        },
+                        attendance: {
+                            time: new Date().toLocaleTimeString(),
+                            date: new Date().toLocaleDateString()
+                        }
+                    };
+                    handleSuccess(response, nisn, location);
+                } else {
+                    // Error - NISN tidak ditemukan
+                    handleError('NISN tidak terdaftar', nisn);
+                }
+            }, 500);
+        }
+
+        function handleSuccess(response, nisn, location) {
+            const student = response.student;
+            
+            console.log('Success:', student);
+            
+            // Update stats
+            scanStats.total++;
+            scanStats.success++;
+            scanStats.today++;
+            saveStats();
+            updateStats();
+
+            // Add to history
+            addToHistory({
+                time: new Date().toLocaleTimeString(),
+                nisn: nisn,
+                nama: student.nama,
+                kelas: student.kelas,
+                location: location,
+                status: 'success'
+            });
+
+            // Show success display
+            showStatus(`BERHASIL: ${student.nama}`, 'success');
+            updateLastScanResult('success', response);
+            
+            // Play sound
+            playBeepSound('success');
+            
+            // Auto clear jika mode auto
+            if (scanMode === 'auto') {
+                document.getElementById('nisnInput').value = '';
+                updateNISNDisplay('');
+            }
+
+            // Focus kembali ke input
+            document.getElementById('nisnInput').focus();
+        }
+
+        function handleError(message, nisn) {
+            console.log('Error:', message);
+            
+            // Update stats
+            scanStats.total++;
+            scanStats.fail++;
+            saveStats();
+            updateStats();
+
+            // Add to history
+            addToHistory({
+                time: new Date().toLocaleTimeString(),
+                nisn: nisn,
+                nama: '-',
+                kelas: '-',
+                location: document.getElementById('scanLocation').value,
+                status: 'error',
+                message: message
+            });
+
+            // Show error
+            showStatus(`GAGAL: ${message}`, 'error');
+            updateLastScanResult('error', { message, nisn });
+            
+            // Play sound
+            playBeepSound('error');
+
+            // Auto clear jika mode auto
+            if (scanMode === 'auto') {
+                document.getElementById('nisnInput').value = '';
+                updateNISNDisplay('');
+            }
+
+            // Focus kembali ke input
+            document.getElementById('nisnInput').focus();
+        }
+
+        function showStatus(message, type) {
+            const panel = document.getElementById('statusPanel');
+            
+            console.log('Status:', type, message);
+            
+            let icon = '';
+            let color = '';
+            
+            switch(type) {
+                case 'success':
+                    icon = '✅';
+                    color = '#28a745';
+                    break;
+                case 'error':
+                    icon = '❌';
+                    color = '#dc3545';
+                    break;
+                case 'info':
+                    icon = 'ℹ️';
+                    color = '#17a2b8';
+                    break;
+                default:
+                    icon = '👆';
+                    color = '#6c757d';
+            }
+
+            panel.innerHTML = `
+                <div class="status-${type}" style="color: ${color}; padding: 1rem; font-weight: bold;">
+                    ${icon} ${message}
+                </div>
+            `;
+        }
+
+        function updateLastScanResult(type, data) {
+            const resultDiv = document.getElementById('lastScanResult');
+            const contentDiv = document.getElementById('lastScanContent');
+
+            if (type === 'success') {
+                const student = data.student;
+                const attendance = data.attendance;
+                
+                contentDiv.innerHTML = `
+                    <div class="result-success">
+                        <div class="student-info">
+                            <div class="info-row">
+                                <span class="label">NISN:</span>
+                                <span class="value nisn-big">${student.nisn}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Nama:</span>
+                                <span class="value">${student.nama}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Kelas:</span>
+                                <span class="value">${student.kelas}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Waktu:</span>
+                                <span class="value">${attendance.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = `
+                    <div class="result-error">
+                        <i class="fas fa-times-circle" style="font-size: 2rem;"></i>
+                        <p style="font-size: 1.2rem;">${data.message}</p>
+                        <p class="small">NISN: ${data.nisn}</p>
+                    </div>
+                `;
+            }
+
+            resultDiv.style.display = 'block';
+            
+            // Auto hide setelah 5 detik
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function closeLastResult() {
+            document.getElementById('lastScanResult').style.display = 'none';
+        }
+
+        function addToHistory(item) {
+            scanHistory.unshift(item);
+            
+            // Batasi 10 item terakhir
+            if (scanHistory.length > 10) {
+                scanHistory.pop();
+            }
+            
+            localStorage.setItem('scan_history', JSON.stringify(scanHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('scanHistoryBody');
+            
+            if (scanHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Belum ada scan</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = scanHistory.map(item => `
+                <tr class="${item.status === 'success' ? 'history-success' : 'history-error'}">
+                    <td>${item.time}</td>
+                    <td class="nisn-cell">${item.nisn}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.kelas}</td>
+                    <td>${item.location}</td>
+                    <td>
+                        <span class="status-badge status-${item.status}">
+                            ${item.status === 'success' ? 'Berhasil' : 'Gagal'}
+                        </span>
+                        ${item.message ? `<br><small>${item.message}</small>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat scan?')) {
+                scanHistory = [];
+                localStorage.setItem('scan_history', JSON.stringify(scanHistory));
+                renderHistory();
+                showStatus('Riwayat dibersihkan', 'info');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('scanCount').textContent = scanStats.today || 0;
+            document.getElementById('successCount').textContent = scanStats.success || 0;
+            document.getElementById('failCount').textContent = scanStats.fail || 0;
+        }
+
+        function saveStats() {
+            localStorage.setItem('scan_stats', JSON.stringify(scanStats));
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function playBeepSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'success') {
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                } else {
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.1);
+                }
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Beep sound not supported');
+            }
+        }
+
+        // Fungsi logout dummy
+        function logout() {
+            alert('Logout clicked');
+        }
+    </script>
+</body>
+</html>

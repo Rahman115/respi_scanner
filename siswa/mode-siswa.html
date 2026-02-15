@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Siswa - Sistem Absensi QR NISN</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Tambahan CSS khusus untuk halaman siswa */
+        .nisn-column {
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-icon {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .btn-icon i {
+            margin-right: 5px;
+        }
+        
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-edit:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn-qr {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-qr:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-mini {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-mini i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .stat-mini-info h4 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-mini-info span {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        
+        .qr-preview-large {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .qr-code-placeholder {
+            font-family: monospace;
+            font-size: 2rem;
+            letter-spacing: 5px;
+            background: white;
+            padding: 20px;
+            display: inline-block;
+            border: 2px dashed var(--primary);
+            border-radius: 10px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .detail-label {
+            width: 120px;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: var(--dark);
+        }
+        
+        .detail-value.nisn {
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>QR Absensi</h3>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="siswa.html" class="active">
+                        <i class="fas fa-users"></i>
+                        <span>Data Siswa</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="verify-qr.html">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verifikasi QR</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="bulk-generate.html">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Bulk Generate</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="check-nisn.html">
+                        <i class="fas fa-search"></i>
+                        <span>Cek NISN</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="scan-legacy.html">
+                        <i class="fas fa-scanner"></i>
+                        <span>Scan Legacy</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1><i class="fas fa-users"></i> Manajemen Data Siswa</h1>
+                <div class="datetime" id="currentDateTime"></div>
+            </div>
+
+            <!-- Mini Stats -->
+            <div class="stats-mini">
+                <div class="stat-mini">
+                    <i class="fas fa-user-graduate"></i>
+                    <div class="stat-mini-info">
+                        <h4>Total Siswa</h4>
+                        <span id="totalSiswa">0</span>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                    <div class="stat-mini-info">
+                        <h4>Dengan NISN</h4>
+                        <span id="denganNISN">0</span>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                    <div class="stat-mini-info">
+                        <h4>Tanpa NISN</h4>
+                        <span id="tanpaNISN">0</span>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-qrcode" style="color: var(--primary);"></i>
+                    <div class="stat-mini-info">
+                        <h4>QR Tersedia</h4>
+                        <span id="qrTersedia">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Input -->
+            <div class="feature-card">
+                <div class="card-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h2 id="formTitle">Tambah Siswa Baru</h2>
+                </div>
+
+                <form id="studentForm">
+                    <input type="hidden" id="oldNis">
+                    
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="nis">
+                                <i class="fas fa-id-card"></i> NIS <span class="required">*</span>
+                            </label>
+                            <input type="text" id="nis" placeholder="Contoh: 2024001" required>
+                        </div>
+
+                        <div class="form-group half">
+                            <label for="nisn">
+                                <i class="fas fa-id-card"></i> NISN (10 digit)
+                            </label>
+                            <input type="text" id="nisn" maxlength="10" placeholder="1234567890">
+                            <small class="form-text">Kosongkan jika belum ada</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="nama">
+                                <i class="fas fa-user"></i> Nama Lengkap <span class="required">*</span>
+                            </label>
+                            <input type="text" id="nama" placeholder="Contoh: John Doe" required>
+                        </div>
+
+                        <div class="form-group half">
+                            <label for="kelas">
+                                <i class="fas fa-school"></i> Kelas <span class="required">*</span>
+                            </label>
+                            <input type="text" id="kelas" placeholder="Contoh: X IPA 1" required>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <i class="fas fa-times"></i> Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="feature-card">
+                <div class="card-header">
+                    <i class="fas fa-filter"></i>
+                    <h2>Filter Data</h2>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="filterKelas">Filter Kelas:</label>
+                        <select id="filterKelas" onchange="applyFilters()">
+                            <option value="">Semua Kelas</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filterNISN">Status NISN:</label>
+                        <select id="filterNISN" onchange="applyFilters()">
+                            <option value="">Semua</option>
+                            <option value="with">Dengan NISN</option>
+                            <option value="without">Tanpa NISN</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="searchInput">Cari:</label>
+                        <input type="text" id="searchInput" placeholder="NIS, NISN, atau Nama..." onkeyup="applyFilters()">
+                    </div>
+
+                    <div class="filter-group">
+                        <button class="btn btn-secondary" onclick="resetFilters()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="feature-card">
+                <div class="card-header">
+                    <i class="fas fa-table"></i>
+                    <h2>Daftar Siswa</h2>
+                    <span class="badge" id="dataCount">0 data</span>
+                </div>
+
+                <div class="table-container">
+                    <table id="studentTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIS</th>
+                                <th>NISN</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Status NISN</th>
+                                <th>QR</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center;">Memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                    <button class="page-btn" onclick="changePage('prev')" id="prevPage">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="pageInfo">Halaman 1 dari 1</span>
+                    <button class="page-btn" onclick="changePage('next')" id="nextPage">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Siswa -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> Detail Siswa</h2>
+                <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal QR Code -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-qrcode"></i> QR Code Siswa</h2>
+                <button class="modal-close" onclick="closeModal('qrModal')">&times;</button>
+            </div>
+            <div id="qrContent"></div>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+    <script src="../js/js_siswa.js"></script>
+    <script>
+        // Override fungsi js_siswa.js dengan yang lebih baik
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudents();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        function showNotification(message, type) {
+            // Gunakan fungsi dari script.js
+            if (window.showNotification) {
+                window.showNotification(message, type);
+            } else {
+                alert(message);
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Override fungsi showDetail untuk menggunakan modal
+        window.showDetail = async function(nis) {
+            try {
+                const response = await makeRequest(`/students/${nis}`, 'GET');
+                if (response.success) {
+                    const s = response.student;
+                    const html = `
+                        <div class="detail-row">
+                            <span class="detail-label">NIS:</span>
+                            <span class="detail-value">${s.nis}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">NISN:</span>
+                            <span class="detail-value nisn">${s.nisn || '-'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Nama:</span>
+                            <span class="detail-value">${s.nama}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Kelas:</span>
+                            <span class="detail-value">${s.kelas}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status NISN:</span>
+                            <span class="detail-value">
+                                ${s.nisn ? 
+                                    '<span class="status-badge status-valid">Valid</span>' : 
+                                    '<span class="status-badge status-missing">Tidak Ada</span>'}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Card Version:</span>
+                            <span class="detail-value">${s.card_version || '1'}</span>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="closeModal('detailModal'); editStudent('${s.nis}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-qr" onclick="closeModal('detailModal'); showQR('${s.nis}')">
+                                <i class="fas fa-qrcode"></i> Lihat QR
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('detailContent').innerHTML = html;
+                    openModal('detailModal');
+                }
+            } catch (error) {
+                showNotification('Gagal memuat detail', 'error');
+            }
+        };
+
+        // Override fungsi showQR untuk menggunakan modal
+        window.showQR = async function(nis) {
+            try {
+                showLoading('Membuat QR Code...');
+                const response = await makeRequest(`/qr/generate/${nis}`, 'GET');
+                hideLoading();
+                
+                if (response.success) {
+                    const html = `
+                        <div class="student-info" style="margin-bottom: 20px;">
+                            <p><strong>Nama:</strong> ${response.student.nama}</p>
+                            <p><strong>NIS:</strong> ${response.student.nis}</p>
+                            <p><strong>Kelas:</strong> ${response.student.kelas}</p>
+                        </div>
+                        <div class="qr-preview-large">
+                            <img src="${response.qr_image}" alt="QR Code" style="max-width: 200px;">
+                            <p class="qr-data" style="margin-top: 10px;">Data: ${response.qr_data}</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <button class="btn btn-primary" onclick="downloadQR('${response.qr_image}', '${response.student.nis}')">
+                                <i class="fas fa-download"></i> Download QR
+                            </button>
+                            <button class="btn btn-secondary" onclick="printQR('${response.qr_image}')">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('qrContent').innerHTML = html;
+                    openModal('qrModal');
+                } else {
+                    showNotification(response.message, 'error');
+                }
+            } catch (error) {
+                hideLoading();
+                showNotification('Gagal membuat QR', 'error');
+            }
+        };
+
+        function downloadQR(qrImage, nis) {
+            // Extract base64 data
+            const base64Data = qrImage.split(',')[1];
+            const blob = base64ToBlob(base64Data, 'image/png');
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `QR_${nis}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function base64ToBlob(base64, type) {
+            const byteCharacters = atob(base64);
+            const byteArrays = [];
+            
+            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                const slice = byteCharacters.slice(offset, offset + 512);
+                
+                const byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+                
+                const byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+            
+            return new Blob(byteArrays, { type: type });
+        }
+
+        function printQR(qrImage) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print QR Code</title>
+                    <style>
+                        body { text-align: center; padding: 50px; }
+                        img { max-width: 300px; }
+                    </style>
+                </head>
+                <body>
+                    <img src="${qrImage}" alt="QR Code">
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
+</body>
+</html>

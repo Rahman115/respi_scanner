@@ -9,7 +9,7 @@ function loadStudents() {
         .then(data => {
             const table = document.getElementById("studentTable");
             table.innerHTML = "";
-
+            cosole.log(data);
             data.data.forEach(siswa => {
                 table.innerHTML += `
                     <tr>
