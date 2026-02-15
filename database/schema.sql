@@ -1,0 +1,2 @@
+-- Schema placeholder
+-- Tambahkan DDL tabel utama di sini.

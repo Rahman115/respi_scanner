@@ -220,3 +220,10 @@ Untuk pertanyaan lebih lanjut, hubungi pengembang aplikasi.
 
 ---
 *Dokumentasi terakhir diperbarui: 2026 februari 04*
+
+## 🧱 STRUKTUR AWAL (SCAFFOLD)
+- Rencana migrasi ke pola MVC tersedia di `docs/MIGRASI_MVC.md` dan dijalankan bertahap.
+- Struktur awal baru telah disiapkan di `src/`, `database/`, `scripts/`, dan `docs/STRUKTUR_AWAL.md`.
+- Implementasi dilakukan **bertahap** (bukan pindah massal) dengan mapping folder lama→baru agar aplikasi tetap stabil.
+- Detail rencana ada di `docs/STRUKTUR_AWAL.md`.
+
