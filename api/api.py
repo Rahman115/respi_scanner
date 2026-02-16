@@ -1295,39 +1295,8 @@ def simulate_error(error_type):
     else:
         return jsonify({'success': False, 'message': 'Error type not found'})
 
-# QUERY ANALIZER
-@app.route('/api/debug/query-analyzer', methods=['POST'])
-def analyze_query():
-    """Analyze SQL query performance"""
-    try:
-        query = request.json.get('query')
-
-        conn = connect_db()
-        cursor = conn.cursor()
-
-        # Explain the query
-        cursor.execute(f"EXPLAIN {query}")
-        explain_result = cursor.fetchall()
-
-        # Execute with profiling
-        cursor.execute("SET profiling = 1")
-        cursor.execute(query)
-        cursor.execute("SHOW PROFILES")
-        profiles = cursor.fetchall()
-
-        return jsonify({
-            'success': True,
-            'explain': explain_result,
-            'profiles': profiles
-        })
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
-
-
-
 # ===========================================
-# ERROR HANDLERS
+# ERROR HANDLERS ============================
 # ===========================================
 
 @app.errorhandler(404)
