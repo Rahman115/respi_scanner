@@ -133,6 +133,8 @@ python3 api.py
 
 ```
 
+
+
 ## 🏃 CARA MENJALANKAN
 
 ### 1. Start Web Server
@@ -207,6 +209,13 @@ session_start();
 - Pastikan kamera mendukung
 - Cek permission akses kamera di browser
 - Verifikasi lighting/pencahayaan
+
+### Menghapus File Logs
+```bash
+sudo truncate -s 0 /var/www/html/api/logs/api.log
+
+```
+
 
 ## 📄 LISENSI
 Proyek ini dikembangkan untuk keperluan internal sekolah.
