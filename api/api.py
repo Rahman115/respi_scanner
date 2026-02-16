@@ -401,7 +401,7 @@ def generate_bulk_qr():
                     })
                 else:
                     # Tambahan catatan untu NISN tidak valid
-                    qr_request.append({
+                    qr_results.append({
                         'nis': student['nis'],
                         'nama': student['nama'],
                         'kelas': student['kelas'],
@@ -411,7 +411,7 @@ def generate_bulk_qr():
                     })
             else:
                 # Jika siswa tidak ditemukan atau tidak punya NISN
-                qr_result.append({
+                qr_results.append({
                 'nis': nis,
                 'error': 'Siswa tidak ditemukan atau tidak memiliki NISN',
                 'qr_data': None,
@@ -1148,7 +1148,7 @@ def test_api():
 # DEBUGS ENDPOINT
 # ===========================================
 # 1. LOG VIEWER - Endpoint
-// Endpoint untuk log
+# Endpoint untuk log
 @app.route('/api/debug/logs', methods=['GET'])
 @token_required
 def get_logs():
@@ -1275,25 +1275,6 @@ def create_backup():
 
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
-
-# ERROR SIMULATOR
-// Endpoint untuk simulate errors
-@app.route('/api/debug/simulate-error/<error_type>', methods=['GET'])
-def simulate_error(error_type):
-    """Simulate various errors for testing"""
-
-    errors = {
-        'database': lambda: simulate_db_error(),
-        'timeout': lambda: simulate_timeout(),
-        'memory': lambda: simulate_memory_error(),
-        'auth': lambda: simulate_auth_error(),
-        'validation': lambda: simulate_validation_error()
-    }
-
-    if error_type in errors:
-        return errors[error_type]()
-    else:
-        return jsonify({'success': False, 'message': 'Error type not found'})
 
 # ===========================================
 # ERROR HANDLERS ============================

@@ -15,7 +15,6 @@ Aplikasi absensi siswa berbasis web dengan fitur manual dan scan QR code untuk p
 absensi/
 ├── manual.php          # Halaman absensi manual
 ├── scan.php            # Halaman scan QR code
-├── test-api.php        # Testing endpoint API
 config/
 ├── database.php        # Konfigurasi koneksi database
 includes/
@@ -29,7 +28,6 @@ api/
 ├── api.py              # API Python untuk scanner
 ├── get_activity.php    # Endpoint get aktivitas
 ├── scanner-api.py      # API utama scanner QR
-├── scanner_api-old.py  # API scanner versi lama
 ├── venv/               # Virtual environment Python
 siswa/                  # Halaman terkait data siswa
 index.html              # Halaman utama/dashboard

@@ -1,7 +1,44 @@
 // script.js - JavaScript bersama untuk semua halaman
 
+// script.js - JavaScript bersama untuk semua halaman
+
+// API Configuration - Deteksi otomatis
+function getApiBaseUrl() {
+    // Coba dapatkan dari localStorage terlebih dahulu
+    const savedUrl = localStorage.getItem('api_base_url');
+    if (savedUrl) return savedUrl;
+    
+    // Deteksi hostname saat ini
+    const currentHost = window.location.hostname;
+    const currentProtocol = window.location.protocol;
+    
+    // Jika diakses dari localhost atau 127.0.0.1
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+        return `${currentProtocol}//localhost:8080/api`;
+    }
+    
+    // Jika diakses dari IP (seperti 192.168.1.x)
+    if (currentHost.match(/^192\.168\.\d+\.\d+$/)) {
+        return `${currentProtocol}//${currentHost}:8080/api`;
+    }
+    
+    // Default fallback
+    return `${currentProtocol}//${currentHost}:8080/api`;
+}
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Simpan ke window object agar bisa diakses
+window.API_BASE_URL = API_BASE_URL;
+
+// Log untuk debugging
+console.log('API Base URL:', API_BASE_URL);
+
+
+
+
 // API Configuration
-const API_BASE_URL = 'http://localhost:8080/api'; // Sesuaikan dengan URL API Anda
+//const API_BASE_URL = 'http://localhost:8080/api'; // Sesuaikan dengan URL API Anda
 
 // JWT Token Management
 let JWT_TOKEN = localStorage.getItem('token') || '';
@@ -74,7 +111,9 @@ async function makeRequest(endpoint, method = 'GET', data = null, requiresAuth =
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
         const result = await response.json();
-
+        console.log('API Response:', response);
+        console.log('API_BASE_URL:', API_BASE_URL);
+        
         // Log activity
         logActivity(`${method} ${endpoint}`, result.success ? 'success' : 'error');
 

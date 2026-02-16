@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadStudents() {
     showLoading('Memuat data siswa...');
-    
+
     try {
         const response = await makeRequest('/students', 'GET');
-        
+
         if (response.success) {
             allStudents = response.students || [];
             updateStats();
@@ -41,7 +41,7 @@ function updateStats() {
     const total = allStudents.length;
     const denganNISN = allStudents.filter(s => s.nisn && s.nisn.length === 10).length;
     const tanpaNISN = total - denganNISN;
-    
+
     document.getElementById('totalSiswa').textContent = total;
     document.getElementById('denganNISN').textContent = denganNISN;
     document.getElementById('tanpaNISN').textContent = tanpaNISN;
@@ -67,11 +67,11 @@ function applyFilters() {
     filteredStudents = allStudents.filter(s => {
         // Filter kelas
         if (kelas && s.kelas !== kelas) return false;
-        
+
         // Filter NISN
         if (nisnFilter === 'with' && !s.nisn) return false;
         if (nisnFilter === 'without' && s.nisn) return false;
-        
+
         // Filter search
         if (search) {
             return s.nis.toLowerCase().includes(search) ||
@@ -79,7 +79,7 @@ function applyFilters() {
                    s.nama.toLowerCase().includes(search) ||
                    s.kelas.toLowerCase().includes(search);
         }
-        
+
         return true;
     });
 
@@ -103,9 +103,9 @@ function renderTable() {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const pageData = filteredStudents.slice(start, end);
-    
+
     const tbody = document.getElementById('studentTableBody');
-    
+
     if (pageData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Tidak ada data siswa</td></tr>';
     } else {
@@ -113,7 +113,7 @@ function renderTable() {
             const statusClass = s.nisn ? 'status-valid' : 'status-missing';
             const statusText = s.nisn ? 'Valid' : 'Tidak Ada';
             const nisnDisplay = s.nisn || '-';
-            
+
             return `
                 <tr>
                     <td>${start + index + 1}</td>
@@ -155,14 +155,14 @@ function renderTable() {
 function updatePagination() {
     const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
     document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
-    
+
     document.getElementById('prevPage').disabled = currentPage === 1;
     document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
 }
 
 function changePage(direction) {
     const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-    
+
     if (direction === 'prev' && currentPage > 1) {
         currentPage--;
     } else if (direction === 'next' && currentPage < totalPages) {
@@ -177,21 +177,21 @@ function changePage(direction) {
 
 function setupInputValidation() {
     const nisnInput = document.getElementById('nisn');
-    
+
     nisnInput.addEventListener('input', function() {
         this.value = this.value.replace(/\D/g, ''); // Hanya angka
         if (this.value.length > 10) {
             this.value = this.value.slice(0, 10);
         }
     });
-    
+
     // Form submit handler
     document.getElementById('studentForm').addEventListener('submit', handleFormSubmit);
 }
 
 async function handleFormSubmit(e) {
     e.preventDefault();
-    
+
     const nis = document.getElementById('nis').value.trim();
     const nisn = document.getElementById('nisn').value.trim();
     const nama = document.getElementById('nama').value.trim();
@@ -211,10 +211,12 @@ async function handleFormSubmit(e) {
     }
 
     const studentData = { nis, nisn, nama, kelas };
-    
+
+    console.log('Student Data', studentData);
+
     try {
         let response;
-        
+
         if (oldNis) {
             // Update
             response = await makeRequest(`/students/${oldNis}`, 'PUT', studentData);
@@ -226,8 +228,11 @@ async function handleFormSubmit(e) {
             response = await makeRequest('/students/add', 'POST', studentData);
             if (response.success) {
                 showNotification('Siswa berhasil ditambahkan', 'success');
+                showNotification('Login berhasil!', 'success');
             }
         }
+
+        console.log('Response :', response);
 
         if (response.success) {
             resetForm();
