@@ -226,9 +226,10 @@ async function handleFormSubmit(e) {
         } else {
             // Create
             response = await makeRequest('/students/add', 'POST', studentData);
+            console.log('Create Response', response);
             if (response.success) {
                 showNotification('Siswa berhasil ditambahkan', 'success');
-                showNotification('Login berhasil!', 'success');
+                // showNotification('Login berhasil!', 'success');
             }
         }
 
@@ -313,12 +314,12 @@ async function deleteStudent(nis) {
 // ===========================================
 
 // Fungsi ini akan di-override oleh script di HTML
-window.showDetail = function(nis) {
-    const student = allStudents.find(s => s.nis === nis);
-    if (student) {
-        alert(`Detail Siswa:\nNIS: ${student.nis}\nNISN: ${student.nisn || '-'}\nNama: ${student.nama}\nKelas: ${student.kelas}`);
-    }
-};
+// window.showDetail = function(nis) {
+//    const student = allStudents.find(s => s.nis === nis);
+//    if (student) {
+//        alert(`Detail Siswa:\nNIS: ${student.nis}\nNISN: ${student.nisn || '-'}\nNama: ${student.nama}\nKelas: ${student.kelas}`);
+//    }
+// };
 
 window.showQR = function(nis) {
     alert('Fitur QR akan segera hadir');

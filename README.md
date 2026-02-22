@@ -133,8 +133,6 @@ python3 api.py
 
 ```
 
-
-
 ## 🏃 CARA MENJALANKAN
 
 ### 1. Start Web Server

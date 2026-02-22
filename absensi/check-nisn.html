@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cek NISN - Sistem Absensi QR NISN</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="../js/navbar.js"></script>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -15,40 +19,14 @@
                 <i class="fas fa-qrcode"></i>
                 <h3>QR Absensi</h3>
             </div>
-            
-            <ul class="sidebar-menu">
-                <li class="menu-item">
-                    <a href="index.html">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="verify-qr.html">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Verifikasi QR</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="bulk-generate.html">
-                        <i class="fas fa-layer-group"></i>
-                        <span>Bulk Generate</span>
-                    </a>
-                </li>
-                <li class="menu-item active">
-                    <a href="check-nisn.html">
-                        <i class="fas fa-search"></i>
-                        <span>Cek NISN</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="scan-legacy.html">
-                        <i class="fas fa-scanner"></i>
-                        <span>Scan Legacy</span>
-                    </a>
-                </li>
-            </ul>
-            
+
+            <ul class="sidebar-menu"></ul>
+            <script>
+                const userRole = "admin"; // ambil dari JWT decode misalnya
+                renderSidebar(userRole);
+
+            </script>
+
             <div class="sidebar-footer">
                 <div class="user-info">
                     <i class="fas fa-user-circle"></i>
@@ -144,7 +122,8 @@
 
                     <div class="form-group">
                         <label for="searchInput">Cari Siswa:</label>
-                        <input type="text" id="searchInput" placeholder="NIS, NISN, atau Nama..." onkeyup="applyFilters()">
+                        <input type="text" id="searchInput" placeholder="NIS, NISN, atau Nama..."
+                            onkeyup="applyFilters()">
                     </div>
                 </div>
             </div>
@@ -234,7 +213,7 @@
         const itemsPerPage = 20;
         let statusChart, kelasChart;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadNISNData();
             loadKelasFilter();
         });
@@ -244,7 +223,7 @@
 
             try {
                 const response = await makeRequest('/students/check-nisn', 'GET');
-                console.log('Response :', response);                
+                console.log('Response :', response);
                 if (response.success) {
                     allStudents = response.students || [];
                     updateSummary(response);
@@ -270,7 +249,7 @@
         function loadKelasFilter() {
             const kelas = [...new Set(allStudents.map(s => s.kelas))];
             const select = document.getElementById('filterKelas');
-            select.innerHTML = '<option value="">Semua Kelas</option>' + 
+            select.innerHTML = '<option value="">Semua Kelas</option>' +
                 kelas.map(k => `<option value="${k}">${k}</option>`).join('');
         }
 
@@ -282,17 +261,17 @@
             filteredStudents = allStudents.filter(s => {
                 // Filter kelas
                 if (kelas && s.kelas !== kelas) return false;
-                
+
                 // Filter status
                 if (status && s.status_nisn !== status) return false;
-                
+
                 // Filter search
                 if (search) {
                     return s.nis.toLowerCase().includes(search) ||
-                           (s.nisn && s.nisn.toLowerCase().includes(search)) ||
-                           s.nama.toLowerCase().includes(search);
+                        (s.nisn && s.nisn.toLowerCase().includes(search)) ||
+                        s.nama.toLowerCase().includes(search);
                 }
-                
+
                 return true;
             });
 
@@ -305,9 +284,9 @@
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
             const pageData = filteredStudents.slice(start, end);
-            
+
             const tbody = document.getElementById('nisnTableBody');
-            
+
             if (pageData.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Tidak ada data</td></tr>';
             } else {
@@ -316,9 +295,9 @@
                         <td>${start + index + 1}</td>
                         <td>${s.nis}</td>
                         <td>
-                            ${s.nisn ? 
-                                `<span class="nisn-cell ${s.status_nisn === 'VALID' ? 'valid' : 'invalid'}">${s.nisn}</span>` : 
-                                '-'}
+                            ${s.nisn ?
+                        `<span class="nisn-cell ${s.status_nisn === 'VALID' ? 'valid' : 'invalid'}">${s.nisn}</span>` :
+                        '-'}
                         </td>
                         <td>${s.nama}</td>
                         <td>${s.kelas}</td>
@@ -352,7 +331,7 @@
         function updatePagination() {
             const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
             document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages}`;
-            
+
             document.getElementById('prevPage').disabled = currentPage === 1;
             document.getElementById('nextPage').disabled = currentPage === totalPages;
         }
@@ -370,7 +349,7 @@
             // Status Chart
             const statusCtx = document.getElementById('statusChart').getContext('2d');
             if (statusChart) statusChart.destroy();
-            
+
             statusChart = new Chart(statusCtx, {
                 type: 'pie',
                 data: {
@@ -402,7 +381,7 @@
 
             const kelasCtx = document.getElementById('kelasChart').getContext('2d');
             if (kelasChart) kelasChart.destroy();
-            
+
             kelasChart = new Chart(kelasCtx, {
                 type: 'bar',
                 data: {
@@ -427,7 +406,7 @@
 
         async function editNISN(nis) {
             const student = allStudents.find(s => s.nis === nis);
-            
+
             const { value: newNisn } = await Swal.fire({
                 title: 'Edit NISN',
                 html: `
@@ -455,7 +434,7 @@
 
         function viewDetails(nis) {
             const student = allStudents.find(s => s.nis === nis);
-            
+
             Swal.fire({
                 title: 'Detail Siswa',
                 html: `
@@ -488,8 +467,8 @@
             ]);
 
             const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-            downloadFile(csv, `NISN_Report_${new Date().toISOString().slice(0,10)}.csv`);
-            
+            downloadFile(csv, `NISN_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+
             showNotification(`${filteredStudents.length} data diekspor`, 'success');
         }
 
@@ -599,4 +578,5 @@
         }
     </script>
 </body>
+
 </html>

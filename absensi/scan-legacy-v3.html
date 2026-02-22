@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Absensi - Tepat Waktu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #1a2639 0%, #2c3e50 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* Main container - full screen no scroll */
+        .scanner-container {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5vh 2vw;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Clock Section - Dominan di atas */
+        .clock-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2rem;
+            margin-bottom: 1.5vh;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .clock-time {
+            font-size: 8vw;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, #a8c0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(168, 192, 255, 0.3);
+        }
+
+        .clock-date {
+            font-size: 1.8vw;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+
+        /* Main Content - Area Scan & Feedback */
+        .main-content {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Scan Area - Default view */
+        .scan-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .scan-icon {
+            width: 8vw;
+            height: 8vw;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .scan-icon svg {
+            width: 4vw;
+            height: 4vw;
+            fill: white;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
+        .scan-instruction {
+            font-size: 2.5vw;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+        }
+
+        .scan-subinstruction {
+            font-size: 1.2vw;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Hidden input for barcode scanner */
+        #nisnInput {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            pointer-events: none;
+        }
+
+        /* Feedback Area - Overlay when scan result */
+        .feedback-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 2rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .feedback-content {
+            text-align: center;
+            padding: 3rem;
+            border-radius: 3rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .student-name {
+            font-size: 3vw;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .student-class {
+            font-size: 1.8vw;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .scan-time {
+            font-size: 1.5vw;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .status-badge {
+            font-size: 2.5vw;
+            font-weight: 800;
+            padding: 0.5rem 2rem;
+            border-radius: 100px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Status colors */
+        .feedback-ontime {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+        }
+
+        .feedback-late {
+            background: linear-gradient(135deg, #f2994a, #f2c94c);
+        }
+
+        .feedback-error {
+            background: linear-gradient(135deg, #eb5757, #f2994a);
+        }
+
+        /* Counter Section */
+        .counter-section {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2rem;
+            padding: 0 3rem;
+            margin: 1.5vh 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .counter-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .counter-label {
+            font-size: 1.2vw;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .counter-value {
+            font-size: 2.5vw;
+            font-weight: 700;
+            color: white;
+        }
+
+        .counter-value.hadir {
+            color: #4ade80;
+        }
+
+        .counter-value.belum {
+            color: #fbbf24;
+        }
+
+        /* Reflective Message */
+        .reflective-message {
+            flex: 0.8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3vw;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+            letter-spacing: 0.5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 1920px) {
+            .clock-time { font-size: 6vw; }
+            .student-name { font-size: 2.5vw; }
+            .status-badge { font-size: 2vw; }
+        }
+
+        /* Ensure no scroll */
+        body, html {
+            overflow: hidden;
+            max-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanner-container">
+        <!-- Jam Digital Besar -->
+        <div class="clock-section">
+            <div class="clock-time" id="currentTime">--:--:--</div>
+            <div class="clock-date" id="currentDate">---, -- --- ----</div>
+        </div>
+
+        <!-- Area Utama: Scan & Feedback -->
+        <div class="main-content">
+            <!-- Default Scan Area -->
+            <div class="scan-area" id="scanArea">
+                <div class="scan-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 6h16v12H4V6zm2 2v8h12V8H6zm2 2h8v4H8v-4z"/>
+                    </svg>
+                </div>
+                <div class="scan-instruction">Silakan Scan Kartu</div>
+                <div class="scan-subinstruction">Tempatkan kartu di depan scanner</div>
+            </div>
+
+            <!-- Feedback Area (muncul saat scan) -->
+            <div class="feedback-area" id="feedbackArea">
+                <div class="feedback-content" id="feedbackContent">
+                    <!-- Diisi oleh JavaScript -->
+                </div>
+            </div>
+
+            <!-- Hidden Input untuk Barcode Scanner -->
+            <input type="text" id="nisnInput" maxlength="10" autofocus>
+        </div>
+
+        <!-- Counter Kehadiran -->
+        <div class="counter-section">
+            <div class="counter-item">
+                <span class="counter-label">Total Hadir</span>
+                <span class="counter-value hadir" id="totalHadir">0</span>
+            </div>
+            <div class="counter-item">
+                <span class="counter-label">Belum Hadir</span>
+                <span class="counter-value belum" id="totalBelum">32</span>
+            </div>
+        </div>
+
+        <!-- Pesan Reflektif -->
+        <div class="reflective-message" id="reflectiveMessage">
+            Disiplin dimulai dari hadir tepat waktu
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8080/api';
+        const BATCH_TIME = '07:40'; // Batas waktu tepat pukul 07:40
+        
+        // Data dummy siswa (untuk demo)
+        const dummyStudents = {
+            '1234567890': { name: 'Ahmad Fauzi', class: 'XI IPA 1' },
+            '1234567891': { name: 'Budi Santoso', class: 'XI IPA 2' },
+            '1234567892': { name: 'Citra Dewi', class: 'XI IPS 1' },
+            '1234567893': { name: 'Dian Pratama', class: 'XI IPS 2' },
+            '1234567894': { name: 'Eka Putri', class: 'X MIPA 1' },
+        };
+
+        // State
+        let attendanceCount = {
+            hadir: 0,
+            total: 32 // Total siswa (contoh)
+        };
+        
+        let scanHistory = JSON.parse(localStorage.getItem('scan_today') || '[]');
+        let messageRotation = [
+            "Disiplin dimulai dari hadir tepat waktu",
+            "Tepat waktu adalah cermin karakter",
+            "Setiap detik berharga, jangan sia-siakan",
+            "Kedisiplinan kunci kesuksesan",
+            "Datang tepat waktu, raih prestasi"
+        ];
+        let messageIndex = 0;
+
+        // DOM Elements
+        const nisnInput = document.getElementById('nisnInput');
+        const scanArea = document.getElementById('scanArea');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const feedbackContent = document.getElementById('feedbackContent');
+        const totalHadirEl = document.getElementById('totalHadir');
+        const totalBelumEl = document.getElementById('totalBelum');
+        const reflectiveMessageEl = document.getElementById('reflectiveMessage');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            setInterval(rotateMessage, 5000); // Rotasi pesan setiap 5 detik
+            updateCounter();
+            
+            // Auto focus dan pastikan selalu focus
+            nisnInput.focus();
+            setInterval(() => {
+                nisnInput.focus();
+            }, 1000);
+        });
+
+        // Real-time clock update
+        function updateClock() {
+            const now = new Date();
+            
+            // Waktu Indonesia (WIB)
+            const timeStr = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            
+            const dateStr = now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('currentTime').textContent = timeStr;
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        // Rotate reflective messages
+        function rotateMessage() {
+            messageIndex = (messageIndex + 1) % messageRotation.length;
+            reflectiveMessageEl.style.opacity = '0';
+            setTimeout(() => {
+                reflectiveMessageEl.textContent = messageRotation[messageIndex];
+                reflectiveMessageEl.style.opacity = '1';
+            }, 300);
+        }
+
+        // Check if current time is late (after 07:40)
+        function isLate() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            // Bandingkan dengan 07:40
+            return (hours > 7) || (hours === 7 && minutes > 40);
+        }
+
+        // Get current time string
+        function getCurrentTimeString() {
+            const now = new Date();
+            return now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        // Process scan
+        async function processScan(nisn) {
+            // Cek validasi NISN
+            if (!nisn || nisn.length !== 10) {
+                showFeedback('error', 'NISN tidak valid', '', '', '');
+                return;
+            }
+
+            // Cek apakah sudah scan hari ini
+            const today = new Date().toDateString();
+            const alreadyScanned = scanHistory.some(s => 
+                s.nisn === nisn && s.date === today
+            );
+
+            if (alreadyScanned) {
+                showFeedback('error', 'Sudah absen hari ini', '', '', '');
+                return;
+            }
+
+            try {
+                // Attempt to fetch from API
+                const response = await fetch(`${API_URL}/siswa/${nisn}`);
+                let studentData;
+                
+                if (response.ok) {
+                    studentData = await response.json();
+                } else {
+                    // Fallback to dummy data for demo
+                    if (dummyStudents[nisn]) {
+                        studentData = dummyStudents[nisn];
+                    } else {
+                        showFeedback('error', 'Siswa tidak terdaftar', '', '', '');
+                        return;
+                    }
+                }
+
+                // Determine status based on time
+                const late = isLate();
+                const status = late ? 'late' : 'ontime';
+                const scanTime = getCurrentTimeString();
+                const today = new Date().toDateString();
+
+                // Save to history
+                scanHistory.push({
+                    nisn: nisn,
+                    date: today,
+                    status: status,
+                    time: scanTime
+                });
+                localStorage.setItem('scan_today', JSON.stringify(scanHistory));
+
+                // Update counter
+                attendanceCount.hadir++;
+                updateCounter();
+
+                // Kirim ke server (async, tidak perlu ditunggu)
+                fetch(`${API_URL}/absensi`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nisn: nisn,
+                        waktu: scanTime,
+                        status: status
+                    })
+                }).catch(err => console.log('Gagal sync ke server:', err));
+
+                // Tampilkan feedback
+                showFeedback(
+                    status,
+                    studentData.name,
+                    studentData.class,
+                    scanTime,
+                    late ? 'TERLAMBAT' : 'TEPAT WAKTU'
+                );
+
+            } catch (error) {
+                console.error('Scan error:', error);
+                showFeedback('error', 'Kesalahan sistem', '', '', '');
+            }
+        }
+
+        // Show feedback and auto reset
+        function showFeedback(type, name, className, time, statusText) {
+            // Siapkan konten feedback
+            let content = '';
+            let bgColor = '';
+            
+            if (type === 'ontime') {
+                bgColor = 'feedback-ontime';
+                content = `
+                    <div class="student-name">${name}</div>
+                    <div class="student-class">${className}</div>
+                    <div class="scan-time">${time}</div>
+                    <div class="status-badge ${bgColor}">${statusText}</div>
+                `;
+            } else if (type === 'late') {
+                bgColor = 'feedback-late';
+                content = `
+                    <div class="student-name">${name}</div>
+                    <div class="student-class">${className}</div>
+                    <div class="scan-time">${time}</div>
+                    <div class="status-badge ${bgColor}">${statusText}</div>
+                `;
+            } else {
+                bgColor = 'feedback-error';
+                content = `
+                    <div class="student-name">${name}</div>
+                    <div class="scan-time">${time || ''}</div>
+                    <div class="status-badge ${bgColor}">GAGAL</div>
+                `;
+            }
+
+            // Tampilkan feedback
+            feedbackContent.innerHTML = content;
+            feedbackArea.style.display = 'flex';
+            scanArea.style.opacity = '0.3';
+
+            // Auto reset setelah 3 detik
+            setTimeout(() => {
+                feedbackArea.style.display = 'none';
+                scanArea.style.opacity = '1';
+                
+                // Reset input dan fokus
+                nisnInput.value = '';
+                nisnInput.focus();
+            }, 3000);
+        }
+
+        // Update counter display
+        function updateCounter() {
+            totalHadirEl.textContent = attendanceCount.hadir;
+            totalBelumEl.textContent = attendanceCount.total - attendanceCount.hadir;
+        }
+
+        // Barcode scanner input handler
+        nisnInput.addEventListener('input', function(e) {
+            const nisn = this.value.trim();
+            
+            // Auto process when length reaches 10 digits
+            if (nisn.length === 10) {
+                processScan(nisn);
+            }
+        });
+
+        // Prevent keyboard from showing on mobile (optional)
+        nisnInput.addEventListener('focus', function() {
+            // For mobile, you might want to blur quickly to hide keyboard
+            // but keep focus for barcode scanner
+            if (window.innerWidth <= 768) {
+                this.blur();
+                setTimeout(() => this.focus(), 50);
+            }
+        });
+
+        // Handle paste from barcode scanner
+        nisnInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
+            if (pasted.length >= 10) {
+                processScan(pasted.substring(0, 10));
+            }
+        });
+
+        // Reset counter setiap hari
+        function resetDailyCounter() {
+            const lastReset = localStorage.getItem('last_reset');
+            const today = new Date().toDateString();
+            
+            if (lastReset !== today) {
+                attendanceCount.hadir = 0;
+                scanHistory = [];
+                localStorage.setItem('scan_today', JSON.stringify([]));
+                localStorage.setItem('last_reset', today);
+                updateCounter();
+            }
+        }
+
+        // Cek reset setiap menit
+        setInterval(resetDailyCounter, 60000);
+        resetDailyCounter();
+
+        // Pastikan selalu full screen dan tidak bisa scroll
+        window.addEventListener('keydown', function(e) {
+            // Prevent scrolling with arrow keys
+            if (e.key.startsWith('Arrow')) {
+                e.preventDefault();
+            }
+        });
+
+        // Handle visibility change untuk menjaga fokus
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                nisnInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

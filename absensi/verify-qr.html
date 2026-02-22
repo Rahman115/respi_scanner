@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi QR - Sistem Absensi QR NISN</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="../js/navbar.js"></script>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar (sama dengan index.html) -->
@@ -15,40 +19,13 @@
                 <i class="fas fa-qrcode"></i>
                 <h3>QR Absensi</h3>
             </div>
-            
-            <ul class="sidebar-menu">
-                <li class="menu-item">
-                    <a href="../index.html">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item active">
-                    <a href="verify-qr.html">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Verifikasi QR</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="bulk-generate.html">
-                        <i class="fas fa-layer-group"></i>
-                        <span>Bulk Generate</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="check-nisn.html">
-                        <i class="fas fa-search"></i>
-                        <span>Cek NISN</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="scan-legacy.html">
-                        <i class="fas fa-scanner"></i>
-                        <span>Scan Legacy</span>
-                    </a>
-                </li>
-            </ul>
-            
+
+            <ul class="sidebar-menu"></ul>
+            <script>
+                const userRole = "admin"; // ambil dari JWT decode misalnya
+                renderSidebar(userRole);
+
+            </script>
             <div class="sidebar-footer">
                 <div class="user-info">
                     <i class="fas fa-user-circle"></i>
@@ -95,9 +72,10 @@
                     <label for="qrDataInput">
                         <i class="fas fa-qrcode"></i> Data QR (JSON atau NISN):
                     </label>
-                    <textarea id="qrDataInput" rows="5" placeholder='Contoh JSON: {"nisn":"1234567890"} atau langsung NISN: 1234567890'></textarea>
+                    <textarea id="qrDataInput" rows="5"
+                        placeholder='Contoh JSON: {"nisn":"1234567890"} atau langsung NISN: 1234567890'></textarea>
                     <p class="input-hint">
-                        <i class="fas fa-info-circle"></i> 
+                        <i class="fas fa-info-circle"></i>
                         Bisa paste langsung dari scanner atau ketik manual. Auto-focus aktif.
                     </p>
                 </div>
@@ -173,10 +151,10 @@
         let cameraStream = null;
         let scanCount = JSON.parse(localStorage.getItem('verify_stats') || '{"total":0,"success":0,"today":0,"students":[]}');
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             setupAutoEntry();
             updateStats();
-            
+
             // Focus ke input
             document.getElementById('qrDataInput').focus();
         });
@@ -184,15 +162,15 @@
         function setupAutoEntry() {
             const input = document.getElementById('qrDataInput');
             // console
-            console.log('INPUT : ',input);
-            input.addEventListener('focus', function() {
+            console.log('INPUT : ', input);
+            input.addEventListener('focus', function () {
                 this.select();
             });
 
-            input.addEventListener('paste', function(e) {
+            input.addEventListener('paste', function (e) {
                 e.preventDefault();
                 const pastedData = e.clipboardData.getData('text');
-                
+
                 // Coba parse sebagai JSON
                 try {
                     const jsonData = JSON.parse(pastedData);
@@ -215,7 +193,7 @@
             });
 
             // Enter key untuk submit
-            input.addEventListener('keypress', function(e) {
+            input.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     verifyQRCode();
@@ -232,7 +210,7 @@
                 showNotification('Data QR tidak boleh kosong', 'error');
                 return;
             }
-            console.log('Hasil Input : ',qrDataInput); // lihat hasil input
+            console.log('Hasil Input : ', qrDataInput); // lihat hasil input
             // Proses input
             let qrData;
             try {
@@ -263,7 +241,7 @@
                     updateStats(true, response.student.nisn);
                     showSuccessResult(response);
                     playBeepSound('success');
-                    
+
                     // Auto clear setelah 3 detik
                     setTimeout(() => {
                         document.getElementById('qrDataInput').value = '';
@@ -352,7 +330,7 @@
 
         function updateStats(isSuccess = false, nisn = null) {
             const today = new Date().toDateString();
-            
+
             // Update counters
             scanCount.total++;
             if (isSuccess) {
@@ -361,20 +339,20 @@
                     scanCount.students.push(nisn);
                 }
             }
-            
+
             // Check if today's date is still today
             if (scanCount.lastDate !== today) {
                 scanCount.today = 0;
                 scanCount.lastDate = today;
             }
             scanCount.today++;
-            
+
             // Save to localStorage
             localStorage.setItem('verify_stats', JSON.stringify(scanCount));
-            
+
             // Update display
             document.getElementById('todayCount').textContent = scanCount.today;
-            document.getElementById('successRate').textContent = 
+            document.getElementById('successRate').textContent =
                 scanCount.total > 0 ? Math.round((scanCount.success / scanCount.total) * 100) + '%' : '0%';
             document.getElementById('uniqueStudents').textContent = scanCount.students.length;
         }
@@ -392,13 +370,13 @@
         // Camera functions (opsional)
         async function toggleCamera() {
             const cameraSection = document.getElementById('cameraSection');
-            
+
             if (cameraSection.style.display === 'none') {
                 try {
                     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                     document.getElementById('camera').srcObject = cameraStream;
                     cameraSection.style.display = 'block';
-                    
+
                     // Setup QR scanning dari camera (perlu library tambahan)
                     startQRScanning();
                 } catch (error) {
@@ -423,37 +401,38 @@
             showNotification('Fitur camera scanner memerlukan library tambahan', 'info');
         }
 
-function playBeepSound(type = 'success') {
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        function playBeepSound(type = 'success') {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
 
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
 
-        // Atur jenis bunyi
-        if (type === 'success') {
-            oscillator.frequency.value = 800; // nada tinggi
-        } else {
-            oscillator.frequency.value = 300; // nada rendah
+                // Atur jenis bunyi
+                if (type === 'success') {
+                    oscillator.frequency.value = 800; // nada tinggi
+                } else {
+                    oscillator.frequency.value = 300; // nada rendah
+                }
+
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2);
+
+                oscillator.onended = () => {
+                    audioContext.close();
+                };
+            } catch (err) {
+                console.error('Gagal memainkan beep:', err);
+            }
         }
-
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.2);
-
-        oscillator.onended = () => {
-            audioContext.close();
-        };
-    } catch (err) {
-        console.error('Gagal memainkan beep:', err);
-    }
-}
 
 
     </script>
 </body>
+
 </html>

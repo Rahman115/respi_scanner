@@ -1,4 +1,3 @@
-
 <!--
 <!DOCTYPE html>
 <html lang="id">
@@ -45,13 +44,18 @@
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistem Absensi QR NISN</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="js/navbar.js"></script>
+
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -60,8 +64,14 @@
                 <i class="fas fa-qrcode"></i>
                 <h3>QR Absensi</h3>
             </div>
-            
+
             <ul class="sidebar-menu">
+                <script>
+                    const userRole = "admin"; // ambil dari JWT decode misalnya
+                    renderSidebar(userRole);
+
+                </script>
+                <!-- 
                 <li class="menu-item active">
                     <a href="index.html">
                         <i class="fas fa-home"></i>
@@ -91,9 +101,10 @@
                         <i class="fas fa-scanner"></i>
                         <span>Scan Legacy</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
-            
+
+
             <div class="sidebar-footer">
                 <div class="user-info">
                     <i class="fas fa-user-circle"></i>
@@ -215,12 +226,13 @@
     </div>
 
     <script src="js/script.js"></script>
+
     <script>
-console.log("Stored token:", localStorage.getItem('token'));
+        console.log("Stored token:", localStorage.getItem('token'));
 
 
         // Fungsi khusus untuk dashboard
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadDashboardStats();
             updateDateTime();
             setInterval(updateDateTime, 1000);
@@ -228,10 +240,10 @@ console.log("Stored token:", localStorage.getItem('token'));
 
         function updateDateTime() {
             const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
@@ -261,7 +273,7 @@ console.log("Stored token:", localStorage.getItem('token'));
                 // Load recent activity dari logs
                 const logs = JSON.parse(localStorage.getItem('activity_logs') || '[]');
                 const recentActivity = document.getElementById('recentActivityList');
-                
+
                 if (logs.length > 0) {
                     recentActivity.innerHTML = logs.slice(0, 5).map(log => `
                         <tr>
@@ -281,4 +293,5 @@ console.log("Stored token:", localStorage.getItem('token'));
         }
     </script>
 </body>
+
 </html>

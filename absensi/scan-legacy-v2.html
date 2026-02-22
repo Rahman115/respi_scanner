@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan NISN - Absensi Siswa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Main container */
+        .container {
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main card */
+        .main-card {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header with Real Time Clock */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .title-section i {
+            font-size: 2.5rem;
+            color: #667eea;
+        }
+
+        .title-section h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .clock-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .clock-time {
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .clock-date {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Input Form */
+        .input-form {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group label i {
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+
+        .nisn-input-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nisn-input-group input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: monospace;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .nisn-input-group input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-scan {
+            padding: 1rem 2.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.3s;
+        }
+
+        .btn-scan:hover {
+            background: #5a67d8;
+        }
+
+        .location-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .location-selector select {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .location-selector select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        /* Status Panel */
+        .status-panel {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f8f9fa;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 4px solid transparent;
+        }
+
+        .status-ready {
+            color: #666;
+        }
+
+        .status-success {
+            color: #28a745;
+            background: #e8f5e9;
+            border-left-color: #28a745;
+        }
+
+        .status-error {
+            color: #dc3545;
+            background: #ffebee;
+            border-left-color: #dc3545;
+        }
+
+        .status-info {
+            color: #17a2b8;
+            background: #e3f2fd;
+            border-left-color: #17a2b8;
+        }
+
+        /* Quick Stats */
+        .scan-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat span {
+            font-size: 2rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .stat small {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .result-header h3 {
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #dc3545;
+        }
+
+        .student-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .label {
+            font-weight: 600;
+            width: 100px;
+            color: #555;
+        }
+
+        .value {
+            flex: 1;
+            color: #333;
+        }
+
+        .nisn-big {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            font-family: monospace;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.hadir {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.terlambat {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Recent Scans Table */
+        .recent-scans {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .recent-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .recent-header i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .recent-header h2 {
+            flex: 1;
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .btn-clear {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .nisn-cell {
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .hadir-row {
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+
+        .terlambat-row {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nisn-input-group {
+                flex-direction: column;
+            }
+
+            .btn-scan {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .clock-time {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">
+        <i class="fas fa-expand"></i> Fullscreen
+    </button>
+
+    <div class="container">
+        <div class="main-card">
+            <!-- Header with Real Time Clock -->
+            <div class="header">
+                <div class="title-section">
+                    <i class="fas fa-qrcode"></i>
+                    <h1>Scan NISN Siswa</h1>
+                </div>
+                <div class="clock-section" id="clockSection">
+                    <div class="clock-time" id="currentTime">--:--:--</div>
+                    <div class="clock-date" id="currentDate">---, -- --- ----</div>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <div class="input-form">
+                <div class="form-group">
+                    <label for="nisn">
+                        <i class="fas fa-id-card"></i> NISN (10 Digit)
+                    </label>
+                    <div class="nisn-input-group">
+                        <input type="text" 
+                               id="nisn" 
+                               maxlength="10" 
+                               placeholder="Masukkan 10 digit NISN"
+                               oninput="this.value = this.value.replace(/\D/g, '')">
+                        <button class="btn-scan" onclick="processScan()">
+                            <i class="fas fa-camera"></i> Scan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="scanLocation">
+                        <i class="fas fa-map-marker-alt"></i> Lokasi
+                    </label>
+                    <div class="location-selector">
+                        <select id="scanLocation">
+                            <option value="Gate Utama">Gate Utama</option>
+                            <option value="Gate Belakang">Gate Belakang</option>
+                            <option value="Lab Komputer">Lab Komputer</option>
+                            <option value="Perpustakaan">Perpustakaan</option>
+                            <option value="Kelas">Kelas</option>
+                            <option value="Aula">Aula</option>
+                            <option value="Lapangan">Lapangan</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Panel -->
+            <div class="status-panel" id="statusPanel">
+                <div class="status-ready">
+                    <i class="fas fa-check-circle"></i> Siap scan... Masukkan NISN
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="scan-stats">
+                <div class="stat">
+                    <i class="fas fa-clock"></i>
+                    <span id="scanCount">0</span>
+                    <small>Total Scan</small>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="hadirCount">0</span>
+                    <small>Hadir</small>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="terlambatCount">0</span>
+                    <small>Terlambat</small>
+                </div>
+            </div>
+
+            <!-- Last Scan Result -->
+            <div class="result-card" id="lastScanResult" style="display: none;">
+                <div class="result-header">
+                    <h3><i class="fas fa-clock"></i> Hasil Scan Terakhir</h3>
+                    <button class="close-btn" onclick="closeLastResult()">&times;</button>
+                </div>
+                <div id="lastScanContent"></div>
+            </div>
+
+            <!-- Recent Scans -->
+            <div class="recent-scans">
+                <div class="recent-header">
+                    <i class="fas fa-history"></i>
+                    <h2>Story Hasil Scanner (10 Terakhir)</h2>
+                    <button class="btn-clear" onclick="clearHistory()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>NISN</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scanHistoryBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #666;">Belum ada scan</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8080/api';
+        
+        // State management
+        let scanHistory = JSON.parse(localStorage.getItem('scan_history') || '[]');
+        let stats = JSON.parse(localStorage.getItem('scan_stats') || '{"total":0,"hadir":0,"terlambat":0}');
+
+        // DOM Elements
+        const nisnInput = document.getElementById('nisn');
+        const statusPanel = document.getElementById('statusPanel');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            updateStats();
+            renderHistory();
+            nisnInput.focus();
+        });
+
+        // Real Time Clock
+        function updateClock() {
+            const now = new Date();
+            
+            // Format time
+            const timeStr = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Format date
+            const dateStr = now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('currentTime').textContent = timeStr;
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        // Check if late (after 7:40 AM)
+        function isLate() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            // Batas waktu 7:40
+            return (hours > 7) || (hours === 7 && minutes > 40);
+        }
+
+        // Process scan
+        async function processScan() {
+            const nisn = nisnInput.value.trim();
+            const location = document.getElementById('scanLocation').value;
+            const scanTime = new Date().toLocaleTimeString('id-ID');
+            const lateStatus = isLate();
+
+            if (!nisn || nisn.length !== 10) {
+                showStatus('NISN harus 10 digit', 'error');
+                return;
+            }
+
+            showStatus('Memproses...', 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/scan-nisn`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nisn: nisn,
+                        location: location
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    handleSuccess(data, nisn, location, scanTime, lateStatus);
+                } else {
+                    handleError(data.message || 'Scan gagal', nisn, location, scanTime);
+                }
+            } catch (error) {
+                console.error('Scan error:', error);
+                // For demo purposes, simulate success
+                simulateSuccess(nisn, location, scanTime, lateStatus);
+            }
+        }
+
+        // Simulate success for demo (remove when API is ready)
+        function simulateSuccess(nisn, location, scanTime, lateStatus) {
+            const demoData = {
+                student: {
+                    nisn: nisn,
+                    nama: 'Budi Santoso',
+                    kelas: 'XI IPA 1'
+                },
+                attendance: {
+                    time: scanTime,
+                    location: location,
+                    status: lateStatus ? 'terlambat' : 'hadir'
+                }
+            };
+            
+            handleSuccess({ success: true, student: demoData.student, attendance: demoData.attendance }, 
+                         nisn, location, scanTime, lateStatus);
+        }
+
+        function handleSuccess(response, nisn, location, scanTime, lateStatus) {
+            const student = response.student;
+            const status = lateStatus ? 'terlambat' : 'hadir';
+            
+            // Update stats
+            stats.total++;
+            if (lateStatus) {
+                stats.terlambat++;
+            } else {
+                stats.hadir++;
+            }
+            saveStats();
+            updateStats();
+
+            // Add to history
+            addToHistory({
+                time: scanTime,
+                nisn: nisn,
+                nama: student.nama,
+                kelas: student.kelas,
+                location: location,
+                status: status
+            });
+
+            // Show success
+            const statusMessage = lateStatus ? 'TERLAMBAT' : 'HADIR';
+            const statusClass = lateStatus ? 'error' : 'success';
+            showStatus(`${statusMessage}: ${student.nama} (${student.kelas})`, statusClass);
+            
+            // Update last scan result
+            updateLastScanResult('success', { student, attendance: { time: scanTime, location, status } });
+            
+            // Play sound
+            playBeepSound(lateStatus ? 'error' : 'success');
+            
+            // Clear input
+            nisnInput.value = '';
+            nisnInput.focus();
+        }
+
+        function handleError(message, nisn, location, scanTime) {
+            // Update stats
+            stats.total++;
+            saveStats();
+            updateStats();
+
+            // Add to history
+            addToHistory({
+                time: scanTime,
+                nisn: nisn,
+                nama: '-',
+                kelas: '-',
+                location: location,
+                status: 'error',
+                message: message
+            });
+
+            // Show error
+            showStatus(`GAGAL: ${message}`, 'error');
+            updateLastScanResult('error', { message, nisn });
+            
+            // Play sound
+            playBeepSound('error');
+
+            // Clear input
+            nisnInput.value = '';
+            nisnInput.focus();
+        }
+
+        function showStatus(message, type) {
+            let icon = '';
+            switch(type) {
+                case 'success': icon = '✅'; break;
+                case 'error': icon = '❌'; break;
+                case 'info': icon = 'ℹ️'; break;
+                default: icon = '👆';
+            }
+
+            statusPanel.innerHTML = `
+                <div class="status-${type}">
+                    ${icon} ${message}
+                </div>
+            `;
+        }
+
+        function updateLastScanResult(type, data) {
+            const resultDiv = document.getElementById('lastScanResult');
+            const contentDiv = document.getElementById('lastScanContent');
+
+            if (type === 'success') {
+                const student = data.student;
+                const attendance = data.attendance;
+                const statusClass = attendance.status === 'terlambat' ? 'terlambat' : 'hadir';
+                const statusText = attendance.status === 'terlambat' ? 'TERLAMBAT' : 'HADIR';
+                
+                contentDiv.innerHTML = `
+                    <div class="result-success">
+                        <div class="student-info">
+                            <div class="info-row">
+                                <span class="label">NISN:</span>
+                                <span class="value nisn-big">${student.nisn}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Nama:</span>
+                                <span class="value">${student.nama}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Kelas:</span>
+                                <span class="value">${student.kelas}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Waktu:</span>
+                                <span class="value">${attendance.time}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Lokasi:</span>
+                                <span class="value">${attendance.location}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Status:</span>
+                                <span class="value">
+                                    <span class="status-badge ${statusClass}">${statusText}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = `
+                    <div class="result-error">
+                        <i class="fas fa-times-circle"></i>
+                        <p>${data.message}</p>
+                        <p class="small">NISN: ${data.nisn}</p>
+                    </div>
+                `;
+            }
+
+            resultDiv.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function closeLastResult() {
+            document.getElementById('lastScanResult').style.display = 'none';
+        }
+
+        function addToHistory(item) {
+            scanHistory.unshift(item);
+            
+            // Keep only last 10 items
+            if (scanHistory.length > 10) {
+                scanHistory.pop();
+            }
+            
+            localStorage.setItem('scan_history', JSON.stringify(scanHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('scanHistoryBody');
+            
+            if (scanHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Belum ada scan</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = scanHistory.map(item => {
+                const rowClass = item.status === 'terlambat' ? 'terlambat-row' : (item.status === 'hadir' ? 'hadir-row' : '');
+                const statusClass = item.status === 'terlambat' ? 'terlambat' : (item.status === 'hadir' ? 'hadir' : 'error');
+                const statusText = item.status === 'terlambat' ? 'Terlambat' : (item.status === 'hadir' ? 'Hadir' : 'Gagal');
+                
+                return `
+                    <tr class="${rowClass}">
+                        <td>${item.time}</td>
+                        <td class="nisn-cell">${item.nisn}</td>
+                        <td>${item.nama}</td>
+                        <td>${item.kelas}</td>
+                        <td>${item.location}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                ${statusText}
+                            </span>
+                            ${item.message ? `<br><small>${item.message}</small>` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('Hapus semua riwayat scan?')) {
+                scanHistory = [];
+                localStorage.setItem('scan_history', JSON.stringify(scanHistory));
+                renderHistory();
+                showStatus('Riwayat dibersihkan', 'info');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('scanCount').textContent = stats.total || 0;
+            document.getElementById('hadirCount').textContent = stats.hadir || 0;
+            document.getElementById('terlambatCount').textContent = stats.terlambat || 0;
+        }
+
+        function saveStats() {
+            localStorage.setItem('scan_stats', JSON.stringify(stats));
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function playBeepSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'success') {
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                } else {
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.1);
+                }
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                console.log('Beep sound not supported');
+            }
+        }
+
+        // Enter key to scan
+        nisnInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processScan();
+            }
+        });
+    </script>
+</body>
+</html>

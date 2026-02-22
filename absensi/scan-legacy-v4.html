@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Absensi - Sekolah</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Status background colors */
+        body.status-ontime {
+            background: linear-gradient(145deg, #00b09b, #96c93d);
+        }
+        
+        body.status-late {
+            background: linear-gradient(145deg, #f2994a, #f2c94c);
+        }
+        
+        body.status-error {
+            background: linear-gradient(145deg, #eb5757, #f2994a);
+        }
+        
+        body.status-warning {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+        }
+
+        /* Main container */
+        .scanner-container {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5vh 2vw;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        /* Clock Section */
+        .clock-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 2rem;
+            margin-bottom: 1.5vh;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .clock-time {
+            font-size: 8vw;
+            font-weight: 700;
+            line-height: 1;
+            color: white;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .clock-date {
+            font-size: 1.8vw;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 1px;
+        }
+
+        .server-time-badge {
+            font-size: 1vw;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Scan Area */
+        .scan-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .scan-icon {
+            width: 8vw;
+            height: 8vw;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .scan-icon svg {
+            width: 4vw;
+            height: 4vw;
+            fill: white;
+        }
+
+        .scan-instruction {
+            font-size: 2.5vw;
+            font-weight: 500;
+            color: white;
+            text-align: center;
+        }
+
+        .scan-subinstruction {
+            font-size: 1.2vw;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Connection Status */
+        .connection-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9vw;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .connection-status.online {
+            background: rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+        }
+
+        .connection-status.offline {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        /* Hidden input */
+        #nisnInput {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            pointer-events: none;
+        }
+
+        /* Feedback Area */
+        .feedback-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .feedback-content {
+            text-align: center;
+            padding: 3rem;
+            border-radius: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .student-name {
+            font-size: 3vw;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .student-class {
+            font-size: 1.8vw;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .scan-time {
+            font-size: 1.5vw;
+            margin-bottom: 1.5rem;
+            color: #777;
+        }
+
+        .status-badge {
+            font-size: 2.5vw;
+            font-weight: 800;
+            padding: 0.5rem 2rem;
+            border-radius: 100px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .previous-scan {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #eee;
+            font-size: 1.2vw;
+            color: #e67e22;
+        }
+
+        /* Counter Section */
+        .counter-section {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 2rem;
+            padding: 0 3rem;
+            margin: 1.5vh 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .counter-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .counter-label {
+            font-size: 1.2vw;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .counter-value {
+            font-size: 2.5vw;
+            font-weight: 700;
+            color: white;
+        }
+
+        .counter-value.hadir {
+            color: #4ade80;
+        }
+
+        .counter-value.belum {
+            color: #fbbf24;
+        }
+
+        /* Reflective Message */
+        .reflective-message {
+            flex: 0.8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3vw;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            letter-spacing: 0.5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        /* Offline Mode Indicator */
+        .offline-mode {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 0.5rem 2rem;
+            border-radius: 50px;
+            font-size: 1vw;
+            display: none;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (min-width: 1920px) {
+            .clock-time { font-size: 6vw; }
+            .student-name { font-size: 2.5vw; }
+            .status-badge { font-size: 2vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanner-container">
+        <!-- Connection Status -->
+        <div class="connection-status" id="connectionStatus">
+            <span class="loading" style="display: none;"></span>
+            <span id="statusText">Menyambungkan...</span>
+        </div>
+
+        <!-- Jam Digital -->
+        <div class="clock-section">
+            <div class="clock-time" id="currentTime">--:--:--</div>
+            <div class="clock-date" id="currentDate">---, -- --- ----</div>
+            <div class="server-time-badge" id="serverTimeBadge">Waktu Server: --:--:--</div>
+        </div>
+
+        <!-- Area Utama -->
+        <div class="main-content">
+            <!-- Scan Area -->
+            <div class="scan-area" id="scanArea">
+                <div class="scan-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 6h16v12H4V6zm2 2v8h12V8H6zm2 2h8v4H8v-4z"/>
+                    </svg>
+                </div>
+                <div class="scan-instruction">Silakan Scan Kartu</div>
+                <div class="scan-subinstruction">Tempatkan kartu di depan scanner</div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div class="feedback-area" id="feedbackArea">
+                <div class="feedback-content" id="feedbackContent">
+                    <!-- Diisi JavaScript -->
+                </div>
+            </div>
+
+            <!-- Hidden Input -->
+            <input type="text" id="nisnInput" maxlength="10" autofocus>
+        </div>
+
+        <!-- Counter -->
+        <div class="counter-section">
+            <div class="counter-item">
+                <span class="counter-label">Hadir Hari Ini</span>
+                <span class="counter-value hadir" id="totalHadir">0</span>
+            </div>
+            <div class="counter-item">
+                <span class="counter-label">Belum Hadir</span>
+                <span class="counter-value belum" id="totalBelum">0</span>
+            </div>
+            <div class="counter-item">
+                <span class="counter-label">Total Siswa</span>
+                <span class="counter-value" id="totalSiswa">0</span>
+            </div>
+        </div>
+
+        <!-- Pesan Reflektif -->
+        <div class="reflective-message" id="reflectiveMessage">
+            Loading pesan inspiratif...
+        </div>
+
+        <!-- Offline Mode Indicator -->
+        <div class="offline-mode" id="offlineMode">
+            Mode Offline - Data tidak tersimpan
+        </div>
+    </div>
+
+    <script>
+        // ==================== KONFIGURASI ====================
+        const CONFIG = {
+            API_URL: 'http://localhost:8080/api',
+            BATCH_TIME: '07:40:00', // Format: HH:MM:SS
+            REQUEST_TIMEOUT: 5000, // 5 detik
+            FEEDBACK_DURATION: 3000, // 3 detik
+            MAX_RETRIES: 3,
+            TOTAL_SISWA: 32 // Default, akan diupdate dari API
+        };
+
+        // ==================== STATE MANAGEMENT ====================
+        const state = {
+            isProcessing: false,
+            isOnline: true,
+            serverTime: null,
+            timeOffset: 0,
+            attendanceCount: {
+                hadir: 0,
+                total: CONFIG.TOTAL_SISWA
+            },
+            messages: [],
+            currentMessageIndex: 0,
+            abortController: null
+        };
+
+        // ==================== DOM ELEMENTS ====================
+        const elements = {
+            nisnInput: document.getElementById('nisnInput'),
+            scanArea: document.getElementById('scanArea'),
+            feedbackArea: document.getElementById('feedbackArea'),
+            feedbackContent: document.getElementById('feedbackContent'),
+            totalHadir: document.getElementById('totalHadir'),
+            totalBelum: document.getElementById('totalBelum'),
+            totalSiswa: document.getElementById('totalSiswa'),
+            reflectiveMessage: document.getElementById('reflectiveMessage'),
+            connectionStatus: document.getElementById('connectionStatus'),
+            statusText: document.getElementById('statusText'),
+            serverTimeBadge: document.getElementById('serverTimeBadge'),
+            offlineMode: document.getElementById('offlineMode'),
+            currentTime: document.getElementById('currentTime'),
+            currentDate: document.getElementById('currentDate')
+        };
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeApp();
+            setupInputHandlers();
+            startClock();
+            loadMessages();
+            startMessageRotation();
+        });
+
+        async function initializeApp() {
+            await syncServerTime();
+            await fetchAttendanceStats();
+            await fetchMessages();
+            focusInput();
+        }
+
+        // ==================== SERVER TIME SYNC (PRESISI) ====================
+        async function syncServerTime() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+
+                const startTime = Date.now();
+                const response = await fetch(`${CONFIG.API_URL}/server-time`, {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error('Server time unavailable');
+                
+                const data = await response.json();
+                const roundTripTime = Date.now() - startTime;
+                
+                // Server time dalam format ISO, hitung offset
+                const serverTimeMs = new Date(data.serverTime).getTime();
+                const clientTimeMs = Date.now();
+                
+                // Offset = serverTime - (clientTime - (roundTripTime/2))
+                state.timeOffset = serverTimeMs - (clientTimeMs - (roundTripTime / 2));
+                
+                updateConnectionStatus(true);
+                updateServerTimeBadge();
+                
+            } catch (error) {
+                console.error('Time sync failed:', error);
+                updateConnectionStatus(false);
+                state.timeOffset = 0; // Fallback ke client time
+            }
+        }
+
+        // Get current server time (dengan kompensasi offset)
+        function getCurrentServerTime() {
+            return new Date(Date.now() + state.timeOffset);
+        }
+
+        // Presisi pengecekan terlambat
+        function isLate() {
+            const serverTime = getCurrentServerTime();
+            const [batchHour, batchMinute, batchSecond] = CONFIG.BATCH_TIME.split(':').map(Number);
+            
+            const batchTime = new Date(serverTime);
+            batchTime.setHours(batchHour, batchMinute, batchSecond, 0);
+            
+            // Bandingkan dengan presisi milidetik
+            return serverTime.getTime() >= batchTime.getTime();
+        }
+
+        // ==================== API INTEGRATION (ROBUST) ====================
+        async function apiRequest(endpoint, options = {}) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+            
+            state.abortController = controller;
+
+            try {
+                const response = await fetch(`${CONFIG.API_URL}${endpoint}`, {
+                    ...options,
+                    signal: controller.signal,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                updateConnectionStatus(true);
+                return await response.json();
+
+            } catch (error) {
+                clearTimeout(timeoutId);
+                
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timeout');
+                }
+                
+                updateConnectionStatus(false);
+                throw error;
+            }
+        }
+
+        // Fetch attendance stats
+        async function fetchAttendanceStats() {
+            try {
+                const data = await apiRequest('/absensi/stats/hari-ini');
+                state.attendanceCount.hadir = data.hadir || 0;
+                state.attendanceCount.total = data.total || CONFIG.TOTAL_SISWA;
+                updateCounter();
+            } catch (error) {
+                console.warn('Using fallback stats:', error);
+                // Fallback ke perhitungan lokal
+                state.attendanceCount.hadir = 0;
+                state.attendanceCount.total = CONFIG.TOTAL_SISWA;
+                updateCounter();
+            }
+        }
+
+        // Fetch inspiratif messages
+        async function fetchMessages() {
+            try {
+                const data = await apiRequest('/messages');
+                state.messages = data.messages || [
+                    "Disiplin dimulai dari hadir tepat waktu",
+                    "Tepat waktu adalah cermin karakter",
+                    "Setiap detik berharga, jangan sia-siakan"
+                ];
+            } catch (error) {
+                console.warn('Using default messages:', error);
+                state.messages = [
+                    "Disiplin dimulai dari hadir tepat waktu",
+                    "Tepat waktu adalah cermin karakter",
+                    "Setiap detik berharga, jangan sia-siakan"
+                ];
+            }
+        }
+
+        // Check if student already scanned
+        async function checkPreviousScan(nisn) {
+            try {
+                return await apiRequest(`/absensi/cek/${nisn}`);
+            } catch (error) {
+                console.warn('Check previous scan failed:', error);
+                return null;
+            }
+        }
+
+        // Submit attendance
+        async function submitAttendance(nisn, status) {
+            const scanTime = getCurrentServerTime().toISOString();
+            
+            try {
+                return await apiRequest('/absensi', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        nisn,
+                        waktu: scanTime,
+                        status,
+                        source: 'scanner'
+                    })
+                });
+            } catch (error) {
+                console.error('Submit failed:', error);
+                throw error;
+            }
+        }
+
+        // ==================== SCAN PROCESSING (ANTI-DOUBLE) ====================
+        async function processScan(nisn) {
+            // Lock check
+            if (state.isProcessing) {
+                console.log('Already processing, ignoring scan');
+                return;
+            }
+
+            // Validasi NISN
+            if (!nisn || !/^\d{10}$/.test(nisn)) {
+                showFeedback('error', 'NISN tidak valid', '', '', '');
+                return;
+            }
+
+            state.isProcessing = true;
+
+            try {
+                // Cek koneksi server dulu
+                if (!state.isOnline) {
+                    throw new Error('Server offline');
+                }
+
+                // Cek apakah sudah absen sebelumnya
+                const previousScan = await checkPreviousScan(nisn);
+                
+                if (previousScan && previousScan.sudahAbsen) {
+                    // Tampilkan informasi jam scan sebelumnya
+                    showFeedback(
+                        'warning',
+                        previousScan.nama,
+                        previousScan.kelas,
+                        previousScan.waktuAbsen,
+                        'SUDAH ABSEN',
+                        previousScan.waktuAbsen
+                    );
+                    return;
+                }
+
+                // Cek status keterlambatan
+                const late = isLate();
+                const status = late ? 'terlambat' : 'hadir';
+
+                // Submit ke server
+                const result = await submitAttendance(nisn, status);
+
+                // Update counter
+                if (result.success) {
+                    state.attendanceCount.hadir++;
+                    updateCounter();
+                }
+
+                // Tampilkan feedback
+                showFeedback(
+                    late ? 'late' : 'ontime',
+                    result.nama,
+                    result.kelas,
+                    result.waktu,
+                    late ? 'TERLAMBAT' : 'TEPAT WAKTU'
+                );
+
+            } catch (error) {
+                console.error('Scan error:', error);
+                
+                let errorMessage = 'Kesalahan sistem';
+                if (error.message === 'Server offline') {
+                    errorMessage = 'Server tidak tersedia';
+                } else if (error.message === 'Request timeout') {
+                    errorMessage = 'Koneksi timeout';
+                } else if (error.message.includes('siswa tidak ditemukan')) {
+                    errorMessage = 'Siswa tidak terdaftar';
+                }
+
+                showFeedback('error', errorMessage, '', '', '');
+                
+                // Tampilkan offline mode indicator
+                elements.offlineMode.style.display = 'block';
+                setTimeout(() => {
+                    elements.offlineMode.style.display = 'none';
+                }, 3000);
+
+            } finally {
+                // Release lock setelah selesai
+                state.isProcessing = false;
+            }
+        }
+
+        // ==================== FEEDBACK VISUAL (DOMINAN) ====================
+        function showFeedback(type, name, className, time, statusText, previousTime = null) {
+            // Set body background
+            document.body.className = '';
+            document.body.classList.add(`status-${type}`);
+
+            // Konten feedback
+            let content = '';
+            
+            if (type === 'ontime' || type === 'late') {
+                content = `
+                    <div class="student-name">${name}</div>
+                    <div class="student-class">${className}</div>
+                    <div class="scan-time">${formatTime(time)}</div>
+                    <div class="status-badge" style="background: ${type === 'ontime' ? '#00b09b' : '#f2994a'}; color: white;">
+                        ${statusText}
+                    </div>
+                `;
+            } else if (type === 'warning') {
+                content = `
+                    <div class="student-name">${name}</div>
+                    <div class="student-class">${className}</div>
+                    <div class="previous-scan">
+                        Sudah absen pukul ${formatTime(previousTime)}
+                    </div>
+                    <div class="status-badge" style="background: #f39c12; color: white;">
+                        SUDAH ABSEN
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div class="student-name">${name}</div>
+                    <div class="status-badge" style="background: #eb5757; color: white;">
+                        GAGAL
+                    </div>
+                `;
+            }
+
+            // Tampilkan feedback
+            elements.feedbackContent.innerHTML = content;
+            elements.feedbackArea.style.display = 'flex';
+            elements.scanArea.style.opacity = '0.3';
+
+            // Auto reset
+            setTimeout(() => {
+                elements.feedbackArea.style.display = 'none';
+                elements.scanArea.style.opacity = '1';
+                document.body.className = ''; // Reset background
+                resetInput();
+            }, CONFIG.FEEDBACK_DURATION);
+        }
+
+        // ==================== INPUT HANDLERS ====================
+        function setupInputHandlers() {
+            // Barcode scanner input
+            elements.nisnInput.addEventListener('input', function(e) {
+                const nisn = this.value.trim();
+                if (nisn.length === 10 && !state.isProcessing) {
+                    processScan(nisn);
+                }
+            });
+
+            // Paste handler
+            elements.nisnInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
+                if (pasted.length >= 10 && !state.isProcessing) {
+                    processScan(pasted.substring(0, 10));
+                }
+            });
+
+            // Enter key
+            elements.nisnInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !state.isProcessing) {
+                    const nisn = this.value.trim();
+                    if (nisn.length === 10) {
+                        processScan(nisn);
+                    }
+                }
+            });
+
+            // Keep focus
+            elements.nisnInput.addEventListener('blur', () => {
+                setTimeout(() => focusInput(), 100);
+            });
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function focusInput() {
+            elements.nisnInput.focus();
+        }
+
+        function resetInput() {
+            elements.nisnInput.value = '';
+            focusInput();
+        }
+
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        function updateCounter() {
+            elements.totalHadir.textContent = state.attendanceCount.hadir;
+            elements.totalBelum.textContent = state.attendanceCount.total - state.attendanceCount.hadir;
+            elements.totalSiswa.textContent = state.attendanceCount.total;
+        }
+
+        function updateConnectionStatus(online) {
+            state.isOnline = online;
+            const statusEl = elements.connectionStatus;
+            const statusText = elements.statusText;
+
+            if (online) {
+                statusEl.className = 'connection-status online';
+                statusText.textContent = 'Terhubung';
+                elements.offlineMode.style.display = 'none';
+            } else {
+                statusEl.className = 'connection-status offline';
+                statusText.textContent = 'Offline - Menggunakan cache';
+            }
+        }
+
+        function updateServerTimeBadge() {
+            const serverTime = getCurrentServerTime();
+            elements.serverTimeBadge.textContent = `Waktu Server: ${serverTime.toLocaleTimeString('id-ID')}`;
+        }
+
+        // ==================== CLOCK (OPTIMIZED) ====================
+        function startClock() {
+            // Update jam setiap detik, tapi efisien
+            let lastSecond = -1;
+            
+            function tick() {
+                const serverTime = getCurrentServerTime();
+                const seconds = serverTime.getSeconds();
+                
+                // Update hanya jika detik berubah
+                if (seconds !== lastSecond) {
+                    const timeStr = serverTime.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    });
+                    
+                    const dateStr = serverTime.toLocaleDateString('id-ID', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    elements.currentTime.textContent = timeStr;
+                    elements.currentDate.textContent = dateStr;
+                    
+                    lastSecond = seconds;
+                }
+                
+                // Update server time badge setiap 30 detik
+                if (seconds % 30 === 0) {
+                    updateServerTimeBadge();
+                }
+                
+                // Gunakan requestAnimationFrame untuk efisiensi
+                requestAnimationFrame(() => {
+                    setTimeout(tick, 100);
+                });
+            }
+            
+            tick();
+        }
+
+        // ==================== MESSAGE ROTATION ====================
+        function loadMessages() {
+            // Pesan sudah di-load dari API
+        }
+
+        function startMessageRotation() {
+            if (state.messages.length === 0) return;
+            
+            function updateMessage() {
+                elements.reflectiveMessage.textContent = state.messages[state.currentMessageIndex];
+                state.currentMessageIndex = (state.currentMessageIndex + 1) % state.messages.length;
+            }
+            
+            // Update setiap 7 detik
+            updateMessage();
+            setInterval(updateMessage, 7000);
+        }
+
+        // ==================== CONNECTION HEALTH CHECK ====================
+        setInterval(async () => {
+            await syncServerTime();
+            await fetchAttendanceStats();
+        }, 30000); // Update setiap 30 detik
+
+        // ==================== PREVENT SCROLL ====================
+        window.addEventListener('keydown', (e) => {
+            if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'Tab') {
+                e.preventDefault();
+            }
+        });
+
+        // ==================== CLEANUP ====================
+        window.addEventListener('beforeunload', () => {
+            if (state.abortController) {
+                state.abortController.abort();
+            }
+        });
+    </script>
+</body>
+</html>

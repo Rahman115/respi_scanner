@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Siswa - QR Absensi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideInDown 0.5s ease;
+        }
+
+        .form-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-card h2 i {
+            color: #667eea;
+        }
+
+        .form-card .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-group label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        .btn-generate i {
+            font-size: 18px;
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Student Card */
+        .student-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideInUp 0.5s ease;
+            display: none;
+        }
+
+        .student-card.visible {
+            display: block;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .card-header h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .card-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card-header .school-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 40px;
+            opacity: 0.2;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .student-photo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 50%;
+            margin: -50px auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .student-photo i {
+            font-size: 50px;
+            color: #667eea;
+        }
+
+        .student-info {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .student-info h4 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .student-info .class-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .info-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            font-family: monospace;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .qr-section h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        #qrImage {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 15px;
+            display: block;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ccc;
+        }
+
+        .qr-placeholder i {
+            font-size: 50px;
+            color: #999;
+        }
+
+        .nisn-text {
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .card-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-print {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-print:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+            border: none;
+        }
+
+        .btn-reset:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .form-card, .btn-generate, .btn-action {
+                display: none;
+            }
+            
+            .student-card {
+                display: block;
+                box-shadow: none;
+                margin: 0;
+                animation: none;
+            }
+            
+            .student-card.visible {
+                display: block;
+            }
+            
+            .card-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Form Card -->
+        <div class="form-card">
+            <h2>
+                <i class="fas fa-id-card"></i>
+                Buat Kartu Siswa
+            </h2>
+            <p class="subtitle">Masukkan NIS untuk membuat kartu siswa dengan QR Code</p>
+            
+            <div class="input-group">
+                <label for="nis">
+                    <i class="fas fa-id-badge"></i>
+                    Nomor Induk Siswa (NIS)
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="nis" placeholder="Contoh: 2024001" autocomplete="off">
+                </div>
+            </div>
+
+            <button class="btn-generate" onclick="generateQR()" id="generateBtn">
+                <i class="fas fa-qrcode"></i>
+                <span>Generate Kartu</span>
+            </button>
+        </div>
+
+        <!-- Student Card -->
+        <div class="student-card" id="studentCard">
+            <div class="card-header">
+                <h3 id="schoolName">Sekolah Menengah Kejuruan</h3>
+                <p id="schoolDesc">Kartu Identitas Siswa</p>
+                <i class="fas fa-school school-icon"></i>
+            </div>
+
+            <div class="card-body">
+                <div class="student-photo">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+
+                <div class="student-info">
+                    <h4 id="studentName">-</h4>
+                    <span class="class-badge" id="studentClass">-</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">NIS</span>
+                        <span class="value" id="studentNIS">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">NISN</span>
+                        <span class="value" id="studentNISN">-</span>
+                    </div>
+                </div>
+
+                <div class="qr-section">
+                    <h4><i class="fas fa-qrcode"></i> QR Code Absensi</h4>
+                    <img id="qrImage" alt="QR Code akan muncul di sini" style="display: none;">
+                    <div id="qrPlaceholder" class="qr-placeholder">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div id="nisnDisplay" class="nisn-text">-</div>
+                </div>
+
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+            </div>
+
+            <div class="card-footer">
+                <button class="btn-action btn-download" onclick="downloadCard()" id="downloadBtn" disabled>
+                    <i class="fas fa-download"></i>
+                    Unduh
+                </button>
+                <button class="btn-action btn-print" onclick="printCard()" id="printBtn" disabled>
+                    <i class="fas fa-print"></i>
+                    Cetak
+                </button>
+                <button class="btn-action btn-reset" onclick="resetCard()">
+                    <i class="fas fa-redo"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/qr.js"></script>
+    <script>
+        // Override fungsi generateQR dari qr.js untuk menangani tampilan kartu
+        const originalGenerateQR = window.generateQR;
+        
+        window.generateQR = async function() {
+            const nis = document.getElementById('nis').value;
+            const statusEl = document.getElementById('statusMessage');
+            const qrImage = document.getElementById('qrImage');
+            const qrPlaceholder = document.getElementById('qrPlaceholder');
+            const studentCard = document.getElementById('studentCard');
+            const generateBtn = document.getElementById('generateBtn');
+
+            if (!nis) {
+                showStatus('NIS wajib diisi', 'error');
+                return;
+            }
+
+            // Tampilkan loading
+            showStatus('Mengambil data...', 'info');
+            generateBtn.innerHTML = '<span class="loading-spinner"></span><span>Memproses...</span>';
+            generateBtn.disabled = true;
+            
+            // Sembunyikan QR sebelumnya
+            qrImage.style.display = 'none';
+            qrPlaceholder.style.display = 'flex';
+            qrImage.src = '';
+
+            try {
+                // Panggil API menggunakan fungsi dari qr.js
+                const response = await fetch(`${API_URL}/qr/generate/${nis}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    showStatus(data.message || 'Gagal generate QR', 'error');
+                    studentCard.classList.remove('visible');
+                    return;
+                }
+
+                // Tampilkan QR
+                qrImage.src = data.qr_image;
+                qrImage.style.display = 'block';
+                qrPlaceholder.style.display = 'none';
+                
+                // Update data siswa di kartu
+                updateStudentCard(data.student);
+                
+                // Tampilkan NISN
+                document.getElementById('nisnDisplay').textContent = data.qr_data || '-';
+                
+                // Tampilkan kartu
+                studentCard.classList.add('visible');
+                
+                // Aktifkan tombol
+                document.getElementById('downloadBtn').disabled = false;
+                document.getElementById('printBtn').disabled = false;
+                
+                showStatus('QR berhasil dibuat', 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Server tidak merespon', 'error');
+                studentCard.classList.remove('visible');
+            } finally {
+                // Kembalikan tombol generate
+                generateBtn.innerHTML = '<i class="fas fa-qrcode"></i><span>Generate Kartu</span>';
+                generateBtn.disabled = false;
+            }
+        };
+
+        // Fungsi untuk update data siswa di kartu
+        function updateStudentCard(student) {
+            document.getElementById('studentName').textContent = student.nama || '-';
+            document.getElementById('studentClass').textContent = student.kelas || '-';
+            document.getElementById('studentNIS').textContent = student.nis || '-';
+            document.getElementById('studentNISN').textContent = student.nisn || '-';
+        }
+
+        // Fungsi untuk menampilkan status
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            statusEl.style.display = 'block';
+            
+            // Auto hide setelah 3 detik untuk success
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Fungsi reset kartu
+        function resetCard() {
+            // Reset input
+            document.getElementById('nis').value = '';
+            
+            // Reset QR
+            const qrImage = document.getElementById('qrImage');
+            const qrPlaceholder = document.getElementById('qrPlaceholder');
+            qrImage.style.display = 'none';
+            qrPlaceholder.style.display = 'flex';
+            qrImage.src = '';
+            
+            // Reset data siswa
+            document.getElementById('studentName').textContent = '-';
+            document.getElementById('studentClass').textContent = '-';
+            document.getElementById('studentNIS').textContent = '-';
+            document.getElementById('studentNISN').textContent = '-';
+            document.getElementById('nisnDisplay').textContent = '-';
+            
+            // Sembunyikan kartu
+            document.getElementById('studentCard').classList.remove('visible');
+            
+            // Nonaktifkan tombol
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('printBtn').disabled = true;
+            
+            // Sembunyikan status
+            document.getElementById('statusMessage').style.display = 'none';
+            
+            // Fokus ke input
+            document.getElementById('nis').focus();
+        }
+
+        // Fungsi download kartu
+        async function downloadCard() {
+            const studentCard = document.getElementById('studentCard');
+            
+            if (!studentCard.classList.contains('visible')) {
+                showStatus('Buat kartu terlebih dahulu', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Menyiapkan unduhan...', 'info');
+                
+                // Load html2canvas jika belum ada
+                if (!window.html2canvas) {
+                    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+                }
+                
+                const canvas = await html2canvas(studentCard, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    allowTaint: true,
+                    useCORS: true
+                });
+
+                const nis = document.getElementById('studentNIS').textContent;
+                const link = document.createElement('a');
+                link.download = `Kartu_Siswa_${nis}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                showStatus('Kartu berhasil diunduh', 'success');
+            } catch (error) {
+                console.error('Download error:', error);
+                showStatus('Gagal mengunduh kartu', 'error');
+            }
+        }
+
+        // Fungsi cetak kartu
+        function printCard() {
+            const studentCard = document.getElementById('studentCard');
+            
+            if (!studentCard.classList.contains('visible')) {
+                showStatus('Buat kartu terlebih dahulu', 'error');
+                return;
+            }
+
+            window.print();
+        }
+
+        // Fungsi helper untuk load script
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Event listener untuk enter key
+        document.getElementById('nis').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+
+        // Auto focus saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('nis').focus();
+        });
+    </script>
+</body>
+</html>
