@@ -1,5 +1,5 @@
 # APLIKASI ABSENSI SISWA
-### Update Version 3.04
+### Update Version 3.05
 
 Aplikasi absensi siswa berbasis web dengan fitur manual dan scan QR code untuk pencatatan kehadiran.
 
@@ -68,6 +68,8 @@ CREATE DATABASE absensi_siswa;
 -- Import struktur database (jika ada file .sql)
 -- mysql -u username -p absensi_siswa < database.sql
 ```
+
+
 
 ### 3. Konfigurasi Database
 Edit file `config/database.php`:
