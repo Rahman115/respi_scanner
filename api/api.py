@@ -547,6 +547,7 @@ def debug_table_structure():
 
 
 # CHECK NISN - GET
+# !! terdapat perubahan kelas ke kelas_id
 @app.route("/api/students/check-nisn", methods=["GET"])
 @token_required
 def check_student_nisn():
@@ -564,7 +565,7 @@ def check_student_nisn():
                 nis,
                 nisn,
                 nama,
-                kelas,
+                kelas_id,
                 CASE
                     WHEN nisn IS NULL OR nisn = '' THEN 'TIDAK ADA'
                     WHEN LENGTH(TRIM(nisn)) != 10 THEN 'TIDAK VALID'
@@ -573,7 +574,7 @@ def check_student_nisn():
                 END as status_nisn,
                 LENGTH(TRIM(nisn)) as panjang_nisn
             FROM siswa
-            ORDER BY kelas, nama
+            ORDER BY kelas_id, nama
         """
         )
 
@@ -840,12 +841,12 @@ def get_students():
 
         if kelas:
             cursor.execute(
-                "SELECT id, nis, nisn, nama, kelas FROM siswa WHERE kelas = %s ORDER BY nama",
+                "SELECT id, nis, nisn, nama, kelas_id FROM siswa WHERE kelas_id = %s ORDER BY nama",
                 (kelas,),
             )
         else:
             cursor.execute(
-                "SELECT id, nis, nisn, nama, kelas FROM siswa ORDER BY kelas, nama"
+                "SELECT id, nis, nisn, nama, kelas_id FROM siswa ORDER BY kelas_id, nama"
             )
 
         students = cursor.fetchall()
@@ -874,7 +875,7 @@ def get_student_detail(nis):
 
         # Get student data
         cursor.execute(
-            """SELECT id, nis, nisn, nama, kelas, card_version 
+            """SELECT id, nis, nisn, nama, kelas_id, card_version 
                FROM siswa 
                WHERE nis = %s""",
             (nis,),
@@ -1109,7 +1110,7 @@ def update_student(nis):
 
         # Update data
         cursor.execute(
-            "UPDATE siswa SET nama = %s, kelas = %s WHERE nis = %s",
+            "UPDATE siswa SET nama = %s, kelas_id = %s WHERE nis = %s",
             (nama.strip(), kelas.strip(), nis),
         )
 
@@ -2462,7 +2463,7 @@ def get_kelas_statistics():
 # ATTENDANCE ENDPOINTS
 # ===========================================
 
-
+# !! perbaiki kelas menjadi kelas_id
 @app.route("/api/attendance/today", methods=["GET"])
 @token_required
 def get_today_attendance():
@@ -2480,7 +2481,7 @@ def get_today_attendance():
         cursor = conn.cursor(dictionary=True)
 
         query = """
-            SELECT a.*, s.nama, s.kelas 
+            SELECT a.*, s.nama, s.kelas_id 
             FROM absensi a 
             JOIN siswa s ON a.siswa_id = s.id 
             WHERE a.tanggal = %s
@@ -2488,7 +2489,7 @@ def get_today_attendance():
         params = [today]
 
         if kelas:
-            query += " AND s.kelas = %s"
+            query += " AND s.kelas_id = %s"
             params.append(kelas)
 
         if status:
@@ -2516,7 +2517,7 @@ def get_today_attendance():
         logger.error(f"Get attendance error: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
 
-
+# !! perbaiki kelas menjadi kelas_id
 @app.route("/api/attendance/statistics", methods=["GET"])
 @token_required
 def get_attendance_statistics():
@@ -2559,13 +2560,13 @@ def get_attendance_statistics():
         cursor.execute(
             """
             SELECT 
-                s.kelas,
+                s.kelas_id,
                 COUNT(DISTINCT a.siswa_id) as attended,
                 COUNT(*) as total_records
             FROM siswa s
             LEFT JOIN absensi a ON s.id = a.siswa_id AND a.tanggal = %s
-            GROUP BY s.kelas
-            ORDER BY s.kelas
+            GROUP BY s.kelas_id
+            ORDER BY s.kelas_id
         """,
             (date.today(),),
         )
