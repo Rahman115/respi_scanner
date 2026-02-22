@@ -254,7 +254,7 @@
 
         async function loadDashboardStats() {
             try {
-                // Load total siswa
+                // Load total siswa 
                 const students = await makeRequest('/students', 'GET');
                 document.getElementById('totalSiswa').textContent = students.count || 0;
 

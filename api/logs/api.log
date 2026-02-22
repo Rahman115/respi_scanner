@@ -1,0 +1,6 @@
+2026-02-22 23:53:49,821 - werkzeug - INFO - 127.0.0.1 - - [22/Feb/2026 23:53:49] "OPTIONS /api/students HTTP/1.1" 200 -
+2026-02-22 23:53:49,877 - werkzeug - INFO - 127.0.0.1 - - [22/Feb/2026 23:53:49] "GET /api/students HTTP/1.1" 200 -
+2026-02-22 23:53:49,995 - werkzeug - INFO - 127.0.0.1 - - [22/Feb/2026 23:53:49] "OPTIONS /api/students/check-nisn HTTP/1.1" 200 -
+2026-02-22 23:53:50,019 - werkzeug - INFO - 127.0.0.1 - - [22/Feb/2026 23:53:50] "GET /api/students/check-nisn HTTP/1.1" 200 -
+2026-02-22 23:53:50,068 - werkzeug - INFO - 127.0.0.1 - - [22/Feb/2026 23:53:50] "OPTIONS /api/attendance/today HTTP/1.1" 200 -
+2026-02-22 23:53:50,092 - werkzeug - INFO - 127.0.0.1 - - [22/Feb/2026 23:53:50] "GET /api/attendance/today HTTP/1.1" 200 -

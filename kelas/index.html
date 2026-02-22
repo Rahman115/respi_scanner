@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Kelas - Absensi QR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Additional styles specific to kelas page */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-item label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: var(--warning);
+            color: #212529;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-view {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .kelas-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .kelas-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .kelas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .kelas-nama {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .kelas-badge {
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .kelas-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-item label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .info-item span {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .info-item i {
+            color: var(--primary);
+            margin-right: 5px;
+        }
+
+        .wali-kelas {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .wali-kelas i {
+            color: var(--primary);
+            margin-right: 5px;
+        }
+
+        .siswa-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .detail-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .detail-group.full-width {
+            grid-column: span 2;
+        }
+
+        .detail-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-group .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .siswa-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .siswa-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .siswa-item:last-child {
+            border-bottom: none;
+        }
+
+        .siswa-item .nama {
+            font-weight: 500;
+        }
+
+        .siswa-item .nis {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .view-btn {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>Absensi QR</h3>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="students.html">
+                        <i class="fas fa-users"></i>
+                        <span>Siswa</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="guru.html">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Guru</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="kelas.html">
+                        <i class="fas fa-school"></i>
+                        <span>Kelas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="attendance.html">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Absensi</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="reports.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Laporan</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="qr-generator.html">
+                        <i class="fas fa-qrcode"></i>
+                        <span>QR Generator</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="settings.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Pengaturan</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1><i class="fas fa-school"></i> Manajemen Kelas</h1>
+                <div class="datetime" id="datetime"></div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalKelas">0</h3>
+                        <p>Total Kelas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalSiswa">0</h3>
+                        <p>Total Siswa</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalWaliKelas">0</h3>
+                        <p>Wali Kelas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="rataSiswa">0</h3>
+                        <p>Rata-rata/Kelas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label>Jurusan</label>
+                        <select id="jurusanFilter" class="form-control" onchange="applyFilters()">
+                            <option value="">Semua Jurusan</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Tingkat</label>
+                        <select id="tingkatFilter" class="form-control" onchange="applyFilters()">
+                            <option value="">Semua Tingkat</option>
+                            <option value="1">X (10)</option>
+                            <option value="2">XI (11)</option>
+                            <option value="3">XII (12)</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Tahun Ajaran</label>
+                        <select id="tahunAjaranFilter" class="form-control" onchange="applyFilters()">
+                            <option value="">Semua Tahun</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <button class="btn btn-primary" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i> Tambah Kelas
+                        </button>
+                    </div>
+                </div>
+
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="toggleView('grid')">
+                        <i class="fas fa-th-large"></i> Grid
+                    </button>
+                    <button class="view-btn" onclick="toggleView('table')">
+                        <i class="fas fa-list"></i> Tabel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid View -->
+            <div id="gridView">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Table View (hidden by default) -->
+            <div id="tableView" style="display: none;">
+                <div class="feature-card">
+                    <div class="card-header">
+                        <i class="fas fa-list"></i>
+                        <h2>Daftar Kelas</h2>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="kelasTable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kelas</th>
+                                    <th>Jurusan</th>
+                                    <th>Tingkat</th>
+                                    <th>Tahun Ajaran</th>
+                                    <th>Wali Kelas</th>
+                                    <th>Jml Siswa</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kelasTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        <div class="loading-spinner"></div>
+                                        Memuat data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="tablePagination">
+                        <button class="page-btn" id="tablePrevPage" onclick="changeTablePage('prev')" disabled>
+                            <i class="fas fa-chevron-left"></i> Sebelumnya
+                        </button>
+                        <span id="tablePageInfo">Halaman 1 dari 1</span>
+                        <button class="page-btn" id="tableNextPage" onclick="changeTablePage('next')">
+                            Selanjutnya <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Pagination -->
+            <div class="pagination" id="gridPagination">
+                <button class="page-btn" id="gridPrevPage" onclick="changeGridPage('prev')" disabled>
+                    <i class="fas fa-chevron-left"></i> Sebelumnya
+                </button>
+                <span id="gridPageInfo">Halaman 1 dari 1</span>
+                <button class="page-btn" id="gridNextPage" onclick="changeGridPage('next')">
+                    Selanjutnya <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Kelas -->
+    <div class="modal" id="kelasModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-school" id="modalIcon"></i>
+                    <span id="modalTitle">Tambah Kelas</span>
+                </h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="kelasForm">
+                    <input type="hidden" id="kelasId">
+
+                    <div class="form-group">
+                        <label for="jurusan_id">Jurusan <span style="color: red;">*</span></label>
+                        <select id="jurusan_id" required onchange="updateKelasOptions()">
+                            <option value="">Pilih Jurusan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="tingkat">Tingkat <span style="color: red;">*</span></label>
+                            <select id="tingkat" required>
+                                <option value="">Pilih Tingkat</option>
+                                <option value="1">X (10)</option>
+                                <option value="2">XI (11)</option>
+                                <option value="3">XII (12)</option>
+                            </select>
+                        </div>
+                        <div class="form-group half">
+                            <label for="nama_kelas">Nama Kelas <span style="color: red;">*</span></label>
+                            <input type="text" id="nama_kelas" required placeholder="Contoh: A, B, C, 1, 2">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tahun_ajaran">Tahun Ajaran <span style="color: red;">*</span></label>
+                        <select id="tahun_ajaran" required>
+                            <option value="">Pilih Tahun Ajaran</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wali_kelas_id">Wali Kelas <span style="color: #999;">(opsional)</span></label>
+                        <select id="wali_kelas_id">
+                            <option value="">Pilih Wali Kelas</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group" style="justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Kelas -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-school"></i>
+                    <span>Detail Kelas</span>
+                </h3>
+                <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-group">
+                        <label>Kelas</label>
+                        <div class="value" id="detailNamaKelas">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Tingkat</label>
+                        <div class="value" id="detailTingkat">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Jurusan</label>
+                        <div class="value" id="detailJurusan">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Tahun Ajaran</label>
+                        <div class="value" id="detailTahunAjaran">-</div>
+                    </div>
+                    <div class="detail-group full-width">
+                        <label>Wali Kelas</label>
+                        <div class="value" id="detailWaliKelas">-</div>
+                    </div>
+                    <div class="detail-group full-width">
+                        <label>Daftar Siswa</label>
+                        <div class="siswa-count" id="detailJumlahSiswa">0 Siswa</div>
+                        <div class="siswa-list" id="detailSiswaList">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group" style="justify-content: flex-end;">
+                    <button class="btn btn-warning btn-small" onclick="editFromDetail()">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hapus Kelas -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                    <span>Konfirmasi Hapus</span>
+                </h3>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus kelas <strong id="deleteKelasName"></strong>?</p>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i>
+                    Kelas yang memiliki siswa tidak dapat dihapus.
+                </p>
+
+                <div class="button-group" style="justify-content: flex-end; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeDeleteModal()">Batal</button>
+                    <button class="btn btn-danger" onclick="confirmDelete()">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification" style="display: none;">
+        <i class="fas" id="notificationIcon"></i>
+        <span id="notificationMessage"></span>
+    </div>
+    <script src="../js/script.js"></script>
+    <script>
+        // Global variables
+        let currentView = 'grid';
+        let currentGridPage = 1;
+        let currentTablePage = 1;
+        let itemsPerPage = 8; // For grid view
+        let tableItemsPerPage = 10;
+        let allKelas = [];
+        let filteredKelas = [];
+        let allGuru = [];
+        let allJurusan = [];
+        let deleteId = null;
+
+        // Token from localStorage
+        const token = localStorage.getItem('token');
+
+        // Check authentication
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            loadInitialData();
+        });
+
+        // Update datetime
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('datetime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        // Load initial data
+        async function loadInitialData() {
+            await Promise.all([
+                loadKelasData(),
+                loadGuruData(),
+                loadJurusanData()
+            ]);
+
+            populateFilters();
+        }
+
+        // Load kelas data from API
+        async function loadKelasData() {
+            try {
+                showLoading();
+
+                const result = await makeRequest('/kelas', 'GET');
+
+                if (result && result.success) {
+                    allKelas = Array.isArray(result.data) ? result.data : [];
+
+                    // Load siswa counts for each class
+                    await loadSiswaCounts();
+
+                    applyFilters();
+                    updateStatistics();
+                } else {
+                    showNotification(result?.message || 'Gagal memuat data kelas', 'error');
+                    allKelas = [];
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('Error loading kelas:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+                allKelas = [];
+                applyFilters();
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load siswa counts
+        async function loadSiswaCounts() {
+            try {
+                const result = await makeRequest('/kelas/statistics', 'GET');
+
+                if (result && result.success && Array.isArray(result.data)) {
+                    // Add siswa counts to kelas data
+                    allKelas = allKelas.map(kelas => {
+                        const stat = result.data.find(s => s.id === kelas.id);
+                        return {
+                            ...kelas,
+                            jumlah_siswa: stat ? stat.jumlah_siswa || 0 : 0,
+                            laki_laki: stat ? stat.laki_laki || 0 : 0,
+                            perempuan: stat ? stat.perempuan || 0 : 0
+                        };
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load guru data
+        async function loadGuruData() {
+            try {
+                const result = await makeRequest('/guru', 'GET');
+
+                if (result && result.success) {
+                    allGuru = Array.isArray(result.data) ? result.data : [];
+                    populateGuruSelect();
+                }
+            } catch (error) {
+                console.error('Error loading guru:', error);
+                allGuru = [];
+            }
+        }
+
+        // Load jurusan data
+        async function loadJurusanData() {
+            try {
+                const result = await makeRequest('/kelas', 'GET');
+
+                if (result && result.success && Array.isArray(result.data)) {
+                    const jurusanMap = new Map();
+                    result.data.forEach(k => {
+                        if (k.jurusan_id && !jurusanMap.has(k.jurusan_id)) {
+                            jurusanMap.set(k.jurusan_id, {
+                                id: k.jurusan_id,
+                                kode: k.jurusan_kode || '-',
+                                nama: k.jurusan_nama || 'Unknown'
+                            });
+                        }
+                    });
+
+                    allJurusan = Array.from(jurusanMap.values());
+                    populateJurusanSelect();
+                }
+            } catch (error) {
+                console.error('Error loading jurusan:', error);
+                allJurusan = [];
+            }
+        }
+
+        // Render grid view - ubah map menjadi forEach
+        function renderGridView() {
+            const gridContainer = document.getElementById('gridView');
+            const start = (currentGridPage - 1) * itemsPerPage;
+
+            console.log('Current Grid Page:', currentGridPage, 'Items Per Page:', itemsPerPage);
+
+            const end = start + itemsPerPage;
+            const pageData = filteredKelas.slice(start, end);
+            console.log('Start:', start, 'End:', end);
+            if (filteredKelas.length === 0) {
+                gridContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-school"></i>
+                <p>Tidak ada data kelas</p>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="fas fa-plus"></i> Tambah Kelas
+                </button>
+            </div>
+        `;
+            } else {
+                let cards = '<div class="grid-view">';
+
+                pageData.forEach(kelas => {
+                    cards += `
+                <div class="kelas-card">
+                    <div class="kelas-header">
+                        <span class="kelas-nama">Kelas ${kelas.nama_kelas || ''}</span>
+                        <span class="kelas-badge">${getTingkatLabel(kelas.tingkat)}</span>
+                    </div>
+                    
+                    <div class="kelas-info">
+                        <div class="info-item">
+                            <label><i class="fas fa-book"></i> Jurusan</label>
+                            <span>${kelas.jurusan_nama || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-calendar"></i> Tahun Ajaran</label>
+                            <span>${kelas.tahun_ajaran || '-'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="wali-kelas">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        Wali Kelas: <strong>${kelas.wali_kelas_nama || 'Belum ditentukan'}</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="siswa-count">
+                            <i class="fas fa-users"></i> ${kelas.jumlah_siswa || 0} Siswa
+                        </span>
+                        
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-view" onclick="viewKelas(${kelas.id})" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon btn-edit" onclick="editKelas(${kelas.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            
+                        </div>
+                    </div>
+                </div>
+            `;
+                });
+
+                // -- tombol hapus pada grid view dihapus karena keterbatasan ruang 
+                // dan untuk mendorong pengguna menggunakan
+                // <button class="btn-icon btn-delete" onclick="deleteKelas(${kelas.id}, '${kelas.nama_kelas || ''}')" title="Hapus">
+                //     <i class="fas fa-trash"></i>
+                // </button>
+
+                cards += '</div>';
+                gridContainer.innerHTML = cards;
+            }
+
+            // Update pagination
+            const totalPages = Math.ceil(filteredKelas.length / itemsPerPage);
+            document.getElementById('gridPageInfo').textContent = `Halaman ${currentGridPage} dari ${totalPages || 1}`;
+            document.getElementById('gridPrevPage').disabled = currentGridPage === 1;
+            document.getElementById('gridNextPage').disabled = currentGridPage === totalPages || totalPages === 0;
+        }
+
+        // Render table view - ubah map menjadi forEach
+        function renderTableView() {
+            const tbody = document.getElementById('kelasTableBody');
+            const start = (currentTablePage - 1) * tableItemsPerPage;
+            const end = start + tableItemsPerPage;
+            const pageData = filteredKelas.slice(start, end);
+
+            if (filteredKelas.length === 0) {
+                tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-school"></i>
+                        <p>Tidak ada data kelas</p>
+                        <button class="btn btn-primary" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i> Tambah Kelas
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+            } else {
+                let rows = '';
+
+                pageData.forEach((kelas, index) => {
+                    rows += `
+                <tr>
+                    <td>${start + index + 1}</td>
+                    <td><strong>${kelas.nama_kelas || '-'}</strong></td>
+                    <td>${kelas.jurusan_nama || '-'} (${kelas.jurusan_kode || '-'})</td>
+                    <td>${getTingkatLabel(kelas.tingkat)}</td>
+                    <td>${kelas.tahun_ajaran || '-'}</td>
+                    <td>${kelas.wali_kelas_nama || '-'}</td>
+                    <td class="text-center">${kelas.jumlah_siswa || 0}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-view" onclick="viewKelas(${kelas.id})" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon btn-edit" onclick="editKelas(${kelas.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            
+                        </div>
+                    </td>
+                </tr>
+            `;
+                });
+                // -- tombol hapus pada table view dihapus untuk konsistensi dengan grid view dan untuk mendorong pengguna menggunakan
+                // <button class="btn-icon btn-delete" onclick="deleteKelas(${kelas.id}, '${kelas.nama_kelas || ''}')" title="Hapus">
+                //     <i class="fas fa-trash"></i>
+                // </button>
+                tbody.innerHTML = rows;
+            }
+
+            // Update pagination
+            const totalPages = Math.ceil(filteredKelas.length / tableItemsPerPage);
+            document.getElementById('tablePageInfo').textContent = `Halaman ${currentTablePage} dari ${totalPages || 1}`;
+            document.getElementById('tablePrevPage').disabled = currentTablePage === 1;
+            document.getElementById('tableNextPage').disabled = currentTablePage === totalPages || totalPages === 0;
+        }
+
+        // View kelas details - ganti dengan makeRequest
+        async function viewKelas(id) {
+            try {
+                showLoading();
+
+                // Get kelas detail
+                const result = await makeRequest(`/kelas/${id}`, 'GET');
+
+                if (result && result.success) {
+                    const kelas = result.data;
+
+                    document.getElementById('detailNamaKelas').textContent = kelas.nama_kelas || '-';
+                    document.getElementById('detailTingkat').textContent = getTingkatLabel(kelas.tingkat);
+                    document.getElementById('detailJurusan').textContent = `${kelas.jurusan_nama || '-'} (${kelas.jurusan_kode || '-'})`;
+                    document.getElementById('detailTahunAjaran').textContent = kelas.tahun_ajaran || '-';
+                    document.getElementById('detailWaliKelas').textContent = kelas.wali_kelas_nama || 'Belum ditentukan';
+
+                    // Load siswa list
+                    await loadSiswaList(id);
+
+                    document.getElementById('kelasId').value = kelas.id;
+                    document.getElementById('detailModal').classList.add('active');
+                } else {
+                    showNotification(result?.message || 'Gagal memuat detail kelas', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading kelas detail:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load siswa list for kelas - ganti dengan makeRequest
+        async function loadSiswaList(kelasId) {
+            try {
+                const result = await makeRequest(`/kelas/${kelasId}/siswa`, 'GET');
+
+                if (result && result.success) {
+                    document.getElementById('detailJumlahSiswa').innerHTML = `<i class="fas fa-users"></i> ${result.total_siswa || 0} Siswa`;
+
+                    const siswaList = document.getElementById('detailSiswaList');
+                    if (!result.total_siswa || result.total_siswa === 0) {
+                        siswaList.innerHTML = '<p style="text-align: center; color: #999;">Tidak ada siswa di kelas ini</p>';
+                    } else {
+                        let siswaItems = '';
+                        (result.data || []).forEach(s => {
+                            siswaItems += `
+                        <div class="siswa-item">
+                            <div>
+                                <div class="nama">${s.nama || '-'}</div>
+                                <div class="nis">NIS: ${s.nis || '-'} | NISN: ${s.nisn || '-'}</div>
+                            </div>
+                            <span class="status-badge status-info">${s.gender || '-'}</span>
+                        </div>
+                    `;
+                        });
+                        siswaList.innerHTML = siswaItems;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading siswa list:', error);
+                document.getElementById('detailSiswaList').innerHTML = '<p style="color: var(--danger);">Gagal memuat data siswa</p>';
+            }
+        }
+
+        // Edit kelas - ganti dengan makeRequest
+        async function editKelas(id) {
+            try {
+                showLoading();
+
+                const result = await makeRequest(`/kelas/${id}`, 'GET');
+
+                if (result && result.success) {
+                    const kelas = result.data;
+
+                    populateTahunAjaranSelect();
+
+                    document.getElementById('modalTitle').textContent = 'Edit Kelas';
+                    document.getElementById('modalIcon').className = 'fas fa-edit';
+                    document.getElementById('kelasId').value = kelas.id;
+                    document.getElementById('jurusan_id').value = kelas.jurusan_id || '';
+                    document.getElementById('tingkat').value = kelas.tingkat || '';
+                    document.getElementById('nama_kelas').value = kelas.nama_kelas || '';
+                    document.getElementById('tahun_ajaran').value = kelas.tahun_ajaran || '';
+                    document.getElementById('wali_kelas_id').value = kelas.wali_kelas_id || '';
+                    document.getElementById('submitBtn').textContent = 'Update';
+
+                    updateKelasOptions();
+                    document.getElementById('kelasModal').classList.add('active');
+                } else {
+                    showNotification(result?.message || 'Gagal memuat data kelas', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading kelas:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Confirm delete - ganti dengan makeRequest
+        async function confirmDelete() {
+            if (!deleteId) return;
+
+            try {
+                showLoading();
+
+                const result = await makeRequest(`/kelas/${deleteId}`, 'DELETE');
+
+                if (result && result.success) {
+                    showNotification('Kelas berhasil dihapus', 'success');
+                    closeDeleteModal();
+                    loadKelasData();
+                } else {
+                    if (result && result.siswa_count) {
+                        showNotification(`Kelas tidak dapat dihapus karena masih memiliki ${result.siswa_count} siswa`, 'error');
+                    } else {
+                        showNotification(result?.message || 'Gagal menghapus kelas', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting kelas:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Handle form submit - ganti dengan makeRequest
+        document.getElementById('kelasForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById('kelasId').value;
+            const jurusan_id = document.getElementById('jurusan_id').value;
+            const tingkat = document.getElementById('tingkat').value;
+            const nama_kelas = document.getElementById('nama_kelas').value;
+            const tahun_ajaran = document.getElementById('tahun_ajaran').value;
+            const wali_kelas_id = document.getElementById('wali_kelas_id').value || null;
+
+            if (!jurusan_id || !tingkat || !nama_kelas || !tahun_ajaran) {
+                showNotification('Semua field wajib diisi', 'error');
+                return;
+            }
+
+            const url = id ? `/kelas/${id}` : '/kelas';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                showLoading();
+
+                const result = await makeRequest(url, method, {
+                    jurusan_id: parseInt(jurusan_id),
+                    tingkat: tingkat,
+                    nama_kelas: nama_kelas,
+                    tahun_ajaran: tahun_ajaran,
+                    wali_kelas_id: wali_kelas_id ? parseInt(wali_kelas_id) : null
+                });
+
+                if (result && result.success) {
+                    showNotification(id ? 'Kelas berhasil diupdate' : 'Kelas berhasil ditambahkan', 'success');
+                    closeModal();
+                    loadKelasData();
+                } else {
+                    showNotification(result?.message || 'Gagal menyimpan data kelas', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving kelas:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Fungsi loading indicator
+        function showLoading() {
+            const gridContainer = document.getElementById('gridView');
+            const tableBody = document.getElementById('kelasTableBody');
+
+            if (currentView === 'grid' && gridContainer) {
+                gridContainer.innerHTML = `
+            <div style="text-align: center; padding: 50px;">
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 20px; color: #666;">Memuat data...</p>
+            </div>
+        `;
+            } else if (tableBody) {
+                tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center">
+                    <div class="loading-spinner"></div>
+                    Memuat data...
+                </td>
+            </tr>
+        `;
+            }
+        }
+
+        function hideLoading() {
+            // Tidak perlu melakukan apa-apa karena renderCurrentView akan dipanggil setelah data dimuat
+        }
+
+
+
+
+
+
+
+        // Populate filter selects
+        function populateFilters() {
+            // Jurusan filter
+            const jurusanFilter = document.getElementById('jurusanFilter');
+            jurusanFilter.innerHTML = '<option value="">Semua Jurusan</option>';
+            allJurusan.forEach(j => {
+                jurusanFilter.innerHTML += `<option value="${j.id}">${j.nama} (${j.kode})</option>`;
+            });
+
+            // Tahun ajaran filter
+            const tahunAjaranFilter = document.getElementById('tahunAjaranFilter');
+            const tahunAjaranSet = new Set(allKelas.map(k => k.tahun_ajaran).filter(Boolean));
+            const tahunAjaranList = Array.from(tahunAjaranSet).sort().reverse();
+
+            tahunAjaranFilter.innerHTML = '<option value="">Semua Tahun</option>';
+            tahunAjaranList.forEach(t => {
+                tahunAjaranFilter.innerHTML += `<option value="${t}">${t}</option>`;
+            });
+        }
+
+        // Populate jurusan select in form
+        function populateJurusanSelect() {
+            const jurusanSelect = document.getElementById('jurusan_id');
+            jurusanSelect.innerHTML = '<option value="">Pilih Jurusan</option>';
+            allJurusan.forEach(j => {
+                jurusanSelect.innerHTML += `<option value="${j.id}">${j.nama} (${j.kode})</option>`;
+            });
+        }
+
+        // Populate guru select in form
+        function populateGuruSelect() {
+            const guruSelect = document.getElementById('wali_kelas_id');
+            guruSelect.innerHTML = '<option value="">Pilih Wali Kelas</option>';
+            allGuru.forEach(g => {
+                guruSelect.innerHTML += `<option value="${g.id}">${g.nama} ${g.nip ? `(${g.nip})` : ''}</option>`;
+            });
+        }
+
+        // Populate tahun ajaran select in form
+        function populateTahunAjaranSelect() {
+            const tahunSelect = document.getElementById('tahun_ajaran');
+            const currentYear = new Date().getFullYear();
+
+            tahunSelect.innerHTML = '<option value="">Pilih Tahun Ajaran</option>';
+            for (let i = 0; i < 5; i++) {
+                const year = currentYear - i;
+                const nextYear = year + 1;
+                tahunSelect.innerHTML += `<option value="${year}/${nextYear}">${year}/${nextYear}</option>`;
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const jurusanId = document.getElementById('jurusanFilter').value;
+            const tingkat = document.getElementById('tingkatFilter').value;
+            const tahunAjaran = document.getElementById('tahunAjaranFilter').value;
+
+            filteredKelas = allKelas.filter(kelas => {
+                if (jurusanId && kelas.jurusan_id != jurusanId) return false;
+                if (tingkat && kelas.tingkat != tingkat) return false;
+                if (tahunAjaran && kelas.tahun_ajaran != tahunAjaran) return false;
+                return true;
+            });
+
+            currentGridPage = 1;
+            currentTablePage = 1;
+            renderCurrentView();
+        }
+
+        // Render current view
+        function renderCurrentView() {
+            if (currentView === 'grid') {
+                renderGridView();
+            } else {
+                renderTableView();
+            }
+        }
+
+
+
+        // Get tingkat label
+        function getTingkatLabel(tingkat) {
+            const map = {
+                '1': 'X (10)',
+                '2': 'XI (11)',
+                '3': 'XII (12)'
+            };
+            return map[tingkat] || tingkat;
+        }
+
+        // Toggle view
+        function toggleView(view) {
+            currentView = view;
+
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (view === 'grid') {
+                document.getElementById('gridView').style.display = 'block';
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('gridPagination').style.display = 'flex';
+                renderGridView();
+            } else {
+                document.getElementById('gridView').style.display = 'none';
+                document.getElementById('tableView').style.display = 'block';
+                document.getElementById('gridPagination').style.display = 'none';
+                renderTableView();
+            }
+        }
+
+        // Change grid page
+        function changeGridPage(direction) {
+            const totalPages = Math.ceil(filteredKelas.length / itemsPerPage);
+
+            if (direction === 'prev' && currentGridPage > 1) {
+                currentGridPage--;
+            } else if (direction === 'next' && currentGridPage < totalPages) {
+                currentGridPage++;
+            }
+
+            renderGridView();
+        }
+
+        // Change table page
+        function changeTablePage(direction) {
+            const totalPages = Math.ceil(filteredKelas.length / tableItemsPerPage);
+
+            if (direction === 'prev' && currentTablePage > 1) {
+                currentTablePage--;
+            } else if (direction === 'next' && currentTablePage < totalPages) {
+                currentTablePage++;
+            }
+
+            renderTableView();
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalKelas = allKelas.length;
+            const totalSiswa = allKelas.reduce((sum, k) => sum + (k.jumlah_siswa || 0), 0);
+            const totalWaliKelas = allKelas.filter(k => k.wali_kelas_id).length;
+            const rataSiswa = totalKelas ? Math.round(totalSiswa / totalKelas) : 0;
+
+            document.getElementById('totalKelas').textContent = totalKelas;
+            document.getElementById('totalSiswa').textContent = totalSiswa;
+            document.getElementById('totalWaliKelas').textContent = totalWaliKelas;
+            document.getElementById('rataSiswa').textContent = rataSiswa;
+        }
+
+        // Open add modal
+        function openAddModal() {
+            populateTahunAjaranSelect();
+
+            document.getElementById('modalTitle').textContent = 'Tambah Kelas';
+            document.getElementById('modalIcon').className = 'fas fa-school';
+            document.getElementById('kelasId').value = '';
+            document.getElementById('jurusan_id').value = '';
+            document.getElementById('tingkat').value = '';
+            document.getElementById('nama_kelas').value = '';
+            document.getElementById('tahun_ajaran').value = '';
+            document.getElementById('wali_kelas_id').value = '';
+            document.getElementById('submitBtn').textContent = 'Simpan';
+
+            document.getElementById('kelasModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('kelasModal').classList.remove('active');
+        }
+
+
+
+
+
+        // Close detail modal
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Edit from detail
+        function editFromDetail() {
+            const id = document.getElementById('kelasId').value;
+            closeDetailModal();
+            editKelas(id);
+        }
+
+        // Edit kelas
+
+
+        // Update kelas options based on jurusan and tingkat
+        function updateKelasOptions() {
+            // This function can be used to generate dynamic kelas name suggestions
+            const jurusan = document.getElementById('jurusan_id').options[
+                document.getElementById('jurusan_id').selectedIndex
+            ]?.text;
+
+            const tingkat = document.getElementById('tingkat').value;
+
+            // You could show suggestions based on jurusan and tingkat
+        }
+
+        // Delete kelas
+        function deleteKelas(id, nama) {
+            deleteId = id;
+            document.getElementById('deleteKelasName').textContent = nama;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteId = null;
+        }
+
+
+
+
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const messageEl = document.getElementById('notificationMessage');
+
+            icon.className = `fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`;
+            notification.className = `notification ${type}`;
+            messageEl.textContent = message;
+
+            notification.style.display = 'flex';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>

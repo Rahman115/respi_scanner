@@ -108,6 +108,8 @@ async function makeRequest(endpoint, method = 'GET', data = null, requiresAuth =
         options.body = JSON.stringify(data);
     }
     console.log('Data : ', data);
+    console.log('API_BASE_URL:', API_BASE_URL);
+    console.log('Endpoint:', endpoint);
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
         const result = await response.json();

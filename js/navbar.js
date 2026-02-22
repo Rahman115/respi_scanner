@@ -30,7 +30,20 @@ const sidebarMenu = [
     path: "absensi/scan-legacy.html",
     roles: ["admin", "guru"]
   },
-
+  // ===== MENU KELAS =====
+  {
+    title: "Data Kelas",
+    icon: "fas fa-school",
+    path: "kelas/index.html",
+    roles: ["admin", "guru"]
+  },
+  // ===== MENU GURU =====
+  {
+    title: "Data Guru",
+    icon: "fas fa-chalkboard-teacher",
+    path: "guru/index.html",
+    roles: ["admin", "guru"]
+  },
   // ===== MENU SISWA =====
   {
     title: "Mode Siswa",

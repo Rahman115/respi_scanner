@@ -1,5 +1,5 @@
 # APLIKASI ABSENSI SISWA
-### Update Version 3.06
+### Update Version 3.07
 
 Aplikasi absensi siswa berbasis web dengan fitur manual dan scan QR code untuk pencatatan kehadiran.
 

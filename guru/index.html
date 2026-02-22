@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Guru - Absensi QR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Additional styles specific to guru page */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: var(--warning);
+            color: #212529;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-view {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .kelas-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .detail-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .detail-group.full-width {
+            grid-column: span 2;
+        }
+
+        .detail-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-group .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .kelas-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .kelas-list li {
+            padding: 8px;
+            background: white;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .kelas-list li strong {
+            color: var(--primary);
+        }
+
+        .kelas-info {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-qrcode"></i>
+                <h3>Absensi QR</h3>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="students.html">
+                        <i class="fas fa-users"></i>
+                        <span>Siswa</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="guru.html">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Guru</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="kelas.html">
+                        <i class="fas fa-school"></i>
+                        <span>Kelas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="attendance.html">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Absensi</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="reports.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Laporan</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="qr-generator.html">
+                        <i class="fas fa-qrcode"></i>
+                        <span>QR Generator</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="settings.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Pengaturan</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <h1><i class="fas fa-chalkboard-teacher"></i> Manajemen Guru</h1>
+                <div class="datetime" id="datetime"></div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalGuru">0</h3>
+                        <p>Total Guru</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalWaliKelas">0</h3>
+                        <p>Wali Kelas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="denganKontak">0</h3>
+                        <p>Dengan Kontak</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="kelasDiampu">0</h3>
+                        <p>Kelas Diampu</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="form-row">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Cari guru berdasarkan nama atau NIP...">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i> Tambah Guru
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="all" onclick="filterGuru('all')">
+                        <i class="fas fa-list"></i> Semua
+                    </button>
+                    <button class="tab-btn" data-tab="wali" onclick="filterGuru('wali')">
+                        <i class="fas fa-user-tie"></i> Wali Kelas
+                    </button>
+                    <button class="tab-btn" data-tab="non-wali" onclick="filterGuru('non-wali')">
+                        <i class="fas fa-user"></i> Non-Wali Kelas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="feature-card">
+                <div class="card-header">
+                    <i class="fas fa-list"></i>
+                    <h2>Daftar Guru</h2>
+                </div>
+
+                <div class="table-container">
+                    <table id="guruTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIP</th>
+                                <th>Nama Guru</th>
+                                <th>Kontak</th>
+                                <th>Status</th>
+                                <th>Kelas Diampu</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guruTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="loading-spinner"></div>
+                                    Memuat data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                    <button class="page-btn" id="prevPage" onclick="changePage('prev')" disabled>
+                        <i class="fas fa-chevron-left"></i> Sebelumnya
+                    </button>
+                    <span id="pageInfo">Halaman 1 dari 1</span>
+                    <button class="page-btn" id="nextPage" onclick="changePage('next')">
+                        Selanjutnya <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Guru -->
+    <div class="modal" id="guruModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-user-plus" id="modalIcon"></i>
+                    <span id="modalTitle">Tambah Guru</span>
+                </h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="guruForm">
+                    <input type="hidden" id="guruId">
+
+                    <div class="form-group">
+                        <label for="nip">NIP <span style="color: #999;">(opsional)</span></label>
+                        <input type="text" id="nip" placeholder="Masukkan NIP">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nama">Nama Lengkap <span style="color: red;">*</span></label>
+                        <input type="text" id="nama" required placeholder="Masukkan nama lengkap">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="telp">No. Telepon</label>
+                            <input type="tel" id="telp" placeholder="08xxxxxxxxxx">
+                        </div>
+                        <div class="form-group half">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="guru@sekolah.com">
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Batal</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Guru -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-user-circle"></i>
+                    <span>Detail Guru</span>
+                </h3>
+                <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-group">
+                        <label>NIP</label>
+                        <div class="value" id="detailNip">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Nama Lengkap</label>
+                        <div class="value" id="detailNama">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>No. Telepon</label>
+                        <div class="value" id="detailTelp">-</div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Email</label>
+                        <div class="value" id="detailEmail">-</div>
+                    </div>
+                    <div class="detail-group full-width">
+                        <label>Kelas yang Diampu (Wali Kelas)</label>
+                        <ul class="kelas-list" id="detailKelas">
+                            <li>Tidak ada kelas yang diampu</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="button-group" style="justify-content: flex-end;">
+                    <button class="btn btn-warning btn-small" onclick="editFromDetail()">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hapus Guru -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                    <span>Konfirmasi Hapus</span>
+                </h3>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus guru <strong id="deleteGuruName"></strong>?</p>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i>
+                    Guru yang menjadi wali kelas tidak dapat dihapus.
+                </p>
+
+                <div class="button-group" style="justify-content: flex-end; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeDeleteModal()">Batal</button>
+                    <button class="btn btn-danger" onclick="confirmDelete()">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification" style="display: none;">
+        <i class="fas" id="notificationIcon"></i>
+        <span id="notificationMessage"></span>
+    </div>
+    <script src="../js/script.js"></script>
+    <script>
+        // Global variables
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let allGuru = [];
+        let filteredGuru = [];
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let deleteId = null;
+
+        // Token from localStorage
+        const token = localStorage.getItem('token');
+
+        // Check authentication
+        if (!token) {
+            window.location.href = '../login.html';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            loadGuruData();
+        });
+
+        // Update datetime
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('datetime').textContent = now.toLocaleDateString('id-ID', options);
+        }
+
+        // Load guru data from API
+        async function loadGuruData() {
+            try {
+                showLoading();
+
+                const result = await makeRequest('/guru/with-kelas', 'GET');
+                console.log('Guru Data:', result);
+
+                if (result && result.success) {
+                    // Pastikan data adalah array
+                    allGuru = Array.isArray(result.data) ? result.data : [];
+
+                    // Validasi dan perbaiki struktur data jika perlu
+                    allGuru = allGuru.map(guru => {
+                        // Pastikan wali_kelas adalah array
+                        if (!guru.wali_kelas || !Array.isArray(guru.wali_kelas)) {
+                            guru.wali_kelas = [];
+                        }
+                        return guru;
+                    });
+
+                    applyFilters();
+                    updateStatistics();
+                } else {
+                    showNotification(result?.message || 'Gagal memuat data guru', 'error');
+                    allGuru = [];
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('Error loading guru:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+                allGuru = [];
+                applyFilters();
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Apply filters and search
+        function applyFilters() {
+            let filtered = allGuru;
+
+            // Apply tab filter
+            if (currentFilter === 'wali') {
+                filtered = filtered.filter(g => g.wali_kelas && g.wali_kelas.length > 0);
+            } else if (currentFilter === 'non-wali') {
+                filtered = filtered.filter(g => !g.wali_kelas || g.wali_kelas.length === 0);
+            }
+
+            // Apply search
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(g =>
+                    g.nama.toLowerCase().includes(term) ||
+                    (g.nip && g.nip.toLowerCase().includes(term))
+                );
+            }
+
+            filteredGuru = filtered;
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Filter guru by tab
+        function filterGuru(filter) {
+            currentFilter = filter;
+
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${filter}"]`).classList.add('active');
+
+            applyFilters();
+        }
+
+        // Search guru
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            searchTerm = e.target.value;
+            applyFilters();
+        });
+
+        // Render table
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('guruTableBody');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredGuru.slice(start, end);
+
+            console.log('Rendering table with data:', pageData);
+
+            if (filteredGuru.length === 0) {
+                tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <p>Tidak ada data guru</p>
+                        <button class="btn btn-primary" onclick="openAddModal()">
+                            <i class="fas fa-plus"></i> Tambah Guru
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+            } else {
+                let rows = '';
+
+                pageData.forEach((guru, index) => {
+                    // Handle wali_kelas dengan aman
+                    let kelasBadges = '';
+                    if (guru.wali_kelas && Array.isArray(guru.wali_kelas) && guru.wali_kelas.length > 0) {
+                        guru.wali_kelas.forEach(k => {
+                            kelasBadges += `<span class="kelas-badge">${k.nama_kelas || 'Kelas'}</span>`;
+                        });
+                    } else {
+                        kelasBadges = '-';
+                    }
+
+                    // Handle status
+                    const isWaliKelas = guru.wali_kelas && Array.isArray(guru.wali_kelas) && guru.wali_kelas.length > 0;
+                    const statusBadge = isWaliKelas
+                        ? '<span class="status-badge status-success"><i class="fas fa-user-tie"></i> Wali Kelas</span>'
+                        : '<span class="status-badge status-info"><i class="fas fa-user"></i> Guru</span>';
+
+                    rows += `
+                <tr>
+                    <td>${start + index + 1}</td>
+                    <td><strong>${guru.nip || '-'}</strong></td>
+                    <td>${guru.nama || '-'}</td>
+                    <td>
+                        ${guru.telp ? `<i class="fas fa-phone"></i> ${guru.telp}<br>` : ''}
+                        ${guru.email ? `<i class="fas fa-envelope"></i> ${guru.email}` : ''}
+                        ${!guru.telp && !guru.email ? '-' : ''}
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>${kelasBadges}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-view" onclick="viewGuru(${guru.id})" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon btn-edit" onclick="editGuru(${guru.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="deleteGuru(${guru.id}, '${guru.nama || ''}')" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+                });
+
+                tbody.innerHTML = rows;
+            }
+
+            // Update pagination
+            updatePagination();
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredGuru.length / itemsPerPage);
+            document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        // Change page
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredGuru.length / itemsPerPage);
+
+            if (direction === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (direction === 'next' && currentPage < totalPages) {
+                currentPage++;
+            }
+
+            renderTable();
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalGuru = allGuru.length;
+            const totalWaliKelas = allGuru.filter(g => g.wali_kelas && g.wali_kelas.length > 0).length;
+            const denganKontak = allGuru.filter(g => g.telp || g.email).length;
+            const totalKelasDiampu = allGuru.reduce((sum, g) => sum + (g.wali_kelas ? g.wali_kelas.length : 0), 0);
+
+            document.getElementById('totalGuru').textContent = totalGuru;
+            document.getElementById('totalWaliKelas').textContent = totalWaliKelas;
+            document.getElementById('denganKontak').textContent = denganKontak;
+            document.getElementById('kelasDiampu').textContent = totalKelasDiampu;
+        }
+
+        // Open add modal
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Tambah Guru';
+            document.getElementById('modalIcon').className = 'fas fa-user-plus';
+            document.getElementById('guruId').value = '';
+            document.getElementById('nip').value = '';
+            document.getElementById('nama').value = '';
+            document.getElementById('telp').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('submitBtn').textContent = 'Simpan';
+
+            document.getElementById('guruModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('guruModal').classList.remove('active');
+        }
+
+        // View guru details
+        async function viewGuru(id) {
+            try {
+                showLoading();
+
+                const result = await makeRequest(`/guru/${id}`, 'GET');
+
+                if (result && result.success) {
+                    const guru = result.data;
+                    const guruWithKelas = allGuru.find(g => g.id === id);
+
+                    document.getElementById('detailNip').textContent = guru.nip || '-';
+                    document.getElementById('detailNama').textContent = guru.nama || '-';
+                    document.getElementById('detailTelp').textContent = guru.telp || '-';
+                    document.getElementById('detailEmail').textContent = guru.email || '-';
+
+                    const kelasList = document.getElementById('detailKelas');
+                    if (guruWithKelas && guruWithKelas.wali_kelas && Array.isArray(guruWithKelas.wali_kelas) && guruWithKelas.wali_kelas.length > 0) {
+                        let kelasItems = '';
+                        guruWithKelas.wali_kelas.forEach(k => {
+                            kelasItems += `
+                        <li>
+                            <strong>${k.nama_kelas || 'Kelas'}</strong>
+                            <div class="kelas-info">Tingkat ${k.tingkat || '-'} - ${k.jurusan_nama || '-'}</div>
+                        </li>
+                    `;
+                        });
+                        kelasList.innerHTML = kelasItems;
+                    } else {
+                        kelasList.innerHTML = '<li>Tidak ada kelas yang diampu</li>';
+                    }
+
+                    // Store ID for edit from detail
+                    document.getElementById('guruId').value = guru.id;
+
+                    document.getElementById('detailModal').classList.add('active');
+                } else {
+                    showNotification(result?.message || 'Gagal memuat detail guru', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading guru detail:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Close detail modal
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Edit from detail
+        function editFromDetail() {
+            const id = document.getElementById('guruId').value;
+            closeDetailModal();
+            editGuru(id);
+        }
+
+        // Edit guru
+        async function editGuru(id) {
+            try {
+                showLoading();
+
+                const result = await makeRequest(`/guru/${id}`, 'GET');
+
+                if (result && result.success) {
+                    const guru = result.data;
+
+                    document.getElementById('modalTitle').textContent = 'Edit Guru';
+                    document.getElementById('modalIcon').className = 'fas fa-user-edit';
+                    document.getElementById('guruId').value = guru.id;
+                    document.getElementById('nip').value = guru.nip || '';
+                    document.getElementById('nama').value = guru.nama || '';
+                    document.getElementById('telp').value = guru.telp || '';
+                    document.getElementById('email').value = guru.email || '';
+                    document.getElementById('submitBtn').textContent = 'Update';
+
+                    document.getElementById('guruModal').classList.add('active');
+                } else {
+                    showNotification(result?.message || 'Gagal memuat data guru', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading guru:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Delete guru
+        function deleteGuru(id, nama) {
+            deleteId = id;
+            document.getElementById('deleteGuruName').textContent = nama;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteId = null;
+        }
+
+        // Confirm delete
+        // Confirm delete
+        async function confirmDelete() {
+            if (!deleteId) return;
+
+            try {
+                showLoading();
+
+                const result = await makeRequest(`/guru/${deleteId}`, 'DELETE');
+
+                if (result && result.success) {
+                    showNotification('Guru berhasil dihapus', 'success');
+                    closeDeleteModal();
+                    loadGuruData();
+                } else {
+                    if (result && result.wali_kelas) {
+                        showNotification(result.message || 'Guru tidak dapat dihapus karena menjadi wali kelas', 'error');
+                    } else {
+                        showNotification(result?.message || 'Gagal menghapus guru', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting guru:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Handle form submit
+        document.getElementById('guruForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById('guruId').value;
+            const nip = document.getElementById('nip').value;
+            const nama = document.getElementById('nama').value;
+            const telp = document.getElementById('telp').value;
+            const email = document.getElementById('email').value;
+
+            if (!nama) {
+                showNotification('Nama guru harus diisi', 'error');
+                return;
+            }
+
+            const url = id ? `/guru/${id}` : '/guru';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                showLoading();
+
+                const result = await makeRequest(url, method, {
+                    nip: nip || null,
+                    nama: nama,
+                    telp: telp || null,
+                    email: email || null
+                });
+
+                if (result && result.success) {
+                    showNotification(id ? 'Guru berhasil diupdate' : 'Guru berhasil ditambahkan', 'success');
+                    closeModal();
+                    loadGuruData();
+                } else {
+                    showNotification(result?.message || 'Gagal menyimpan data guru', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving guru:', error);
+                showNotification('Gagal terhubung ke server', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Export data
+        function exportData() {
+            if (filteredGuru.length === 0) {
+                showNotification('Tidak ada data untuk diexport', 'error');
+                return;
+            }
+
+            // Create CSV
+            const headers = ['NIP', 'Nama', 'Telepon', 'Email', 'Status', 'Kelas Diampu'];
+            const rows = filteredGuru.map(g => [
+                g.nip || '',
+                g.nama,
+                g.telp || '',
+                g.email || '',
+                g.wali_kelas && g.wali_kelas.length > 0 ? 'Wali Kelas' : 'Guru',
+                g.wali_kelas ? g.wali_kelas.map(k => k.nama_kelas).join(', ') : ''
+            ]);
+
+            const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `guru_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const messageEl = document.getElementById('notificationMessage');
+
+            icon.className = `fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`;
+            notification.className = `notification ${type}`;
+            messageEl.textContent = message;
+
+            notification.style.display = 'flex';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+
+        // Show loading indicator
+        function showLoading() {
+            const tbody = document.getElementById('guruTableBody');
+            if (tbody) {
+                tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">
+                    <div class="loading-spinner"></div>
+                    Memuat data...
+                </td>
+            </tr>
+        `;
+            }
+        }
+
+        // Hide loading indicator (optional, karena akan diganti saat renderTable dipanggil)
+        function hideLoading() {
+            // Tidak perlu melakukan apa-apa karena renderTable akan mengganti konten
+        }
+    </script>
+</body>
+
+</html>
