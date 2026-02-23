@@ -8,6 +8,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <style>
+        /* Perbaikan untuk form-control */
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+
+        .form-control:hover {
+            border-color: #999;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Style untuk option dalam select */
+        .form-control option {
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        /* Perbaikan untuk filter section */
+        .filter-section select.form-control {
+            background-color: white;
+            min-height: 45px;
+        }
+
+        /* Perbaikan untuk modal select */
+        .modal .form-control {
+            background-color: white;
+        }
+
+        /* Style untuk select di dalam form-row */
+        .form-row .form-control {
+            width: 100%;
+        }
+
         /* Additional styles specific to kelas page */
         .filter-section {
             background: white;
@@ -22,6 +80,7 @@
             gap: 15px;
             flex-wrap: wrap;
             align-items: flex-end;
+            margin-bottom: 20px;
         }
 
         .filter-item {
@@ -31,8 +90,9 @@
 
         .filter-item label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #555;
+            font-weight: 500;
             font-size: 0.9rem;
         }
 
