@@ -98,6 +98,7 @@ cd api
 # Buat virtual environment (jika belum ada)
 python -m venv venv
 
+
 # Aktifkan virtual environment
 # Windows:
 venv\Scripts\activate

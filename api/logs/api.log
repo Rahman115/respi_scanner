@@ -1,0 +1,510 @@
+2026-02-26 02:24:43,856 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 02:24:43,857 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 02:24:43,857 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 02:24:43,857 - __main__ - INFO - ============================================================
+2026-02-26 02:24:43,858 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 02:24:43,858 - __main__ - INFO - ============================================================
+2026-02-26 02:24:43,858 - __main__ - INFO - Start Time: 2026-02-26 02:24:43
+2026-02-26 02:24:43,858 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 02:24:43,858 - __main__ - INFO - Debug Mode: False
+2026-02-26 02:24:43,858 - __main__ - INFO - ============================================================
+2026-02-26 02:24:43,859 - __main__ - INFO - Registered Blueprints:
+2026-02-26 02:24:43,859 - __main__ - INFO -   - auth
+2026-02-26 02:24:43,859 - __main__ - INFO -   - system
+2026-02-26 02:24:43,859 - __main__ - INFO -   - students
+2026-02-26 02:24:43,859 - __main__ - INFO -   - teachers
+2026-02-26 02:24:43,859 - __main__ - INFO -   - classes
+2026-02-26 02:24:43,859 - __main__ - INFO -   - attendance
+2026-02-26 02:24:43,859 - __main__ - INFO -   - qrcode
+2026-02-26 02:24:43,859 - __main__ - INFO -   - scanner
+2026-02-26 02:24:43,860 - __main__ - INFO -   - debug
+2026-02-26 02:24:43,860 - __main__ - INFO - ============================================================
+2026-02-26 02:24:43,870 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 02:24:43,871 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 02:28:02,023 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 02:28:02,023 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 02:28:02,024 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 02:28:02,024 - __main__ - INFO - ============================================================
+2026-02-26 02:28:02,024 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 02:28:02,025 - __main__ - INFO - ============================================================
+2026-02-26 02:28:02,025 - __main__ - INFO - Start Time: 2026-02-26 02:28:02
+2026-02-26 02:28:02,025 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 02:28:02,025 - __main__ - INFO - Debug Mode: False
+2026-02-26 02:28:02,025 - __main__ - INFO - ============================================================
+2026-02-26 02:28:02,025 - __main__ - INFO - Registered Blueprints:
+2026-02-26 02:28:02,026 - __main__ - INFO -   - auth
+2026-02-26 02:28:02,026 - __main__ - INFO -   - system
+2026-02-26 02:28:02,026 - __main__ - INFO -   - students
+2026-02-26 02:28:02,026 - __main__ - INFO -   - teachers
+2026-02-26 02:28:02,026 - __main__ - INFO -   - classes
+2026-02-26 02:28:02,026 - __main__ - INFO -   - attendance
+2026-02-26 02:28:02,026 - __main__ - INFO -   - qrcode
+2026-02-26 02:28:02,027 - __main__ - INFO -   - scanner
+2026-02-26 02:28:02,027 - __main__ - INFO -   - debug
+2026-02-26 02:28:02,027 - __main__ - INFO - ============================================================
+2026-02-26 02:28:02,034 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 02:28:02,034 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 02:34:18,074 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:34:18,095 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/students HTTP/1.1" 200 -
+2026-02-26 02:34:18,124 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/students/by-kelas/1 HTTP/1.1" 200 -
+2026-02-26 02:34:18,138 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/students/statistics/by-kelas HTTP/1.1" 200 -
+2026-02-26 02:34:18,157 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/guru HTTP/1.1" 200 -
+2026-02-26 02:34:18,224 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/guru/with-kelas HTTP/1.1" 200 -
+2026-02-26 02:34:18,244 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/kelas HTTP/1.1" 200 -
+2026-02-26 02:34:18,268 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/kelas/statistics HTTP/1.1" 200 -
+2026-02-26 02:34:18,294 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/kelas/1/siswa HTTP/1.1" 200 -
+2026-02-26 02:34:18,316 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 02:34:18,335 - utils.database - ERROR - Query error: 1054 (42S22): Unknown column 'j.nama' in 'SELECT'
+2026-02-26 02:34:18,343 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 02:34:18,360 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 02:34:18,381 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "POST /api/qr/validate-nisn HTTP/1.1" 200 -
+2026-02-26 02:34:18,391 - blueprints.scanner - INFO - NISN scan received | NISN=1234567890 | IP=127.0.0.1
+2026-02-26 02:34:18,395 - blueprints.scanner - WARNING - NISN scan with unknown NISN: 1234567890
+2026-02-26 02:34:18,397 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "[33mPOST /api/scan-nisn HTTP/1.1[0m" 404 -
+2026-02-26 02:34:18,408 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "[33mGET /api/scan-status/12345 HTTP/1.1[0m" 404 -
+2026-02-26 02:34:18,417 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/system/health HTTP/1.1" 200 -
+2026-02-26 02:34:18,426 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/system/test HTTP/1.1" 200 -
+2026-02-26 02:34:18,446 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "GET /api/debug/table-structure HTTP/1.1" 200 -
+2026-02-26 02:34:18,477 - blueprints.debug - ERROR - Performance check error: name 'DB_CONFIG' is not defined
+2026-02-26 02:34:18,478 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:34:18] "[35m[1mGET /api/debug/performance HTTP/1.1[0m" 500 -
+2026-02-26 02:36:07,445 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:36:07] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:36:07,457 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:36:07] "GET /api/students HTTP/1.1" 200 -
+2026-02-26 02:36:07,483 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:36:07] "GET /api/students/by-kelas/1 HTTP/1.1" 200 -
+2026-02-26 02:36:07,497 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:36:07] "GET /api/students/statistics/by-kelas HTTP/1.1" 200 -
+2026-02-26 02:37:01,133 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:37:01] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:37:01,145 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:37:01] "GET /api/guru HTTP/1.1" 200 -
+2026-02-26 02:37:01,207 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:37:01] "GET /api/guru/with-kelas HTTP/1.1" 200 -
+2026-02-26 02:38:30,637 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:38:30] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:38:30,650 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:38:30] "GET /api/kelas HTTP/1.1" 200 -
+2026-02-26 02:38:30,670 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:38:30] "GET /api/kelas/statistics HTTP/1.1" 200 -
+2026-02-26 02:38:30,691 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:38:30] "GET /api/kelas/1/siswa HTTP/1.1" 200 -
+2026-02-26 02:40:02,185 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:40:02] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:40:02,199 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:40:02] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 02:40:02,218 - utils.database - ERROR - Query error: 1054 (42S22): Unknown column 'j.nama' in 'SELECT'
+2026-02-26 02:40:02,227 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:40:02] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 02:40:02,244 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:40:02] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 02:43:18,728 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:43:18] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:43:18,741 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:43:18] "GET /api/students HTTP/1.1" 200 -
+2026-02-26 02:43:18,768 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:43:18] "GET /api/students/by-kelas/1 HTTP/1.1" 200 -
+2026-02-26 02:43:18,781 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:43:18] "GET /api/students/statistics/by-kelas HTTP/1.1" 200 -
+2026-02-26 02:48:13,118 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 02:48:13,119 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 02:48:13,120 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 02:48:13,120 - __main__ - INFO - ============================================================
+2026-02-26 02:48:13,120 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 02:48:13,120 - __main__ - INFO - ============================================================
+2026-02-26 02:48:13,120 - __main__ - INFO - Start Time: 2026-02-26 02:48:13
+2026-02-26 02:48:13,121 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 02:48:13,121 - __main__ - INFO - Debug Mode: False
+2026-02-26 02:48:13,121 - __main__ - INFO - ============================================================
+2026-02-26 02:48:13,121 - __main__ - INFO - Registered Blueprints:
+2026-02-26 02:48:13,121 - __main__ - INFO -   - auth
+2026-02-26 02:48:13,121 - __main__ - INFO -   - system
+2026-02-26 02:48:13,122 - __main__ - INFO -   - students
+2026-02-26 02:48:13,122 - __main__ - INFO -   - teachers
+2026-02-26 02:48:13,122 - __main__ - INFO -   - classes
+2026-02-26 02:48:13,122 - __main__ - INFO -   - attendance
+2026-02-26 02:48:13,122 - __main__ - INFO -   - qrcode
+2026-02-26 02:48:13,122 - __main__ - INFO -   - scanner
+2026-02-26 02:48:13,122 - __main__ - INFO -   - debug
+2026-02-26 02:48:13,122 - __main__ - INFO - ============================================================
+2026-02-26 02:48:13,129 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 02:48:13,130 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 02:48:25,827 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:48:25] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:48:25,844 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:48:25] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 02:48:25,861 - utils.database - ERROR - Query error: 1054 (42S22): Unknown column 'j.nama' in 'SELECT'
+2026-02-26 02:48:25,869 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:48:25] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 02:48:25,888 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:48:25] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 02:54:42,645 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 02:54:42,645 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 02:54:42,646 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 02:54:42,646 - __main__ - INFO - ============================================================
+2026-02-26 02:54:42,646 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 02:54:42,646 - __main__ - INFO - ============================================================
+2026-02-26 02:54:42,646 - __main__ - INFO - Start Time: 2026-02-26 02:54:42
+2026-02-26 02:54:42,647 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 02:54:42,647 - __main__ - INFO - Debug Mode: False
+2026-02-26 02:54:42,647 - __main__ - INFO - ============================================================
+2026-02-26 02:54:42,647 - __main__ - INFO - Registered Blueprints:
+2026-02-26 02:54:42,647 - __main__ - INFO -   - auth
+2026-02-26 02:54:42,647 - __main__ - INFO -   - system
+2026-02-26 02:54:42,648 - __main__ - INFO -   - students
+2026-02-26 02:54:42,648 - __main__ - INFO -   - teachers
+2026-02-26 02:54:42,648 - __main__ - INFO -   - classes
+2026-02-26 02:54:42,648 - __main__ - INFO -   - attendance
+2026-02-26 02:54:42,648 - __main__ - INFO -   - qrcode
+2026-02-26 02:54:42,648 - __main__ - INFO -   - scanner
+2026-02-26 02:54:42,648 - __main__ - INFO -   - debug
+2026-02-26 02:54:42,648 - __main__ - INFO - ============================================================
+2026-02-26 02:54:42,655 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 02:54:42,656 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 02:54:48,188 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:54:48] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:54:48,209 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:54:48] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 02:54:48,236 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:54:48] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 02:54:48,258 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:54:48] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 02:56:00,726 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:56:00] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:56:00,739 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:56:00] "POST /api/qr/validate-nisn HTTP/1.1" 200 -
+2026-02-26 02:57:51,691 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:57:51] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 02:57:51,700 - blueprints.scanner - INFO - NISN scan received | NISN=0075787971 | IP=127.0.0.1
+2026-02-26 02:57:51,708 - utils.database - ERROR - Execute error: 1265 (01000): Data truncated for column 'metode' at row 1
+2026-02-26 02:57:51,710 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:57:51] "[35m[1mPOST /api/scan-nisn HTTP/1.1[0m" 500 -
+2026-02-26 02:57:51,728 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 02:57:51] "GET /api/scan-status/626 HTTP/1.1" 200 -
+2026-02-26 03:01:33,591 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 03:01:33,592 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 03:01:33,592 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 03:01:33,592 - __main__ - INFO - ============================================================
+2026-02-26 03:01:33,592 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 03:01:33,593 - __main__ - INFO - ============================================================
+2026-02-26 03:01:33,593 - __main__ - INFO - Start Time: 2026-02-26 03:01:33
+2026-02-26 03:01:33,593 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 03:01:33,593 - __main__ - INFO - Debug Mode: False
+2026-02-26 03:01:33,593 - __main__ - INFO - ============================================================
+2026-02-26 03:01:33,593 - __main__ - INFO - Registered Blueprints:
+2026-02-26 03:01:33,594 - __main__ - INFO -   - auth
+2026-02-26 03:01:33,594 - __main__ - INFO -   - system
+2026-02-26 03:01:33,594 - __main__ - INFO -   - students
+2026-02-26 03:01:33,594 - __main__ - INFO -   - teachers
+2026-02-26 03:01:33,594 - __main__ - INFO -   - classes
+2026-02-26 03:01:33,594 - __main__ - INFO -   - attendance
+2026-02-26 03:01:33,594 - __main__ - INFO -   - qrcode
+2026-02-26 03:01:33,594 - __main__ - INFO -   - scanner
+2026-02-26 03:01:33,594 - __main__ - INFO -   - debug
+2026-02-26 03:01:33,595 - __main__ - INFO - ============================================================
+2026-02-26 03:01:33,602 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 03:01:33,602 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 03:01:40,974 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:01:40] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:01:40,983 - blueprints.scanner - INFO - NISN scan received | NISN=0075787971 | IP=127.0.0.1
+2026-02-26 03:01:41,000 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:01:41] "POST /api/scan-nisn HTTP/1.1" 200 -
+2026-02-26 03:01:41,015 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:01:41] "GET /api/scan-status/626 HTTP/1.1" 200 -
+2026-02-26 03:04:21,820 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:04:21] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:04:21,831 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:04:21] "GET /api/system/health HTTP/1.1" 200 -
+2026-02-26 03:04:21,839 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:04:21] "GET /api/system/test HTTP/1.1" 200 -
+2026-02-26 03:05:16,850 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:05:16] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:05:16,870 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:05:16] "GET /api/debug/table-structure HTTP/1.1" 200 -
+2026-02-26 03:05:16,899 - blueprints.debug - ERROR - Performance check error: name 'DB_CONFIG' is not defined
+2026-02-26 03:05:16,901 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:05:16] "[35m[1mGET /api/debug/performance HTTP/1.1[0m" 500 -
+2026-02-26 03:11:50,293 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 03:11:50,294 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 03:11:50,294 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 03:11:50,295 - __main__ - INFO - ============================================================
+2026-02-26 03:11:50,295 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 03:11:50,295 - __main__ - INFO - ============================================================
+2026-02-26 03:11:50,296 - __main__ - INFO - Start Time: 2026-02-26 03:11:50
+2026-02-26 03:11:50,296 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 03:11:50,296 - __main__ - INFO - Debug Mode: False
+2026-02-26 03:11:50,297 - __main__ - INFO - ============================================================
+2026-02-26 03:11:50,297 - __main__ - INFO - Registered Blueprints:
+2026-02-26 03:11:50,297 - __main__ - INFO -   - auth
+2026-02-26 03:11:50,297 - __main__ - INFO -   - system
+2026-02-26 03:11:50,297 - __main__ - INFO -   - students
+2026-02-26 03:11:50,297 - __main__ - INFO -   - teachers
+2026-02-26 03:11:50,297 - __main__ - INFO -   - classes
+2026-02-26 03:11:50,297 - __main__ - INFO -   - attendance
+2026-02-26 03:11:50,298 - __main__ - INFO -   - qrcode
+2026-02-26 03:11:50,298 - __main__ - INFO -   - scanner
+2026-02-26 03:11:50,298 - __main__ - INFO -   - debug
+2026-02-26 03:11:50,298 - __main__ - INFO - ============================================================
+2026-02-26 03:11:50,305 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 03:11:50,305 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 03:11:56,607 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:11:56] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:11:56,633 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:11:56] "GET /api/debug/table-structure HTTP/1.1" 200 -
+2026-02-26 03:11:56,667 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:11:56] "GET /api/debug/performance HTTP/1.1" 200 -
+2026-02-26 03:15:42,055 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:15:42,118 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "GET /api/students HTTP/1.1" 200 -
+2026-02-26 03:15:42,395 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "GET /api/students/by-kelas/1 HTTP/1.1" 200 -
+2026-02-26 03:15:42,528 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "GET /api/students/statistics/by-kelas HTTP/1.1" 200 -
+2026-02-26 03:15:42,650 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "GET /api/guru HTTP/1.1" 200 -
+2026-02-26 03:15:42,841 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "GET /api/guru/with-kelas HTTP/1.1" 200 -
+2026-02-26 03:15:42,942 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:42] "GET /api/guru/statistics HTTP/1.1" 200 -
+2026-02-26 03:15:43,085 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:43] "GET /api/kelas HTTP/1.1" 200 -
+2026-02-26 03:15:43,248 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:43] "GET /api/kelas/statistics HTTP/1.1" 200 -
+2026-02-26 03:15:43,453 - blueprints.attendance - ERROR - Get today attendance error: Object of type timedelta is not JSON serializable
+2026-02-26 03:15:43,457 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:43] "[35m[1mGET /api/attendance/today HTTP/1.1[0m" 500 -
+2026-02-26 03:15:43,656 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:43] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 03:15:43,837 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:43] "[31m[1mGET /api/qr/validate-nisn HTTP/1.1[0m" 405 -
+2026-02-26 03:15:43,972 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:43] "GET /api/system/health HTTP/1.1" 200 -
+2026-02-26 03:15:44,119 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:44] "GET /api/system/test HTTP/1.1" 200 -
+2026-02-26 03:15:44,278 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:44] "GET /api/debug/table-structure HTTP/1.1" 200 -
+2026-02-26 03:15:44,439 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:15:44] "GET /api/debug/performance HTTP/1.1" 200 -
+2026-02-26 03:20:12,562 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:20:12] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:20:12,606 - blueprints.attendance - ERROR - Get today attendance error: Object of type timedelta is not JSON serializable
+2026-02-26 03:20:12,607 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:20:12] "[35m[1mGET /api/attendance/today HTTP/1.1[0m" 500 -
+2026-02-26 03:20:12,727 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:20:12] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 03:20:12,823 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:20:12] "[31m[1mGET /api/qr/validate-nisn HTTP/1.1[0m" 405 -
+2026-02-26 03:25:04,987 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:04] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:25:05,005 - blueprints.attendance - ERROR - Get today attendance error: Object of type timedelta is not JSON serializable
+2026-02-26 03:25:05,006 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:05] "[35m[1mGET /api/attendance/today HTTP/1.1[0m" 500 -
+2026-02-26 03:25:05,032 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:05] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 03:25:05,058 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:05] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 03:25:21,633 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:21] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:25:21,647 - blueprints.attendance - ERROR - Get today attendance error: Object of type timedelta is not JSON serializable
+2026-02-26 03:25:21,648 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:21] "[35m[1mGET /api/attendance/today HTTP/1.1[0m" 500 -
+2026-02-26 03:25:21,675 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:21] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 03:25:21,700 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:25:21] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 03:52:51,681 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 03:52:51,682 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 03:52:51,682 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 03:52:51,683 - __main__ - INFO - ============================================================
+2026-02-26 03:52:51,683 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 03:52:51,683 - __main__ - INFO - ============================================================
+2026-02-26 03:52:51,683 - __main__ - INFO - Start Time: 2026-02-26 03:52:51
+2026-02-26 03:52:51,684 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 03:52:51,684 - __main__ - INFO - Debug Mode: False
+2026-02-26 03:52:51,684 - __main__ - INFO - ============================================================
+2026-02-26 03:52:51,684 - __main__ - INFO - Registered Blueprints:
+2026-02-26 03:52:51,684 - __main__ - INFO -   - auth
+2026-02-26 03:52:51,684 - __main__ - INFO -   - system
+2026-02-26 03:52:51,684 - __main__ - INFO -   - students
+2026-02-26 03:52:51,685 - __main__ - INFO -   - teachers
+2026-02-26 03:52:51,685 - __main__ - INFO -   - classes
+2026-02-26 03:52:51,685 - __main__ - INFO -   - attendance
+2026-02-26 03:52:51,685 - __main__ - INFO -   - qrcode
+2026-02-26 03:52:51,685 - __main__ - INFO -   - scanner
+2026-02-26 03:52:51,685 - __main__ - INFO -   - debug
+2026-02-26 03:52:51,685 - __main__ - INFO - ============================================================
+2026-02-26 03:52:51,692 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 03:52:51,693 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 03:53:05,267 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:53:05] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:53:05,284 - blueprints.attendance - ERROR - Get today attendance error: Object of type timedelta is not JSON serializable
+2026-02-26 03:53:05,285 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:53:05] "[35m[1mGET /api/attendance/today HTTP/1.1[0m" 500 -
+2026-02-26 03:53:05,312 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:53:05] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 03:53:05,335 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:53:05] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 03:55:02,979 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 03:55:02,979 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 03:55:02,984 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 03:55:02,984 - __main__ - INFO - ============================================================
+2026-02-26 03:55:02,984 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 03:55:02,984 - __main__ - INFO - ============================================================
+2026-02-26 03:55:02,985 - __main__ - INFO - Start Time: 2026-02-26 03:55:02
+2026-02-26 03:55:02,985 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 03:55:02,985 - __main__ - INFO - Debug Mode: False
+2026-02-26 03:55:02,985 - __main__ - INFO - ============================================================
+2026-02-26 03:55:02,985 - __main__ - INFO - Registered Blueprints:
+2026-02-26 03:55:02,985 - __main__ - INFO -   - auth
+2026-02-26 03:55:02,986 - __main__ - INFO -   - system
+2026-02-26 03:55:02,986 - __main__ - INFO -   - students
+2026-02-26 03:55:02,986 - __main__ - INFO -   - teachers
+2026-02-26 03:55:02,986 - __main__ - INFO -   - classes
+2026-02-26 03:55:02,986 - __main__ - INFO -   - attendance
+2026-02-26 03:55:02,986 - __main__ - INFO -   - qrcode
+2026-02-26 03:55:02,986 - __main__ - INFO -   - scanner
+2026-02-26 03:55:02,987 - __main__ - INFO -   - debug
+2026-02-26 03:55:02,987 - __main__ - INFO - ============================================================
+2026-02-26 03:55:02,994 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 03:55:02,994 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 03:55:08,128 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:55:08] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 03:55:08,149 - blueprints.attendance - ERROR - Get today attendance error: Object of type timedelta is not JSON serializable
+2026-02-26 03:55:08,152 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:55:08] "[35m[1mGET /api/attendance/today HTTP/1.1[0m" 500 -
+2026-02-26 03:55:08,178 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:55:08] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 03:55:08,202 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 03:55:08] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:02:48,668 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 04:02:48,669 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 04:02:48,669 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 04:02:48,669 - __main__ - INFO - ============================================================
+2026-02-26 04:02:48,670 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 04:02:48,670 - __main__ - INFO - ============================================================
+2026-02-26 04:02:48,670 - __main__ - INFO - Start Time: 2026-02-26 04:02:48
+2026-02-26 04:02:48,670 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 04:02:48,670 - __main__ - INFO - Debug Mode: False
+2026-02-26 04:02:48,671 - __main__ - INFO - ============================================================
+2026-02-26 04:02:48,671 - __main__ - INFO - Registered Blueprints:
+2026-02-26 04:02:48,671 - __main__ - INFO -   - auth
+2026-02-26 04:02:48,671 - __main__ - INFO -   - system
+2026-02-26 04:02:48,671 - __main__ - INFO -   - students
+2026-02-26 04:02:48,671 - __main__ - INFO -   - teachers
+2026-02-26 04:02:48,671 - __main__ - INFO -   - classes
+2026-02-26 04:02:48,672 - __main__ - INFO -   - attendance
+2026-02-26 04:02:48,672 - __main__ - INFO -   - qrcode
+2026-02-26 04:02:48,672 - __main__ - INFO -   - scanner
+2026-02-26 04:02:48,672 - __main__ - INFO -   - debug
+2026-02-26 04:02:48,672 - __main__ - INFO - ============================================================
+2026-02-26 04:02:48,679 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 04:02:48,680 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 04:02:54,863 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:02:54] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:02:54,881 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:02:54] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:02:54,908 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:02:54] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:02:54,930 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:02:54] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:13:30,116 - __main__ - INFO - Custom JSON provider berhasil di-setup
+2026-02-26 04:13:30,180 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 04:13:30,180 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 04:13:30,180 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 04:13:30,181 - __main__ - INFO - ============================================================
+2026-02-26 04:13:30,181 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 04:13:30,181 - __main__ - INFO - ============================================================
+2026-02-26 04:13:30,181 - __main__ - INFO - Start Time: 2026-02-26 04:13:30
+2026-02-26 04:13:30,181 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 04:13:30,182 - __main__ - INFO - Debug Mode: False
+2026-02-26 04:13:30,182 - __main__ - INFO - ============================================================
+2026-02-26 04:13:30,182 - __main__ - INFO - Registered Blueprints:
+2026-02-26 04:13:30,182 - __main__ - INFO -   - auth
+2026-02-26 04:13:30,182 - __main__ - INFO -   - system
+2026-02-26 04:13:30,182 - __main__ - INFO -   - students
+2026-02-26 04:13:30,183 - __main__ - INFO -   - teachers
+2026-02-26 04:13:30,183 - __main__ - INFO -   - classes
+2026-02-26 04:13:30,183 - __main__ - INFO -   - attendance
+2026-02-26 04:13:30,183 - __main__ - INFO -   - qrcode
+2026-02-26 04:13:30,183 - __main__ - INFO -   - scanner
+2026-02-26 04:13:30,183 - __main__ - INFO -   - debug
+2026-02-26 04:13:30,183 - __main__ - INFO - ============================================================
+2026-02-26 04:13:30,190 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 04:13:30,190 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 04:13:36,612 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:13:36] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:13:36,631 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:13:36] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:13:36,662 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:13:36] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:13:36,689 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:13:36] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:24:41,337 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:24:41] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:24:41,358 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:24:41] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:24:41,385 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:24:41] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:24:41,411 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:24:41] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:26:05,285 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:05] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:26:10,799 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:10] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:26:15,215 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:15] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:26:15,230 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:15] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:26:15,257 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:15] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:26:15,278 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:15] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:26:39,692 - __main__ - INFO - Custom JSON provider berhasil di-setup
+2026-02-26 04:26:39,758 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 04:26:39,759 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 04:26:39,759 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 04:26:39,759 - __main__ - INFO - ============================================================
+2026-02-26 04:26:39,759 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 04:26:39,760 - __main__ - INFO - ============================================================
+2026-02-26 04:26:39,760 - __main__ - INFO - Start Time: 2026-02-26 04:26:39
+2026-02-26 04:26:39,760 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 04:26:39,760 - __main__ - INFO - Debug Mode: False
+2026-02-26 04:26:39,760 - __main__ - INFO - ============================================================
+2026-02-26 04:26:39,760 - __main__ - INFO - Registered Blueprints:
+2026-02-26 04:26:39,760 - __main__ - INFO -   - auth
+2026-02-26 04:26:39,761 - __main__ - INFO -   - system
+2026-02-26 04:26:39,761 - __main__ - INFO -   - students
+2026-02-26 04:26:39,761 - __main__ - INFO -   - teachers
+2026-02-26 04:26:39,761 - __main__ - INFO -   - classes
+2026-02-26 04:26:39,761 - __main__ - INFO -   - attendance
+2026-02-26 04:26:39,761 - __main__ - INFO -   - qrcode
+2026-02-26 04:26:39,761 - __main__ - INFO -   - scanner
+2026-02-26 04:26:39,761 - __main__ - INFO -   - debug
+2026-02-26 04:26:39,762 - __main__ - INFO - ============================================================
+2026-02-26 04:26:39,769 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 04:26:39,770 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 04:26:47,895 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:26:47] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:27:57,387 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:27:57] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:28:35,158 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:28:35] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:28:39,211 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:28:39] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:28:39,226 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:28:39] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:28:39,254 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:28:39] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:28:39,278 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:28:39] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:29:57,528 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:29:57] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:30:41,829 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:30:41] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:34:22,027 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:34:22] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:34:28,560 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:34:28] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:34:28,575 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:34:28] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:34:28,601 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:34:28] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:34:28,627 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:34:28] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:37:35,440 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:37:35] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:37:41,859 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:37:41] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:37:41,876 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:37:41] "GET /api/attendance/today HTTP/1.1" 200 -
+2026-02-26 04:37:41,904 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:37:41] "GET /api/attendance/statistics HTTP/1.1" 200 -
+2026-02-26 04:37:41,927 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:37:41] "GET /api/attendance/summary/by-class HTTP/1.1" 200 -
+2026-02-26 04:39:35,970 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:39:35] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:39:35,982 - blueprints.scanner - INFO - NISN scan received | NISN=0075787971 | IP=127.0.0.1
+2026-02-26 04:39:35,998 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:39:35] "[31m[1mPOST /api/scan-nisn HTTP/1.1[0m" 409 -
+2026-02-26 04:39:36,013 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:39:36] "GET /api/scan-status/626 HTTP/1.1" 200 -
+2026-02-26 04:48:02,443 - __main__ - INFO - Custom JSON provider berhasil di-setup
+2026-02-26 04:48:02,506 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 04:48:02,506 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 04:48:02,507 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 04:48:02,507 - __main__ - INFO - ============================================================
+2026-02-26 04:48:02,507 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 04:48:02,507 - __main__ - INFO - ============================================================
+2026-02-26 04:48:02,507 - __main__ - INFO - Start Time: 2026-02-26 04:48:02
+2026-02-26 04:48:02,508 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 04:48:02,508 - __main__ - INFO - Debug Mode: False
+2026-02-26 04:48:02,508 - __main__ - INFO - ============================================================
+2026-02-26 04:48:02,508 - __main__ - INFO - Registered Blueprints:
+2026-02-26 04:48:02,508 - __main__ - INFO -   - auth
+2026-02-26 04:48:02,508 - __main__ - INFO -   - system
+2026-02-26 04:48:02,508 - __main__ - INFO -   - students
+2026-02-26 04:48:02,508 - __main__ - INFO -   - teachers
+2026-02-26 04:48:02,509 - __main__ - INFO -   - classes
+2026-02-26 04:48:02,509 - __main__ - INFO -   - attendance
+2026-02-26 04:48:02,509 - __main__ - INFO -   - qrcode
+2026-02-26 04:48:02,509 - __main__ - INFO -   - scanner
+2026-02-26 04:48:02,509 - __main__ - INFO -   - debug
+2026-02-26 04:48:02,509 - __main__ - INFO - ============================================================
+2026-02-26 04:48:02,516 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 04:48:02,516 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 04:48:59,904 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:48:59] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 04:48:59,919 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:48:59] "GET /api/students HTTP/1.1" 200 -
+2026-02-26 04:48:59,954 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:48:59] "GET /api/students/626 HTTP/1.1" 200 -
+2026-02-26 04:48:59,973 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:48:59] "GET /api/students/by-kelas/1 HTTP/1.1" 200 -
+2026-02-26 04:48:59,987 - blueprints.students - ERROR - Get statistics error: Object of type Decimal is not JSON serializable
+2026-02-26 04:48:59,988 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 04:48:59] "[35m[1mGET /api/students/statistics/by-kelas HTTP/1.1[0m" 500 -
+2026-02-26 05:01:54,859 - __main__ - INFO - Custom JSON provider berhasil di-setup
+2026-02-26 05:01:54,923 - __main__ - INFO - Directory ensured: /var/www/html/api/logs
+2026-02-26 05:01:54,923 - __main__ - INFO - Directory ensured: /var/www/html/api/qr_codes
+2026-02-26 05:01:54,935 - __main__ - INFO - Directory ensured: /var/www/html/api/backups
+2026-02-26 05:01:54,935 - __main__ - INFO - ============================================================
+2026-02-26 05:01:54,936 - __main__ - INFO - ABSENSI API - COMPLETE MODULAR VERSION
+2026-02-26 05:01:54,936 - __main__ - INFO - ============================================================
+2026-02-26 05:01:54,936 - __main__ - INFO - Start Time: 2026-02-26 05:01:54
+2026-02-26 05:01:54,936 - __main__ - INFO - Server: 0.0.0.0:5000
+2026-02-26 05:01:54,937 - __main__ - INFO - Debug Mode: False
+2026-02-26 05:01:54,937 - __main__ - INFO - ============================================================
+2026-02-26 05:01:54,937 - __main__ - INFO - Registered Blueprints:
+2026-02-26 05:01:54,937 - __main__ - INFO -   - auth
+2026-02-26 05:01:54,937 - __main__ - INFO -   - system
+2026-02-26 05:01:54,938 - __main__ - INFO -   - students
+2026-02-26 05:01:54,938 - __main__ - INFO -   - teachers
+2026-02-26 05:01:54,938 - __main__ - INFO -   - classes
+2026-02-26 05:01:54,938 - __main__ - INFO -   - attendance
+2026-02-26 05:01:54,938 - __main__ - INFO -   - qrcode
+2026-02-26 05:01:54,938 - __main__ - INFO -   - scanner
+2026-02-26 05:01:54,938 - __main__ - INFO -   - debug
+2026-02-26 05:01:54,938 - __main__ - INFO - ============================================================
+2026-02-26 05:01:54,946 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.43.3:5000
+2026-02-26 05:01:54,946 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-26 05:02:01,179 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 05:02:01] "POST /api/auth/login HTTP/1.1" 200 -
+2026-02-26 05:02:01,195 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 05:02:01] "GET /api/students HTTP/1.1" 200 -
+2026-02-26 05:02:01,229 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 05:02:01] "GET /api/students/626 HTTP/1.1" 200 -
+2026-02-26 05:02:01,247 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 05:02:01] "GET /api/students/by-kelas/1 HTTP/1.1" 200 -
+2026-02-26 05:02:01,263 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 05:02:01] "GET /api/students/statistics/by-kelas HTTP/1.1" 200 -
+2026-02-26 05:15:09,892 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 05:15:09] "POST /api/auth/login HTTP/1.1" 200 -

@@ -38,7 +38,7 @@ QR_CONFIG = {
 # API Configuration
 API_CONFIG = {
 	'host': '0.0.0.0',
-	'port': 8080, #app.run(port=8080) / test 5000
+	'port': 5000, #app.run(port=8080) / test 5000
 	'debug': False,
 	'threaded': True
 }
