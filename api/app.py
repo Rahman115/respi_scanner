@@ -50,7 +50,15 @@ else:
     logger.warning("Gagal setup custom JSON provider, menggunakan default")
     
 # Flask app
-CORS(app)
+# CORS(app)
+
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "allow_headers": ["Content-Type", "Authorization"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    }
+})
 
 # Register all blueprints
 app.register_blueprint(auth_bp)
@@ -148,6 +156,12 @@ def index():
             }
         }
     })
+
+# Favicon route
+@app.route('/favicon.ico')
+def favicon():
+    return jsonify({"message": "No favicon available"}), 204
+
 
 # Legacy support - redirect old endpoints
 @app.route('/api/test', methods=['GET'])

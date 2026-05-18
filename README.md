@@ -227,5 +227,8 @@ Untuk saran atau perbaikan, silakan buat issue atau pull request.
 ## 📞 KONTAK
 Untuk pertanyaan lebih lanjut, hubungi pengembang aplikasi.
 
+## NOTE
+- cek code keseluruhan
+
 ---
 *Dokumentasi terakhir diperbarui: 2026 februari 04*
