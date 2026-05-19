@@ -36,18 +36,19 @@ curl -X GET http://localhost:5000/api/students
 ```bash
 # Get all students
 curl -X GET http://localhost:5000/api/students
+-H "Authorization: Bearer $TOKEN"
 
 # Get student by NIS
-curl -X GET http://localhost:5000/api/students/12345
+curl -X GET http://localhost:5000/api/students/644 -H "Authorization: Bearer $TOKEN"
 
 # Get students by kelas
-curl -X GET http://localhost:5000/api/students/by-kelas/1
+curl -X GET http://localhost:5000/api/students/by-kelas/1 -H "Authorization: Bearer $TOKEN"
 
 # Get statistics by class
-curl -X GET http://localhost:5000/api/students/statistics/by-kelas
+curl -X GET http://localhost:5000/api/students/statistics/by-kelas -H "Authorization: Bearer $TOKEN"
 
 # Check NISN
-curl -X GET "http://localhost:5000/api/students/check-nisn?nisn=1234567890"
+curl -X GET "http://localhost:5000/api/students/check-nisn?nisn=0099305168" -H "Authorization: Bearer $TOKEN"
 
 # Add new student
 curl -X POST http://localhost:5000/api/students/add \

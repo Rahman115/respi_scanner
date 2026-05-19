@@ -15,7 +15,7 @@ async function verifyQR() {
     result.textContent = 'Memverifikasi...';
 
     try {
-        const response = await fetch('http://localhost:8080/api/qr/verify', {
+        const response = await fetch('http://localhost:5000/api/qr/verify', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

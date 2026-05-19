@@ -14,16 +14,16 @@ function getApiBaseUrl() {
     
     // Jika diakses dari localhost atau 127.0.0.1
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-        return `${currentProtocol}//localhost:8080/api`;
+        return `${currentProtocol}//localhost:5000/api`;
     }
     
     // Jika diakses dari IP (seperti 192.168.1.x)
     if (currentHost.match(/^192\.168\.\d+\.\d+$/)) {
-        return `${currentProtocol}//${currentHost}:8080/api`;
+        return `${currentProtocol}//${currentHost}:5000/api`;
     }
     
     // Default fallback
-    return `${currentProtocol}//${currentHost}:8080/api`;
+    return `${currentProtocol}//${currentHost}:5000/api`;
 }
 
 const API_BASE_URL = getApiBaseUrl();

@@ -371,7 +371,7 @@
 
     <!-- Chart.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script src="../js/script.js"></script>
     <script>
         // Initialize date inputs
         const today = new Date().toISOString().split('T')[0];
@@ -402,7 +402,7 @@
             document.getElementById('errorMessage').style.display = 'none';
             
             try {
-                const response = await fetch(`http://localhost:8080/api/attendance/statistics?start_date=${startDate}&end_date=${endDate}`, {
+                const response = await fetch(`http://localhost:5000/api/attendance/statistics?start_date=${startDate}&end_date=${endDate}`, {
                     headers: {
                         'Authorization': 'Bearer '+token // Ganti dengan token yang valid
                     }

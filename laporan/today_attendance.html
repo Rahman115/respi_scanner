@@ -513,7 +513,7 @@
             </div>
         </div>
     </div>
-
+<script src="../js/script.js"></script>
     <script>
         // Set current date
         const today = new Date();
@@ -540,7 +540,7 @@
             const status = document.getElementById('statusFilter').value;
             
             // Build URL with filters
-            let url = 'http://localhost:8080/api/attendance/today';
+            let url = 'http://localhost:5000/api/attendance/today';
             const params = new URLSearchParams();
             if (kelas) params.append('kelas', kelas);
             if (status) params.append('status', status);
