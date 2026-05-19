@@ -218,17 +218,23 @@ sudo truncate -s 0 /var/www/html/api/logs/api.log
 ```
 
 
-## 📄 LISENSI
+## - LISENSI
 Proyek ini dikembangkan untuk keperluan internal sekolah.
 
-## 🤝 KONTRIBUSI
+## - KONTRIBUSI
 Untuk saran atau perbaikan, silakan buat issue atau pull request.
 
-## 📞 KONTAK
+## - KONTAK
 Untuk pertanyaan lebih lanjut, hubungi pengembang aplikasi.
 
 ## NOTE
 - cek code keseluruhan
+- Aktivasi Servise
+```bash
+# Buat service file
+sudo nano /etc/systemd/system/scanner-api.service
+
+```
 
 ---
 *Dokumentasi terakhir diperbarui: 2026 februari 04*

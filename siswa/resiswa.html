@@ -1111,7 +1111,7 @@
                             <button class="btn btn-primary" onclick="downloadQR('${response.qr_image}', '${response.student.nis}')">
                                 <i class="fas fa-download"></i> Download
                             </button>
-                            <button class="btn btn-secondary" onclick="printQR('${response.qr_image}')">
+                            <button class="btn btn-secondary" onclick="printQR('${response.qr_image}', '${response.student.nama}')">
                                 <i class="fas fa-print"></i> Print
                             </button>
                         </div>
@@ -1156,7 +1156,7 @@
             return new Blob(byteArrays, { type: type });
         }
 
-        function printQR(qrImage) {
+        function printQR(qrImage,name) {
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
                 <html>
@@ -1169,6 +1169,10 @@
                 </head>
                 <body>
                     <img src="${qrImage}" alt="QR Code">
+
+                    <br>
+                    <br>
+                    <p>( ${escapeHtml(name)} )</p>
                 </body>
                 </html>
             `);
