@@ -358,7 +358,7 @@
                             <th>Izin</th>
                             <th>Sakit</th>
                             <th>Alpha</th>
-                            <th>Total Hadir</th>
+                            <th>Total Records</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -429,19 +429,19 @@
 
         function updateSummaryCards(data) {
             const summaryCards = document.getElementById('summaryCards');
-            
+            // console.log(data);
             // Calculate totals
-            let totalPresent = 0, totalIzin = 0, totalSick = 0, totalAlpha = 0;
+            let totalPresent = 0, totalIzin = 0, totalSakit = 0, totalAlpha = 0;
             data.daily_statistics.forEach(day => {
-                totalPresent += parseInt(day.present) || 0;
+                totalPresent += parseInt(day.hadir) || 0;
                 totalIzin += parseInt(day.izin) || 0;
-                totalSick += parseInt(day.sick) || 0;
+                totalSakit += parseInt(day.sakit) || 0;
                 totalAlpha += parseInt(day.alpha) || 0;
             });
-
+    
             summaryCards.innerHTML = `
                 <div class="stat-card total">
-                    <div class="stat-value">${data.total_students}</div>
+                    <div class="stat-value">${data.summary['total_absensi']}</div>
                     <div class="stat-label">Total Siswa</div>
                 </div>
                 <div class="stat-card present">
@@ -453,7 +453,7 @@
                     <div class="stat-label">Total Izin</div>
                 </div>
                 <div class="stat-card sick">
-                    <div class="stat-value">${totalSick}</div>
+                    <div class="stat-value">${totalSakit}</div>
                     <div class="stat-label">Total Sakit</div>
                 </div>
                 <div class="stat-card alpha">
@@ -464,6 +464,7 @@
         }
 
         function updateDailyTable(dailyStats) {
+            // console.log(dailyStats);
             const tbody = document.querySelector('#dailyTable tbody');
             
             if (!dailyStats || dailyStats.length === 0) {
@@ -474,11 +475,11 @@
             tbody.innerHTML = dailyStats.map(day => `
                 <tr>
                     <td>${formatDate(day.date)}</td>
-                    <td><span class="status-badge status-hadir">${day.present}</span></td>
+                    <td><span class="status-badge status-hadir">${day.hadir}</span></td>
                     <td><span class="status-badge status-izin">${day.izin}</span></td>
-                    <td><span class="status-badge status-sakit">${day.sakit || day.sick}</span></td>
+                    <td><span class="status-badge status-sakit">${day.sakit}</span></td>
                     <td><span class="status-badge status-alpha">${day.alpha}</span></td>
-                    <td><strong>${day.attended}</strong></td>
+                    <td><strong>${day.total_records}</strong></td>
                 </tr>
             `).join('');
         }
@@ -497,7 +498,7 @@
                     datasets: [
                         {
                             label: 'Hadir',
-                            data: data.daily_statistics.map(day => day.present),
+                            data: data.daily_statistics.map(day => day.hadir),
                             borderColor: '#84fab0',
                             backgroundColor: 'rgba(132, 250, 176, 0.1)',
                             tension: 0.4
@@ -511,7 +512,7 @@
                         },
                         {
                             label: 'Sakit',
-                            data: data.daily_statistics.map(day => day.sakit || day.sick),
+                            data: data.daily_statistics.map(day => day.sakit),
                             borderColor: '#f093fb',
                             backgroundColor: 'rgba(240, 147, 251, 0.1)',
                             tension: 0.4
@@ -536,14 +537,15 @@
             });
 
             // Class Chart
+            // console.log(data.daily_statistics.map(day => day.hadir));
             const classCtx = document.getElementById('classChart').getContext('2d');
             classChart = new Chart(classCtx, {
                 type: 'bar',
                 data: {
-                    labels: data.class_statistics.map(cls => `Kelas ${cls.kelas}`),
+                    labels: data.class_statistics.map(cls => `Kelas ${cls.nama_kelas}`),
                     datasets: [{
                         label: 'Jumlah Siswa Hadir',
-                        data: data.class_statistics.map(cls => cls.attended),
+                        data: data.class_statistics.map(cls => cls.total_siswa_absen),
                         backgroundColor: 'rgba(102, 126, 234, 0.5)',
                         borderColor: '#667eea',
                         borderWidth: 1

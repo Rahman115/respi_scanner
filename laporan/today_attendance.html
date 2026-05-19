@@ -585,17 +585,18 @@
                 sakit: 0,
                 alpha: 0
             };
-            
+
             data.attendance.forEach(item => {
-                if (item.status === 'Hadir') stats.hadir++;
-                else if (item.status === 'Izin') stats.izin++;
-                else if (item.status === 'Sakit') stats.sakit++;
-                else if (item.status === 'Alpha') stats.alpha++;
+                //console.log(item);
+                if (item.status === 'hadir') stats.hadir++;
+                else if (item.status === 'izin') stats.izin++;
+                else if (item.status === 'sakit') stats.sakit++;
+                else if (item.status === 'alpha') stats.alpha++;
             });
 
             summaryCards.innerHTML = `
                 <div class="stat-card total">
-                    <div class="stat-value">${data.count}</div>
+                    <div class="stat-value">${data.attended}</div>
                     <div class="stat-label">Total Absensi</div>
                 </div>
                 <div class="stat-card present">
@@ -623,7 +624,9 @@
             const attendanceCount = document.getElementById('attendanceCount');
             
             // Update count
-            attendanceCount.textContent = `${data.count} siswa`;
+            // console.log(data.attended);
+            // console.log(data);
+            attendanceCount.textContent = `${data.attended} siswa`;
             
             if (!data.attendance || data.attendance.length === 0) {
                 tbody.innerHTML = '';
@@ -643,7 +646,7 @@
                         <td><strong>${item.nama}</strong></td>
                         <td><span class="class-badge">Kelas ${item.kelas}</span></td>
                         <td><span class="status-badge ${statusClass}">${item.status}</span></td>
-                        <td class="time-cell">${waktu}</td>
+                        <td class="time-cell">${item.waktu}</td>
                         <td>${item.keterangan || '-'}</td>
                     </tr>
                 `;
