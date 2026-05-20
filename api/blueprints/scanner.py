@@ -126,8 +126,9 @@ def process_scan_nisn():
 
         nisn = str(data['nisn']).strip()
         location = data.get('location', 'Scanner NISN USB')
+        attendance_type = data.get('tipe', 'datang')  # 'datang' atau 'pulang'
 
-        logger.info(f"NISN scan received | NISN={nisn} | IP={request.remote_addr}")
+        logger.info(f"NISN scan received | NISN={nisn} | IP={request.remote_addr} | Location={location} | Type={attendance_type}")
 
         # Validate NISN format
         if not validate_nisn(nisn):
@@ -153,58 +154,139 @@ def process_scan_nisn():
 
         # Check if already attended today
         today = date.today()
-        existing = fetch_one("""
-            SELECT id FROM absensi 
-            WHERE siswa_id = %s AND tanggal = %s
-        """, (student['id'], today))
-
-        if existing:
-            return jsonify({
-                "success": False,
-                "message": f"{student['nama']} sudah absen hari ini",
-                "student": {
-                    "nis": student['nis'],
-                    "nisn": student['nisn'],
-                    "nama": student['nama']
-                }
-            }), 409
-
-        # Save attendance
         now = datetime.now()
-        result = execute("""
-            INSERT INTO absensi
-            (siswa_id, nis, tanggal, waktu, status, metode, scanner_lokasi)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (
-            student['id'],
-            student['nis'],
-            today,
-            now.time(),
-            'Hadir',
-            'scanner',
-            location
-        ), commit=True)
 
-        if not result['success']:
+        logger.info(f"Prosesing absensi untuk {student['nama']} (NISN: {student['nisn']}) dengan tipe {attendance_type}")
+        # Handle berdasarkan tipe absensi
+        if attendance_type == 'datang':
+            logger.info(f"masuk absensi datang untuk {student['nama']} (ID: {student['id']}) (DATE: {today})")
+            # Cek apakah sudah datang hari ini
+            existing_datang = fetch_one("""
+                SELECT a.id, a.waktu, k.nama_kelas FROM absensi a JOIN siswa s ON a.siswa_id = s.id JOIN kelas k ON s.kelas_id = k.id WHERE a.siswa_id = %s AND a.tanggal = %s AND a.status = 'hadir'
+            """, (student['id'], today))
+
+            logger.info(f"cek absensi datang untuk {student} -kelas: {existing_datang['nama_kelas']} existing_datang: {existing_datang}")
+            if existing_datang:
+                return jsonify({
+                    "success": False,
+                    "message": f"{student['nama']} sudah melakukan check-in hari ini pada pukul {existing_datang['waktu']}",
+                    "student": {
+                        "nis": student['nis'],
+                        "nisn": student['nisn'],
+                        "nama": student['nama'],
+                        "kelas": existing_datang['nama_kelas']
+                    }
+                }), 409
+
+            # Save attendance for DATANG (check-in)
+            result = execute("""
+                INSERT INTO absensi
+                (siswa_id, nis, tanggal, waktu, status, metode, scanner_lokasi)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                student['id'],
+                student['nis'],
+                today,
+                now.time(),
+                'hadir',  # status = 'hadir' untuk datang
+                'scanner',
+                location
+            ), commit=True)
+
+            if not result['success']:
+                return jsonify({
+                    "success": False,
+                    "message": "Gagal menyimpan absensi datang"
+                }), 500
+
+            message = f"Check-in berhasil untuk {student['nama']}"
+            
+        elif attendance_type == 'pulang':
+            # Cek apakah sudah datang hari ini (harus datang dulu sebelum pulang)
+            sudah_datang = fetch_one("""
+                SELECT id, waktu FROM absensi 
+                WHERE siswa_id = %s AND tanggal = %s AND status = 'hadir'
+            """, (student['id'], today))
+
+            logger.info(f"cek absensi pulang untuk {student['nama']} - sudah_datang: {sudah_datang}")
+
+            if not sudah_datang:
+                return jsonify({
+                    "success": False,
+                    "message": f"{student['nama']} belum melakukan check-in hari ini. Silakan check-in terlebih dahulu.",
+                    "student": {
+                        "nis": student['nis'],
+                        "nisn": student['nisn'],
+                        "nama": student['nama'],
+                        "kelas": student.get('kelas', '-')
+                    }
+                }), 400
+
+            # Cek apakah sudah pulang hari ini
+            existing_pulang = fetch_one("""
+                SELECT id FROM absensi 
+                WHERE siswa_id = %s AND tanggal = %s AND status = 'pulang'
+            """, (student['id'], today))
+
+            if existing_pulang:
+                return jsonify({
+                    "success": False,
+                    "message": f"{student['nama']} sudah melakukan check-out hari ini",
+                    "student": {
+                        "nis": student['nis'],
+                        "nisn": student['nisn'],
+                        "nama": student['nama'],
+                        "kelas": student.get('kelas', '-')
+                    }
+                }), 409
+
+            # Save attendance for PULANG (check-out)
+            result = execute("""
+                INSERT INTO absensi
+                (siswa_id, nis, tanggal, waktu, status, metode, scanner_lokasi)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                student['id'],
+                student['nis'],
+                today,
+                now.time(),
+                'pulang',  # status = 'pulang' untuk check-out
+                'scanner',
+                location
+            ), commit=True)
+
+            if not result['success']:
+                return jsonify({
+                    "success": False,
+                    "message": "Gagal menyimpan absensi pulang"
+                }), 500
+
+            message = f"Check-out berhasil untuk {student['nama']}"
+            
+        else:
             return jsonify({
                 "success": False,
-                "message": "Gagal menyimpan absensi"
-            }), 500
+                "message": f"Tipe absensi tidak valid: {attendance_type}. Gunakan 'datang' atau 'pulang'"
+            }), 400
 
+        # Return success response
         return jsonify({
             "success": True,
-            "message": "Absensi NISN berhasil",
+            "message": message,
             "student": {
                 "nis": student['nis'],
                 "nisn": student['nisn'],
                 "nama": student['nama'],
-                "gender": student['gender']
+                "gender": student['gender'],
+                "kelas": student.get('kelas', '-')
             },
             "attendance": {
                 "id": result.get('last_id'),
                 "date": str(today),
                 "time": now.strftime("%H:%M:%S"),
-                "method": "Scanner"
+                "method": "Scanner",
+                "location": location,
+                "type": attendance_type
             }
         })
 
